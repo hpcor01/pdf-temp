@@ -25,7 +25,7 @@ export default function Header({
   } = useKanban();
   const buttons = useLanguageKey("buttons");
   const toggleButtonLabels = useLanguageKey(
-    "buttons.button-toggle-selected-all"
+    "buttons.button-toggle-selected-all",
   );
 
   const removeBgId = useId();
@@ -36,7 +36,7 @@ export default function Header({
   const [isRemoveBgChecked, setIsRemoveBgChecked] = useState(true);
   const [toastOpen, setToastOpen] = useState(false);
   const [toastVariant, setToastVariant] = useState<"default" | "destructive">(
-    "default"
+    "default",
   );
   const [toastTitle, setToastTitle] = useState("");
   const [toastDescription, setToastDescription] = useState("");
@@ -62,7 +62,7 @@ export default function Header({
   const showToast = (
     variant: "default" | "destructive",
     title: string,
-    description: string
+    description: string,
   ) => {
     setToastVariant(variant);
     setToastTitle(title);
@@ -92,7 +92,7 @@ export default function Header({
       showToast(
         "default",
         "Processando...",
-        "Seu arquivo está sendo gerado, por favor aguarde."
+        "Seu arquivo está sendo gerado, por favor aguarde.",
       );
 
       // Get selected columns
@@ -103,7 +103,7 @@ export default function Header({
         showToast(
           "destructive",
           "Nenhuma coluna selecionada",
-          "Selecione pelo menos uma coluna para salvar."
+          "Selecione pelo menos uma coluna para salvar.",
         );
         return;
       }
@@ -130,7 +130,7 @@ export default function Header({
         showToast(
           "default",
           "PDFs gerados",
-          `${selectedCols.length} PDF(s) foram salvos com fundo removido.`
+          `${selectedCols.length} PDF(s) foram salvos com fundo removido.`,
         );
       }
       // Case 2: Convert to PDF only (no background removal)
@@ -140,7 +140,7 @@ export default function Header({
         showToast(
           "default",
           "PDF gerado",
-          `${selectedColumnsCount} PDF(s) foram salvos.`
+          `${selectedColumnsCount} PDF(s) foram salvos.`,
         );
       }
       // Case 3: Remove background only (no PDF conversion)
@@ -162,7 +162,7 @@ export default function Header({
         showToast(
           "default",
           "Imagens baixadas",
-          `${downloadCount} imagem(s) foram baixadas com fundo removido.`
+          `${downloadCount} imagem(s) foram baixadas com fundo removido.`,
         );
       }
       // Case 4: No processing (original behavior)
@@ -171,7 +171,7 @@ export default function Header({
         showToast(
           "default",
           "Download iniciado",
-          `Baixando imagens individuais...`
+          `Baixando imagens individuais...`,
         );
       }
     } catch (error: unknown) {
