@@ -26,7 +26,7 @@ export default function Header({
   } = useKanban();
   const buttons = useLanguageKey("buttons");
   const toggleButtonLabels = useLanguageKey(
-    "buttons.button-toggle-selected-all"
+    "buttons.button-toggle-selected-all",
   );
 
   const removeBgId = useId();
@@ -37,13 +37,14 @@ export default function Header({
   const [isRemoveBgChecked, setIsRemoveBgChecked] = useState(true);
   const [toastOpen, setToastOpen] = useState(false);
   const [toastVariant, setToastVariant] = useState<"default" | "destructive">(
-    "default"
+    "default",
   );
   const [toastTitle, setToastTitle] = useState("");
   const [toastDescription, setToastDescription] = useState("");
+  const [isProcessing, setIsProcessing] = useState(false);
   const selectedColumnsCount =
     Object.values(selectedColumns).filter(Boolean).length;
-  const isSaveButtonEnabled = selectedColumnsCount > 0;
+  const isSaveButtonEnabled = selectedColumnsCount > 0 && !isProcessing;
 
   const handleToggleAllChange = (checked: boolean) => {
     toggleAllColumnsSelection(checked);
@@ -62,7 +63,7 @@ export default function Header({
   const showToast = (
     variant: "default" | "destructive",
     title: string,
-    description: string
+    description: string,
   ) => {
     setToastVariant(variant);
     setToastTitle(title);
@@ -86,14 +87,24 @@ export default function Header({
 
   const handleSaveClick = async () => {
     try {
+      setIsProcessing(true);
+
+      // Show processing toast
+      showToast(
+        "default",
+        "Processando...",
+        "Seu arquivo está sendo gerado, por favor aguarde.",
+      );
+
       // Get selected columns
       const selectedCols = columns.filter((col) => selectedColumns[col.id]);
 
       if (selectedCols.length === 0) {
+        setIsProcessing(false);
         showToast(
           "destructive",
           "Nenhuma coluna selecionada",
-          "Selecione pelo menos uma coluna para salvar."
+          "Selecione pelo menos uma coluna para salvar.",
         );
         return;
       }
@@ -116,19 +127,21 @@ export default function Header({
           await generatePDFForColumns([col], { [col.id]: true });
         }
 
+        setIsProcessing(false);
         showToast(
           "default",
           "PDFs gerados",
-          `${selectedCols.length} PDF(s) foram salvos com fundo removido.`
+          `${selectedCols.length} PDF(s) foram salvos com fundo removido.`,
         );
       }
       // Case 2: Convert to PDF only (no background removal)
       else if (!isRemoveBgChecked && isConvertToPDFChecked) {
         await generatePDFForColumns(columns, selectedColumns);
+        setIsProcessing(false);
         showToast(
           "default",
           "PDF gerado",
-          `${selectedColumnsCount} PDF(s) foram salvos.`
+          `${selectedColumnsCount} PDF(s) foram salvos.`,
         );
       }
       // Case 3: Remove background only (no PDF conversion)
@@ -146,21 +159,24 @@ export default function Header({
           }
         }
 
+        setIsProcessing(false);
         showToast(
           "default",
           "Imagens baixadas",
-          `${downloadCount} imagem(s) foram baixadas com fundo removido.`
+          `${downloadCount} imagem(s) foram baixadas com fundo removido.`,
         );
       }
       // Case 4: No processing (original behavior)
       else {
+        setIsProcessing(false);
         showToast(
           "default",
           "Download iniciado",
-          `Baixando imagens individuais...`
+          `Baixando imagens individuais...`,
         );
       }
     } catch (error: unknown) {
+      setIsProcessing(false);
       if (error instanceof Error && error?.name === "AbortError") {
         showToast("default", "Cancelado", "Operação de salvamento cancelada.");
       } else {
@@ -208,6 +224,7 @@ export default function Header({
                 checked={isRemoveBgChecked}
                 onCheckedChange={handleRemoveBgChange}
                 className="cursor-pointer"
+                disabled={isProcessing}
               />
               {buttons["button-remove-background"]}
             </Label>
@@ -220,6 +237,7 @@ export default function Header({
                 checked={isConvertToPDFChecked}
                 onCheckedChange={handleConvertToPDFChange}
                 className="cursor-pointer"
+                disabled={isProcessing}
               />
               {buttons["button-convert-to-pdf"]}
             </Label>
@@ -231,8 +249,10 @@ export default function Header({
               disabled={!isSaveButtonEnabled}
               onClick={handleSaveClick}
             >
-              {buttons["button-save"]}{" "}
-              {selectedColumnsCount > 0 ? `(${selectedColumnsCount})` : ""}
+              {isProcessing ? "Processando..." : buttons["button-save"]}
+              {selectedColumnsCount > 0 && !isProcessing
+                ? ` (${selectedColumnsCount})`
+                : ""}
             </Button>
           </div>
         </section>

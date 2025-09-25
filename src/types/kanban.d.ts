@@ -29,7 +29,7 @@ export interface KanbanContextType {
     sourceColumnId: string,
     destColumnId: string,
     imageId: string,
-    destIndex: number
+    destIndex: number,
   ) => void;
   moveColumn: (sourceIndex: number, destIndex: number) => void;
   toggleColumnSelection: (columnId: string, selected: boolean) => void;
@@ -37,6 +37,6 @@ export interface KanbanContextType {
   areAllColumnsSelected: boolean;
   saveSelectedColumns: (
     convertToPDF: boolean,
-    savePath: string
+    savePath: string,
   ) => Promise<void>;
 }
