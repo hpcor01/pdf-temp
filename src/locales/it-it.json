@@ -1,0 +1,58 @@
+{
+  "languages-selected": {
+    "label": "Seleziona lingue",
+    "locales": {
+      "pt-br": {
+        "label": "Portoghese brasiliano",
+        "flag": "pt-BR",
+        "default-selected": true
+      },
+      "en-en": {
+        "label": "Inglese",
+        "flag": "en-EN"
+      },
+      "fr-fr": {
+        "label": "Francese",
+        "flag": "fr-FR"
+      },
+      "it-it": {
+        "label": "Italiano",
+        "flag": "it-IT"
+      },
+      "es-es": {
+        "label": "Spagnolo",
+        "flag": "es-ES"
+      },
+      "el-gr": {
+        "label": "Greco",
+        "flag": "el-GR"
+      },
+      "he-il": {
+        "label": "Ebraico",
+        "flag": "he-IL"
+      }
+    }
+  },
+  "buttons": {
+    "toggle-button-theme": {
+      "label": "Cambia il tema chiaro o scuro",
+      "theme": {
+        "light": "Chiaro",
+        "dark": "Scuro",
+        "system": "Sistema"
+      }
+    },
+    "button-save": "Salva",
+    "button-convert-to-pdf": "Converti in PDF",
+    "button-remove-background": "Rimuovi sfondo",
+    "button-toggle-selected-all": {
+      "active": "Seleziona tutto",
+      "disabled": "Deseleziona tutto"
+    }
+  },
+  "combobox": {
+    "placeholder": "Seleziona lingua...",
+    "search-placeholder": "Cerca lingua...",
+    "no-language-found": "Nessuna lingua trovata."
+  }
+}

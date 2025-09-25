@@ -1,0 +1,58 @@
+{
+  "languages-selected": {
+    "label": "בחר שפות",
+    "locales": {
+      "pt-br": {
+        "label": "פורטוגזית ברזילאית",
+        "flag": "pt-BR",
+        "default-selected": true
+      },
+      "en-en": {
+        "label": "אנגלית",
+        "flag": "en-EN"
+      },
+      "fr-fr": {
+        "label": "צרפתית",
+        "flag": "fr-FR"
+      },
+      "it-it": {
+        "label": "איטלקית",
+        "flag": "it-IT"
+      },
+      "es-es": {
+        "label": "ספרדית",
+        "flag": "es-ES"
+      },
+      "el-gr": {
+        "label": "יוונית",
+        "flag": "el-GR"
+      },
+      "he-il": {
+        "label": "עברית",
+        "flag": "he-IL"
+      }
+    }
+  },
+  "buttons": {
+    "toggle-button-theme": {
+      "label": "החלפת צבע הנושא לאור או כהה",
+      "theme": {
+        "light": "בהיר",
+        "dark": "כהה",
+        "system": "מערכת"
+      }
+    },
+    "button-save": "שמור",
+    "button-convert-to-pdf": "המר ל-PDF",
+    "button-remove-background": "הסר רקע",
+    "button-toggle-selected-all": {
+      "active": "בחר הכל",
+      "disabled": "הסר סימון מהכל"
+    }
+  },
+  "combobox": {
+    "placeholder": "בחר שפה.",
+    "search-placeholder": "חפש שפה.",
+    "no-language-found": "לא נמצאה שפה."
+  }
+}

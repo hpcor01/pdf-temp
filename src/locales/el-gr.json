@@ -1,0 +1,58 @@
+{
+  "languages-selected": {
+    "label": "Επιλογή γλωσσών",
+    "locales": {
+      "pt-br": {
+        "label": "Βραζιλιάνικη Πορτογαλικά",
+        "flag": "pt-BR",
+        "default-selected": true
+      },
+      "en-en": {
+        "label": "Αγγλικά",
+        "flag": "en-EN"
+      },
+      "fr-fr": {
+        "label": "Γαλλικά",
+        "flag": "fr-FR"
+      },
+      "it-it": {
+        "label": "Ιταλικά",
+        "flag": "it-IT"
+      },
+      "es-es": {
+        "label": "Ισπανικά",
+        "flag": "es-ES"
+      },
+      "el-gr": {
+        "label": "Ελληνικά",
+        "flag": "el-GR"
+      },
+      "he-il": {
+        "label": "Εβραϊκά",
+        "flag": "he-IL"
+      }
+    }
+  },
+  "buttons": {
+    "toggle-button-theme": {
+      "label": "Αλλαγή θέματος σε ανοιχτό ή σκούρο",
+      "theme": {
+        "light": "Ανοιχτό",
+        "dark": "Σκούρο",
+        "system": "Σύστημα"
+      }
+    },
+    "button-save": "Αποθήκευση",
+    "button-convert-to-pdf": "Μετατροπή σε PDF",
+    "button-remove-background": "Αφαίρεση φόντου",
+    "button-toggle-selected-all": {
+      "active": "Επιλογή όλων",
+      "disabled": "Αποεπιλογή όλων"
+    }
+  },
+  "combobox": {
+    "placeholder": "Επιλέξτε γλώσσα...",
+    "search-placeholder": "Αναζήτηση γλώσσας...",
+    "no-language-found": "Δεν βρέθηκε καμία γλώσσα."
+  }
+}
