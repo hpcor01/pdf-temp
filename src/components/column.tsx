@@ -1,8 +1,9 @@
 import { Droppable } from "@hello-pangea/dnd";
 import { Pencil, Trash2 } from "lucide-react";
-import { type DragEvent, useState } from "react";
+import { type DragEvent, useEffect, useState } from "react";
 import { ImageCard } from "@/components/image-card";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { useKanban } from "@/providers/kanban-provider";
 import type { ColumnProps } from "@/types/column";
@@ -14,10 +15,21 @@ export function ColumnComponent({ column, index }: ColumnProps) {
     removeImage,
     rotateImage,
     addImagesToColumn,
+    selectedColumns,
+    toggleColumnSelection,
+    areAllColumnsSelected,
   } = useKanban();
   const [isEditing, setIsEditing] = useState(false);
   const [title, setTitle] = useState(column.title);
   const [isDragOver, setIsDragOver] = useState(false);
+  const isSelected = selectedColumns[column.id] || false;
+
+  // Sync individual column selection with "select all" state
+  useEffect(() => {
+    if (areAllColumnsSelected && !isSelected) {
+      toggleColumnSelection(column.id, true);
+    }
+  }, [areAllColumnsSelected, isSelected, column.id, toggleColumnSelection]);
 
   const handleSaveTitle = () => {
     if (title.trim()) {
@@ -86,6 +98,10 @@ export function ColumnComponent({ column, index }: ColumnProps) {
     }
   };
 
+  const handleCheckboxChange = (checked: boolean) => {
+    toggleColumnSelection(column.id, checked);
+  };
+
   return (
     <Droppable droppableId={column.id}>
       {(provided) => (
@@ -105,6 +121,11 @@ export function ColumnComponent({ column, index }: ColumnProps) {
           <div className="p-3 border-b border-border">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
+                <Checkbox
+                  checked={isSelected}
+                  onCheckedChange={handleCheckboxChange}
+                  className="cursor-pointer"
+                />
                 {isEditing ? (
                   <Input
                     value={title}

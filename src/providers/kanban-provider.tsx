@@ -11,6 +11,7 @@ import type { Column, ImageItem } from "@/types/kanban";
 
 interface KanbanContextType {
   columns: Column[];
+  selectedColumns: Record<string, boolean>;
   addColumn: (title: string) => void;
   removeColumn: (id: string) => void;
   renameColumn: (id: string, title: string) => void;
@@ -21,9 +22,12 @@ interface KanbanContextType {
     sourceColumnId: string,
     destColumnId: string,
     imageId: string,
-    destIndex: number,
+    destIndex: number
   ) => void;
   moveColumn: (sourceIndex: number, destIndex: number) => void;
+  toggleColumnSelection: (columnId: string, selected: boolean) => void;
+  toggleAllColumnsSelection: (selected: boolean) => void;
+  areAllColumnsSelected: boolean;
 }
 
 const KanbanContext = createContext<KanbanContextType | undefined>(undefined);
@@ -37,6 +41,12 @@ export function KanbanProvider({ children }: { children: ReactNode }) {
       save: false,
     },
   ]);
+  const [selectedColumns, setSelectedColumns] = useState<
+    Record<string, boolean>
+  >({});
+
+  const areAllColumnsSelected =
+    columns.length > 0 && columns.every((column) => selectedColumns[column.id]);
 
   const addColumn = useCallback(
     (title: string) => {
@@ -48,18 +58,24 @@ export function KanbanProvider({ children }: { children: ReactNode }) {
       };
       setColumns((prev) => [...prev, newColumn]);
     },
-    [columns.length],
+    [columns.length]
   );
 
   const removeColumn = useCallback((id: string) => {
     // Prevent removing the first column
     if (id === "column-1") return;
     setColumns((prev) => prev.filter((col) => col.id !== id));
+    // Also remove from selected columns
+    setSelectedColumns((prev) => {
+      const newSelected = { ...prev };
+      delete newSelected[id];
+      return newSelected;
+    });
   }, []);
 
   const renameColumn = useCallback((id: string, title: string) => {
     setColumns((prev) =>
-      prev.map((col) => (col.id === id ? { ...col, title } : col)),
+      prev.map((col) => (col.id === id ? { ...col, title } : col))
     );
   }, []);
 
@@ -69,11 +85,11 @@ export function KanbanProvider({ children }: { children: ReactNode }) {
         prev.map((col) =>
           col.id === columnId
             ? { ...col, items: [...col.items, ...images] }
-            : col,
-        ),
+            : col
+        )
       );
     },
-    [],
+    []
   );
 
   const removeImage = useCallback((columnId: string, imageId: string) => {
@@ -81,8 +97,8 @@ export function KanbanProvider({ children }: { children: ReactNode }) {
       prev.map((col) =>
         col.id === columnId
           ? { ...col, items: col.items.filter((img) => img.id !== imageId) }
-          : col,
-      ),
+          : col
+      )
     );
   }, []);
 
@@ -94,14 +110,14 @@ export function KanbanProvider({ children }: { children: ReactNode }) {
             ? {
                 ...col,
                 items: col.items.map((img) =>
-                  img.id === imageId ? { ...img, rotation } : img,
+                  img.id === imageId ? { ...img, rotation } : img
                 ),
               }
-            : col,
-        ),
+            : col
+        )
       );
     },
-    [],
+    []
   );
 
   const moveImage = useCallback(
@@ -109,15 +125,15 @@ export function KanbanProvider({ children }: { children: ReactNode }) {
       sourceColumnId: string,
       destColumnId: string,
       imageId: string,
-      destIndex: number,
+      destIndex: number
     ) => {
       setColumns((prev) => {
         const newColumns = [...prev];
         const sourceColumnIndex = newColumns.findIndex(
-          (col) => col.id === sourceColumnId,
+          (col) => col.id === sourceColumnId
         );
         const destColumnIndex = newColumns.findIndex(
-          (col) => col.id === destColumnId,
+          (col) => col.id === destColumnId
         );
 
         if (sourceColumnIndex === -1 || destColumnIndex === -1) return prev;
@@ -126,7 +142,7 @@ export function KanbanProvider({ children }: { children: ReactNode }) {
         const destColumn = newColumns[destColumnIndex];
 
         const imageIndex = sourceColumn.items.findIndex(
-          (img) => img.id === imageId,
+          (img) => img.id === imageId
         );
 
         if (imageIndex === -1) return prev;
@@ -144,7 +160,7 @@ export function KanbanProvider({ children }: { children: ReactNode }) {
         return newColumns;
       });
     },
-    [],
+    []
   );
 
   const moveColumn = useCallback((sourceIndex: number, destIndex: number) => {
@@ -156,10 +172,32 @@ export function KanbanProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
+  const toggleColumnSelection = useCallback(
+    (columnId: string, selected: boolean) => {
+      setSelectedColumns((prev) => ({
+        ...prev,
+        [columnId]: selected,
+      }));
+    },
+    []
+  );
+
+  const toggleAllColumnsSelection = useCallback(
+    (selected: boolean) => {
+      const newSelected: Record<string, boolean> = {};
+      columns.forEach((column) => {
+        newSelected[column.id] = selected;
+      });
+      setSelectedColumns(newSelected);
+    },
+    [columns]
+  );
+
   return (
     <KanbanContext.Provider
       value={{
         columns,
+        selectedColumns,
         addColumn,
         removeColumn,
         renameColumn,
@@ -168,6 +206,9 @@ export function KanbanProvider({ children }: { children: ReactNode }) {
         rotateImage,
         moveImage,
         moveColumn,
+        toggleColumnSelection,
+        toggleAllColumnsSelection,
+        areAllColumnsSelected,
       }}
     >
       {children}

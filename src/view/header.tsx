@@ -1,36 +1,31 @@
 "use client";
 
-import { useEffect, useId, useState } from "react";
+import { useId } from "react";
 import ComboboxChangeLanguage from "@/components/combobox-change-language";
 import { ModeToggle } from "@/components/mode-toggle";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { useLanguageKey } from "@/hooks/use-i18n";
+import { useKanban } from "@/providers/kanban-provider";
 import type { HeaderProps } from "@/types/header";
 
 export default function Header({
-  areAllColumnsSaved,
   onToggleAllChange,
   toggleAllColumnsSave,
 }: HeaderProps) {
+  const { toggleAllColumnsSelection, areAllColumnsSelected } = useKanban();
   const buttons = useLanguageKey("buttons");
   const toggleButtonLabels = useLanguageKey(
-    "buttons.button-toggle-selected-all",
+    "buttons.button-toggle-selected-all"
   );
 
   const removeBgId = useId();
   const convertToPDF = useId();
   const toggleAllColumns = useId();
 
-  const [isToggleAllChecked, setIsToggleAllChecked] = useState(false);
-
-  useEffect(() => {
-    setIsToggleAllChecked(areAllColumnsSaved ?? false);
-  }, [areAllColumnsSaved]);
-
   const handleToggleAllChange = (checked: boolean) => {
-    setIsToggleAllChecked(checked);
+    toggleAllColumnsSelection(checked);
     onToggleAllChange?.(checked);
     toggleAllColumnsSave?.(checked);
   };
@@ -48,12 +43,12 @@ export default function Header({
             <Checkbox
               id={toggleAllColumns}
               className="cursor-pointer"
-              checked={isToggleAllChecked}
+              checked={areAllColumnsSelected}
               onCheckedChange={(checked) =>
                 handleToggleAllChange(checked as boolean)
               }
             />
-            {isToggleAllChecked
+            {areAllColumnsSelected
               ? toggleButtonLabels.disabled
               : toggleButtonLabels.active}
           </Label>
