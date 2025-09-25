@@ -9,8 +9,10 @@ import { Label } from "@/components/ui/label";
 import { Toast } from "@/components/ui/toast";
 import { useLanguageKey } from "@/hooks/use-i18n";
 import { generatePDFForColumns } from "@/lib/pdf";
+import { removeBackgroundBatch } from "@/lib/rem-bg";
 import { useKanban } from "@/providers/kanban-provider";
 import type { HeaderProps } from "@/types/header";
+import type { Column } from "@/types/kanban";
 
 export default function Header({
   onToggleAllChange,
@@ -32,6 +34,7 @@ export default function Header({
   const toggleAllColumns = useId();
 
   const [isConvertToPDFChecked, setIsConvertToPDFChecked] = useState(true);
+  const [isRemoveBgChecked, setIsRemoveBgChecked] = useState(true);
   const [toastOpen, setToastOpen] = useState(false);
   const [toastVariant, setToastVariant] = useState<"default" | "destructive">(
     "default"
@@ -52,6 +55,10 @@ export default function Header({
     setIsConvertToPDFChecked(checked);
   };
 
+  const handleRemoveBgChange = (checked: boolean) => {
+    setIsRemoveBgChecked(checked);
+  };
+
   const showToast = (
     variant: "default" | "destructive",
     title: string,
@@ -68,16 +75,85 @@ export default function Header({
     }, 5000);
   };
 
+  const triggerDownload = (url: string, filename: string) => {
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const handleSaveClick = async () => {
     try {
-      if (isConvertToPDFChecked) {
+      // Get selected columns
+      const selectedCols = columns.filter((col) => selectedColumns[col.id]);
+
+      if (selectedCols.length === 0) {
+        showToast(
+          "destructive",
+          "Nenhuma coluna selecionada",
+          "Selecione pelo menos uma coluna para salvar."
+        );
+        return;
+      }
+
+      // Case 1: Remove background + Convert to PDF
+      if (isRemoveBgChecked && isConvertToPDFChecked) {
+        // Process all images to remove background
+        const processedColumns: Column[] = [];
+
+        for (const col of selectedCols) {
+          const processedItems = await removeBackgroundBatch(col.items);
+          processedColumns.push({
+            ...col,
+            items: processedItems,
+          });
+        }
+
+        // Generate PDFs with processed images
+        for (const col of processedColumns) {
+          await generatePDFForColumns([col], { [col.id]: true });
+        }
+
+        showToast(
+          "default",
+          "PDFs gerados",
+          `${selectedCols.length} PDF(s) foram salvos com fundo removido.`
+        );
+      }
+      // Case 2: Convert to PDF only (no background removal)
+      else if (!isRemoveBgChecked && isConvertToPDFChecked) {
         await generatePDFForColumns(columns, selectedColumns);
         showToast(
           "default",
           "PDF gerado",
           `${selectedColumnsCount} PDF(s) foram salvos.`
         );
-      } else {
+      }
+      // Case 3: Remove background only (no PDF conversion)
+      else if (isRemoveBgChecked && !isConvertToPDFChecked) {
+        // Process all images and download individually
+        let downloadCount = 0;
+
+        for (const col of selectedCols) {
+          const processedItems = await removeBackgroundBatch(col.items);
+
+          // Download each processed image
+          for (const item of processedItems) {
+            triggerDownload(item.src, item.fileName);
+            downloadCount++;
+          }
+        }
+
+        showToast(
+          "default",
+          "Imagens baixadas",
+          `${downloadCount} imagem(s) foram baixadas com fundo removido.`
+        );
+      }
+      // Case 4: No processing (original behavior)
+      else {
         showToast(
           "default",
           "Download iniciado",
@@ -88,7 +164,7 @@ export default function Header({
       if (error instanceof Error && error?.name === "AbortError") {
         showToast("default", "Cancelado", "Operação de salvamento cancelada.");
       } else {
-        showToast("destructive", "Erro", "Falha ao gerar os PDFs.");
+        showToast("destructive", "Erro", "Falha ao processar as imagens.");
       }
     }
   };
@@ -129,7 +205,8 @@ export default function Header({
             <Label htmlFor={removeBgId} className="cursor-pointer py-2">
               <Checkbox
                 id={removeBgId}
-                defaultChecked
+                checked={isRemoveBgChecked}
+                onCheckedChange={handleRemoveBgChange}
                 className="cursor-pointer"
               />
               {buttons["button-remove-background"]}
