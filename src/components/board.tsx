@@ -1,8 +1,32 @@
 import { DragDropContext, type DropResult } from "@hello-pangea/dnd";
+import dynamic from "next/dynamic";
 import { useCallback } from "react";
 import { useKanban } from "@/providers/kanban-provider";
+import type { ColumnProps } from "@/types/column";
 import { BtnCreateColumn } from "./btn-create-column";
-import { ColumnComponent } from "./column";
+
+// Dynamically import ColumnComponent for code splitting
+const ColumnComponent = dynamic<ColumnProps>(
+  () => import("./column").then((mod) => mod.ColumnComponent),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex flex-col w-64 min-w-[16rem] rounded-lg shadow bg-card animate-pulse">
+        <div className="p-3 border-b border-border">
+          <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+        </div>
+        <div className="p-2 space-y-2">
+          {[...Array(3)].map((_, i) => (
+            <div
+              key={`loading-skeleton-${Date.now()}-${i}`}
+              className="h-32 bg-gray-200 dark:bg-gray-700 rounded"
+            ></div>
+          ))}
+        </div>
+      </div>
+    ),
+  }
+);
 
 export function Board() {
   const { columns, moveImage, addColumn } = useKanban();
@@ -30,7 +54,7 @@ export function Board() {
           source.droppableId,
           destination.droppableId,
           draggableId,
-          destination.index,
+          destination.index
         );
       } else {
         // Different column
@@ -38,11 +62,11 @@ export function Board() {
           source.droppableId,
           destination.droppableId,
           draggableId,
-          destination.index,
+          destination.index
         );
       }
     },
-    [moveImage],
+    [moveImage]
   );
 
   const handleAddColumn = (title?: string) => {

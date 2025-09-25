@@ -21,7 +21,9 @@ export const metadata: Metadata = {
   title: "Editor de Imagem | Archí",
   description:
     "Editor de Imagem | Archí é um poderoso editor de imagens estilo KanBan onde você pode organizar suas imagens de forma simples e intuitiva, remover fundo e converter para PDF.",
-  icons: "/assets/icon-editor-de-imagem-archi.png",
+  icons: {
+    icon: "/assets/icon-editor-de-imagem-archi.png",
+  },
 };
 
 export default function RootLayout({
@@ -31,7 +33,19 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR" suppressHydrationWarning>
-      <head />
+      <head>
+        <link rel="preconnect" href="https://api.remove.bg" />
+        <link
+          rel="preconnect"
+          href="https://axvaplbwrlcl.compat.objectstorage.sa-vinhedo-1.oraclecloud.com"
+        />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

@@ -68,7 +68,7 @@ export function ColumnComponent({ column, index }: ColumnProps) {
       if (/\.(jpe?g|png|gif|webp|avif|svg)(\?|$)/i.test(url)) {
         const fileName =
           decodeURIComponent(
-            new URL(url).pathname.split("/").pop() || "image",
+            new URL(url).pathname.split("/").pop() || "image"
           ) || "image";
         const newImage = {
           id: crypto.randomUUID(),
