@@ -1,6 +1,6 @@
 import { Draggable } from "@hello-pangea/dnd";
-import { Info, RotateCw, X } from "lucide-react";
-import { useState } from "react";
+import { RotateCw, X } from "lucide-react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import type { ImageCardProps } from "@/types/image-card";
@@ -12,15 +12,9 @@ export function ImageCard({
   onRemove,
   onRotate,
 }: ImageCardProps) {
-  const [showModal, setShowModal] = useState<boolean>(false);
-
   const handleRotate = (): void => {
     const newRotation = (item.rotation + 90) % 360;
     onRotate(columnId, item.id, newRotation);
-  };
-
-  const handleImageError = (_e: React.SyntheticEvent<HTMLImageElement>) => {
-    console.error("Error loading image:", item.src);
   };
 
   return (
@@ -65,59 +59,26 @@ export function ImageCard({
               >
                 <RotateCw className="w-4 h-4" />
               </Button>
-
-              <Button
-                type="button"
-                onClick={() => setShowModal(true)}
-                className="
-                  p-2 rounded-full cursor-pointer bg-white/90 dark:bg-gray-800/90
-                  text-gray-900 dark:text-gray-100 hover:bg-green-500 hover:text-white
-                  transition-all duration-200 shadow-md
-                "
-                aria-label="Inspecionar imagem"
-              >
-                <Info className="w-4 h-4" />
-              </Button>
             </div>
 
             <CardContent className="p-0">
-              <img
+              <Image
                 src={item.src}
                 alt={item.fileName}
-                onError={handleImageError}
-                style={{ transform: `rotate(${item.rotation}deg)` }}
+                width={0}
+                height={0}
+                sizes="100vw"
+                style={{
+                  transform: `rotate(${item.rotation}deg)`,
+                  width: "100%",
+                  height: "12rem",
+                  objectFit: "cover",
+                }}
                 className="
-                  w-full h-48 object-cover
                   transition-transform duration-500 ease-in-out
                 "
               />
             </CardContent>
-
-            {/* We'll implement the ImageInfoModal later if needed */}
-            {showModal && (
-              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                <div className="bg-white dark:bg-gray-800 p-4 rounded-lg max-w-md w-full">
-                  <h3 className="text-lg font-semibold mb-2">
-                    {item.fileName}
-                  </h3>
-                  <img
-                    src={item.src}
-                    alt={item.fileName}
-                    className="w-full h-auto max-h-96 object-contain"
-                  />
-                  <div className="mt-2 text-sm text-gray-600 dark:text-gray-300">
-                    <p>Rotation: {item.rotation}°</p>
-                    {item.size && <p>Size: {item.size} bytes</p>}
-                  </div>
-                  <Button
-                    onClick={() => setShowModal(false)}
-                    className="mt-4 w-full"
-                  >
-                    Close
-                  </Button>
-                </div>
-              </div>
-            )}
           </Card>
         </div>
       )}

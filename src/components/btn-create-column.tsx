@@ -4,8 +4,7 @@ import type { BtnCreateColumnProps } from "@/types/buttons";
 
 export function BtnCreateColumn({ onClick }: BtnCreateColumnProps) {
   const handleClick = () => {
-    const title = prompt("Nome da nova coluna:");
-    onClick(title || undefined);
+    onClick(undefined);
   };
 
   return (

@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  images: {
+    domains: ["axvaplbwrlcl.compat.objectstorage.sa-vinhedo-1.oraclecloud.com"],
+  },
 };
 
 export default nextConfig;

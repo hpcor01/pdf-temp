@@ -65,7 +65,7 @@ export function ColumnComponent({ column, index }: ColumnProps) {
                   variant="ghost"
                   size="sm"
                   onClick={() => setIsEditing(true)}
-                  className="h-7 w-7 p-0"
+                  className="h-7 w-7 p-0 cursor-pointer"
                   aria-label="Editar coluna"
                 >
                   <Pencil className="w-4 h-4" />
@@ -75,7 +75,7 @@ export function ColumnComponent({ column, index }: ColumnProps) {
                     variant="ghost"
                     size="sm"
                     onClick={handleRemoveColumn}
-                    className="h-7 w-7 p-0 text-red-500 hover:text-red-700"
+                    className="h-7 w-7 p-0 text-red-500 hover:text-red-700 cursor-pointer"
                     aria-label="Remover coluna"
                   >
                     <Trash2 className="w-4 h-4" />
