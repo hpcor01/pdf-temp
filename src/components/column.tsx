@@ -1,21 +1,23 @@
 import { Droppable } from "@hello-pangea/dnd";
 import { Pencil, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { type DragEvent, useState } from "react";
 import { ImageCard } from "@/components/image-card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useKanban } from "@/providers/kanban-provider";
-import type { Column as ColumnType } from "@/types/kanban";
-
-interface ColumnProps {
-  column: ColumnType;
-  index: number;
-}
+import type { ColumnProps } from "@/types/column";
 
 export function ColumnComponent({ column, index }: ColumnProps) {
-  const { removeColumn, renameColumn, removeImage, rotateImage } = useKanban();
+  const {
+    removeColumn,
+    renameColumn,
+    removeImage,
+    rotateImage,
+    addImagesToColumn,
+  } = useKanban();
   const [isEditing, setIsEditing] = useState(false);
   const [title, setTitle] = useState(column.title);
+  const [isDragOver, setIsDragOver] = useState(false);
 
   const handleSaveTitle = () => {
     if (title.trim()) {
@@ -30,15 +32,77 @@ export function ColumnComponent({ column, index }: ColumnProps) {
     removeColumn(column.id);
   };
 
+  const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e: DragEvent<HTMLDivElement>) => {
+    e.stopPropagation(); // Add this to prevent event bubbling
+    setIsDragOver(false);
+  };
+
+  const handleDrop = (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
+
+    const url =
+      e.dataTransfer.getData("text/uri-list") ||
+      e.dataTransfer.getData("text/plain");
+
+    if (url && /^https?:\/\//i.test(url)) {
+      if (/\.(jpe?g|png|gif|webp|avif|svg)(\?|$)/i.test(url)) {
+        const fileName =
+          decodeURIComponent(
+            new URL(url).pathname.split("/").pop() || "image"
+          ) || "image";
+        const newImage = {
+          id: crypto.randomUUID(),
+          src: url,
+          fileName,
+          rotation: 0,
+          size: 0,
+        };
+        // Add image to this column
+        addImagesToColumn(column.id, [newImage]);
+        return;
+      }
+    }
+
+    const files = Array.from(e.dataTransfer.files);
+    const imageFiles = files.filter((f) => f.type.startsWith("image/"));
+    if (imageFiles.length > 0) {
+      const newImages = imageFiles.map((file) => ({
+        id: crypto.randomUUID(),
+        src: URL.createObjectURL(file),
+        fileName: file.name,
+        rotation: 0,
+        size: file.size,
+      }));
+      // Add images to this column
+      addImagesToColumn(column.id, newImages);
+    }
+  };
+
   return (
     <Droppable droppableId={column.id}>
       {(provided) => (
-        <div
+        <section
           ref={provided.innerRef}
           {...provided.droppableProps}
-          className="flex flex-col w-64 min-w-[16rem] bg-gray-100 dark:bg-gray-800 rounded-lg shadow"
+          className={`flex flex-col w-64 min-w-[16rem] rounded-lg shadow transition-all duration-200 ${
+            isDragOver
+              ? "bg-primary/10 border-2 border-dashed border-primary"
+              : "bg-card"
+          }`}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          aria-label={`${column.title} column`}
         >
-          <div className="p-3 border-b border-gray-200 dark:border-gray-700">
+          <div className="p-3 border-b border-border">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
                 {isEditing ? (
@@ -97,7 +161,7 @@ export function ColumnComponent({ column, index }: ColumnProps) {
             ))}
             {provided.placeholder}
           </div>
-        </div>
+        </section>
       )}
     </Droppable>
   );

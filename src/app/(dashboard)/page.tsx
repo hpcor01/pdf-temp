@@ -8,12 +8,20 @@ import Header from "@/view/header";
 
 export default function Dashboard() {
   const [isDragging, setIsDragging] = useState(false);
+  const [_dragOverColumnId, setDragOverColumnId] = useState<string | null>(
+    null
+  );
   const { addImagesToColumn, columns } = useKanban();
 
   const handleDrop = useCallback(
-    async (e: DragEvent<HTMLDivElement>) => {
+    async (e: DragEvent<HTMLElement>, targetColumnId?: string) => {
       e.preventDefault();
       setIsDragging(false);
+      setDragOverColumnId(null);
+
+      // Determine which column to add the image to
+      const columnId = targetColumnId || columns[0]?.id;
+      if (!columnId) return;
 
       const url =
         e.dataTransfer.getData("text/uri-list") ||
@@ -23,7 +31,7 @@ export default function Dashboard() {
         if (/\.(jpe?g|png|gif|webp|avif|svg)(\?|$)/i.test(url)) {
           const fileName =
             decodeURIComponent(
-              new URL(url).pathname.split("/").pop() || "image",
+              new URL(url).pathname.split("/").pop() || "image"
             ) || "image";
           const newImage: ImageItem = {
             id: crypto.randomUUID(),
@@ -32,8 +40,8 @@ export default function Dashboard() {
             rotation: 0,
             size: 0,
           };
-          // Add image to the first column
-          addImagesToColumn(columns[0].id, [newImage]);
+          // Add image to the target column
+          addImagesToColumn(columnId, [newImage]);
           return;
         }
       }
@@ -48,11 +56,11 @@ export default function Dashboard() {
           rotation: 0,
           size: file.size,
         }));
-        // Add images to the first column
-        addImagesToColumn(columns[0].id, newImages);
+        // Add images to the target column
+        addImagesToColumn(columnId, newImages);
       }
     },
-    [addImagesToColumn, columns],
+    [addImagesToColumn, columns]
   );
 
   return (
@@ -74,8 +82,11 @@ export default function Dashboard() {
           e.preventDefault();
           if (!isDragging) setIsDragging(true);
         }}
-        onDragLeave={() => setIsDragging(false)}
-        onDrop={handleDrop}
+        onDragLeave={() => {
+          setIsDragging(false);
+          setDragOverColumnId(null);
+        }}
+        onDrop={(e) => handleDrop(e)}
         aria-label="Área para arrastar e soltar imagens"
       >
         <Board />

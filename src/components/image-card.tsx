@@ -26,13 +26,15 @@ export function ImageCard({
           {...provided.dragHandleProps}
           className="mb-2"
         >
-          <Card className="cursor-pointer relative w-full overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 group">
+          <Card className="relative w-full overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 group">
             <div
               className="
                 absolute top-0 left-0 w-full flex justify-center gap-2 py-2
                 bg-gradient-to-b from-black/70 to-transparent opacity-0 group-hover:opacity-100
                 transition-opacity duration-300 z-10
               "
+              role="toolbar"
+              aria-label="Image actions"
             >
               <Button
                 type="button"
