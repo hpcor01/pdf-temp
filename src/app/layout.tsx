@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "@/app/globals.css";
 
 import { I18nProvider } from "@/providers/i18n-provider";
+import { KanbanProvider } from "@/providers/kanban-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
 
 const geistSans = Geist({
@@ -40,7 +41,7 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            {children}
+            <KanbanProvider>{children}</KanbanProvider>
           </ThemeProvider>
         </I18nProvider>
       </body>
