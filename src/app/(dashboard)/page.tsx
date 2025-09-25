@@ -23,7 +23,7 @@ export default function Dashboard() {
         if (/\.(jpe?g|png|gif|webp|avif|svg)(\?|$)/i.test(url)) {
           const fileName =
             decodeURIComponent(
-              new URL(url).pathname.split("/").pop() || "image"
+              new URL(url).pathname.split("/").pop() || "image",
             ) || "image";
           const newImage: ImageItem = {
             id: crypto.randomUUID(),
@@ -52,7 +52,7 @@ export default function Dashboard() {
         addImagesToColumn(columns[0].id, newImages);
       }
     },
-    [addImagesToColumn, columns]
+    [addImagesToColumn, columns],
   );
 
   return (

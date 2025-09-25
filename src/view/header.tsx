@@ -16,7 +16,7 @@ export default function Header({
 }: HeaderProps) {
   const buttons = useLanguageKey("buttons");
   const toggleButtonLabels = useLanguageKey(
-    "buttons.button-toggle-selected-all"
+    "buttons.button-toggle-selected-all",
   );
 
   const removeBgId = useId();

@@ -39,7 +39,7 @@ export default function ComboboxChangeLanguage() {
         flag: lang.flag,
         defaultSelected: lang["default-selected"] ?? false,
       };
-    }
+    },
   );
 
   const [value, setValue] = React.useState<SupportedLocale>(locale);
@@ -83,7 +83,7 @@ export default function ComboboxChangeLanguage() {
                       "ml-auto",
                       value === lang.value
                         ? "opacity-100 text-primary"
-                        : "opacity-0"
+                        : "opacity-0",
                     )}
                   />
                 </CommandItem>

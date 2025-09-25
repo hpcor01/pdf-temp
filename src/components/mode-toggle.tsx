@@ -57,7 +57,7 @@ export function ModeToggle() {
             <Check
               className={cn(
                 "ml-2 h-4 w-4",
-                theme === value ? "opacity-100 text-primary" : "opacity-0"
+                theme === value ? "opacity-100 text-primary" : "opacity-0",
               )}
             />
           </DropdownMenuItem>
