@@ -20,7 +20,7 @@ export function ImageCard({
   return (
     <Draggable draggableId={item.id} index={index}>
       {(provided) => (
-        <div
+        <li
           ref={provided.innerRef}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
@@ -44,7 +44,7 @@ export function ImageCard({
                   text-gray-900 dark:text-gray-100 hover:bg-red-500 hover:text-white
                   transition-all duration-200 shadow-md
                 "
-                aria-label="Remover imagem"
+                aria-label={`Remover imagem ${item.fileName}`}
               >
                 <X className="w-4 h-4" />
               </Button>
@@ -57,7 +57,7 @@ export function ImageCard({
                   text-gray-900 dark:text-gray-100 hover:bg-blue-500 hover:text-white
                   transition-all duration-200 shadow-md
                 "
-                aria-label="Rotacionar imagem"
+                aria-label={`Rotacionar imagem ${item.fileName}`}
               >
                 <RotateCw className="w-4 h-4" />
               </Button>
@@ -82,7 +82,7 @@ export function ImageCard({
               />
             </CardContent>
           </Card>
-        </div>
+        </li>
       )}
     </Draggable>
   );

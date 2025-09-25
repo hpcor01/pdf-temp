@@ -31,7 +31,7 @@ const buttonVariants = cva(
       variant: "default",
       size: "default",
     },
-  },
+  }
 );
 
 function Button({
@@ -39,6 +39,7 @@ function Button({
   variant,
   size,
   asChild = false,
+  children,
   ...props
 }: React.ComponentProps<"button"> &
   VariantProps<typeof buttonVariants> & {
@@ -46,12 +47,35 @@ function Button({
   }) {
   const Comp = asChild ? Slot : "button";
 
+  // Ensure the button has accessible content
+  const hasVisibleText =
+    (typeof children === "string" && children.trim() !== "") ||
+    (Array.isArray(children) &&
+      children.some(
+        (child) => typeof child === "string" && child.trim() !== ""
+      ));
+
+  // Warn if no accessible name is provided (in development only)
+  if (
+    process.env.NODE_ENV === "development" &&
+    !hasVisibleText &&
+    !props["aria-label"] &&
+    !props["aria-labelledby"]
+  ) {
+    console.warn(
+      "Button is missing accessible name. Add visible text content or an aria-label/aria-labelledby attribute."
+    );
+  }
+
   return (
     <Comp
       data-slot="button"
       className={cn(buttonVariants({ variant, size, className }))}
+      tabIndex={0} // Ensure keyboard focusability
       {...props}
-    />
+    >
+      {children}
+    </Comp>
   );
 }
 

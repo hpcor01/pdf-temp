@@ -39,6 +39,7 @@ export function ModeToggle() {
           variant="outline"
           size="icon"
           className="cursor-pointer relative"
+          aria-label={label}
         >
           <Sun className="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
           <Moon className="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
@@ -46,18 +47,20 @@ export function ModeToggle() {
         </Button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align="end" role="menu" aria-label="Theme options">
         {themes.map(({ value, label }) => (
           <DropdownMenuItem
             key={value}
             className="cursor-pointer flex justify-between"
             onClick={() => setTheme(value)}
+            role="menuitem"
+            aria-label={label}
           >
             {label}
             <Check
               className={cn(
                 "ml-2 h-4 w-4",
-                theme === value ? "opacity-100 text-primary" : "opacity-0",
+                theme === value ? "opacity-100 text-primary" : "opacity-0"
               )}
             />
           </DropdownMenuItem>

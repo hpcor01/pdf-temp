@@ -39,7 +39,7 @@ export default function ComboboxChangeLanguage() {
         flag: lang.flag,
         defaultSelected: lang["default-selected"] ?? false,
       };
-    },
+    }
   );
 
   const [value, setValue] = React.useState<SupportedLocale>(locale);
@@ -58,15 +58,24 @@ export default function ComboboxChangeLanguage() {
           role="combobox"
           aria-expanded={open}
           className="w-[200px] justify-between cursor-pointer"
+          aria-label="Selecionar idioma"
         >
           {languages.find((lang) => lang.value === value)?.label ?? placeholder}
           <ChevronsUpDown className="opacity-50" />
         </Button>
       </PopoverTrigger>
 
-      <PopoverContent className="w-[200px] p-0">
+      <PopoverContent
+        className="w-[200px] p-0"
+        role="listbox"
+        aria-label="Lista de idiomas"
+      >
         <Command>
-          <CommandInput placeholder={searchPlaceholder} className="h-9" />
+          <CommandInput
+            placeholder={searchPlaceholder}
+            className="h-9"
+            aria-label="Pesquisar idioma"
+          />
           <CommandList>
             <CommandEmpty>{noLanguageFound}</CommandEmpty>
             <CommandGroup>
@@ -76,6 +85,8 @@ export default function ComboboxChangeLanguage() {
                   value={lang.value}
                   onSelect={() => handleSelect(lang.value)}
                   className="cursor-pointer"
+                  role="option"
+                  aria-selected={value === lang.value}
                 >
                   <p>{lang.label}</p>
                   <Check
@@ -83,7 +94,7 @@ export default function ComboboxChangeLanguage() {
                       "ml-auto",
                       value === lang.value
                         ? "opacity-100 text-primary"
-                        : "opacity-0",
+                        : "opacity-0"
                     )}
                   />
                 </CommandItem>

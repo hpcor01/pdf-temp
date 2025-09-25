@@ -9,7 +9,7 @@ import Header from "@/view/header";
 export default function Dashboard() {
   const [isDragging, setIsDragging] = useState(false);
   const [_dragOverColumnId, setDragOverColumnId] = useState<string | null>(
-    null,
+    null
   );
   const { addImagesToColumn, columns } = useKanban();
 
@@ -31,7 +31,7 @@ export default function Dashboard() {
         if (/\.(jpe?g|png|gif|webp|avif|svg)(\?|$)/i.test(url)) {
           const fileName =
             decodeURIComponent(
-              new URL(url).pathname.split("/").pop() || "image",
+              new URL(url).pathname.split("/").pop() || "image"
             ) || "image";
           const newImage: ImageItem = {
             id: crypto.randomUUID(),
@@ -60,11 +60,11 @@ export default function Dashboard() {
         addImagesToColumn(columnId, newImages);
       }
     },
-    [addImagesToColumn, columns],
+    [addImagesToColumn, columns]
   );
 
   return (
-    <section className="h-screen flex flex-col">
+    <main className="h-screen flex flex-col">
       <Header onToggleAllChange={() => {}} toggleAllColumnsSave={() => {}} />
 
       <section
@@ -87,6 +87,6 @@ export default function Dashboard() {
       >
         <Board />
       </section>
-    </section>
+    </main>
   );
 }

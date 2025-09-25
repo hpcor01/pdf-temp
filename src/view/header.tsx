@@ -5,7 +5,6 @@ import ComboboxChangeLanguage from "@/components/combobox-change-language";
 import { ModeToggle } from "@/components/mode-toggle";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
 import { Toast } from "@/components/ui/toast";
 import { useLanguageKey } from "@/hooks/use-i18n";
 import { generatePDFForColumns } from "@/lib/pdf";
@@ -26,7 +25,7 @@ export default function Header({
   } = useKanban();
   const buttons = useLanguageKey("buttons");
   const toggleButtonLabels = useLanguageKey(
-    "buttons.button-toggle-selected-all",
+    "buttons.button-toggle-selected-all"
   );
 
   const removeBgId = useId();
@@ -37,7 +36,7 @@ export default function Header({
   const [isRemoveBgChecked, setIsRemoveBgChecked] = useState(true);
   const [toastOpen, setToastOpen] = useState(false);
   const [toastVariant, setToastVariant] = useState<"default" | "destructive">(
-    "default",
+    "default"
   );
   const [toastTitle, setToastTitle] = useState("");
   const [toastDescription, setToastDescription] = useState("");
@@ -63,7 +62,7 @@ export default function Header({
   const showToast = (
     variant: "default" | "destructive",
     title: string,
-    description: string,
+    description: string
   ) => {
     setToastVariant(variant);
     setToastTitle(title);
@@ -93,7 +92,7 @@ export default function Header({
       showToast(
         "default",
         "Processando...",
-        "Seu arquivo está sendo gerado, por favor aguarde.",
+        "Seu arquivo está sendo gerado, por favor aguarde."
       );
 
       // Get selected columns
@@ -104,7 +103,7 @@ export default function Header({
         showToast(
           "destructive",
           "Nenhuma coluna selecionada",
-          "Selecione pelo menos uma coluna para salvar.",
+          "Selecione pelo menos uma coluna para salvar."
         );
         return;
       }
@@ -131,7 +130,7 @@ export default function Header({
         showToast(
           "default",
           "PDFs gerados",
-          `${selectedCols.length} PDF(s) foram salvos com fundo removido.`,
+          `${selectedCols.length} PDF(s) foram salvos com fundo removido.`
         );
       }
       // Case 2: Convert to PDF only (no background removal)
@@ -141,7 +140,7 @@ export default function Header({
         showToast(
           "default",
           "PDF gerado",
-          `${selectedColumnsCount} PDF(s) foram salvos.`,
+          `${selectedColumnsCount} PDF(s) foram salvos.`
         );
       }
       // Case 3: Remove background only (no PDF conversion)
@@ -163,7 +162,7 @@ export default function Header({
         showToast(
           "default",
           "Imagens baixadas",
-          `${downloadCount} imagem(s) foram baixadas com fundo removido.`,
+          `${downloadCount} imagem(s) foram baixadas com fundo removido.`
         );
       }
       // Case 4: No processing (original behavior)
@@ -172,7 +171,7 @@ export default function Header({
         showToast(
           "default",
           "Download iniciado",
-          `Baixando imagens individuais...`,
+          `Baixando imagens individuais...`
         );
       }
     } catch (error: unknown) {
@@ -195,52 +194,61 @@ export default function Header({
         description={toastDescription}
       />
       <header className="flex flex-wrap gap-4 justify-between items-center border-1 rounded-b-lg p-2.5">
-        <section className="flex flex-wrap items-center gap-4">
+        <section
+          className="flex flex-wrap items-center gap-4"
+          aria-label="Navigation"
+        >
           <ModeToggle />
           <ComboboxChangeLanguage />
         </section>
 
-        <section className="flex flex-wrap items-center gap-4">
+        <section
+          className="flex flex-wrap items-center gap-4"
+          aria-label="Actions toolbar"
+        >
           <div className="flex items-center gap-2">
-            <Label htmlFor={toggleAllColumns} className="cursor-pointer py-2">
-              <Checkbox
-                id={toggleAllColumns}
-                className="cursor-pointer"
-                checked={areAllColumnsSelected}
-                onCheckedChange={(checked) =>
-                  handleToggleAllChange(checked as boolean)
-                }
-              />
-              {areAllColumnsSelected
-                ? toggleButtonLabels.disabled
-                : toggleButtonLabels.active}
-            </Label>
+            <Checkbox
+              id={toggleAllColumns}
+              className="cursor-pointer"
+              checked={areAllColumnsSelected}
+              onCheckedChange={(checked) =>
+                handleToggleAllChange(checked as boolean)
+              }
+            >
+              <span className="cursor-pointer py-2">
+                {areAllColumnsSelected
+                  ? toggleButtonLabels.disabled
+                  : toggleButtonLabels.active}
+              </span>
+            </Checkbox>
           </div>
 
           <div className="flex items-center gap-2">
-            <Label htmlFor={removeBgId} className="cursor-pointer py-2">
-              <Checkbox
-                id={removeBgId}
-                checked={isRemoveBgChecked}
-                onCheckedChange={handleRemoveBgChange}
-                className="cursor-pointer"
-                disabled={isProcessing}
-              />
-              {buttons["button-remove-background"]}
-            </Label>
+            <Checkbox
+              id={removeBgId}
+              checked={isRemoveBgChecked}
+              onCheckedChange={handleRemoveBgChange}
+              className="cursor-pointer"
+              disabled={isProcessing}
+            >
+              <span className="cursor-pointer py-2">
+                {buttons["button-remove-background"]}
+              </span>
+            </Checkbox>
           </div>
 
           <div className="flex items-center gap-2">
-            <Label htmlFor={convertToPDF} className="cursor-pointer py-2">
-              <Checkbox
-                id={convertToPDF}
-                checked={isConvertToPDFChecked}
-                onCheckedChange={handleConvertToPDFChange}
-                className="cursor-pointer"
-                disabled={isProcessing}
-              />
-              {buttons["button-convert-to-pdf"]}
-            </Label>
+            <Checkbox
+              id={convertToPDF}
+              checked={isConvertToPDFChecked}
+              onCheckedChange={handleConvertToPDFChange}
+              className="cursor-pointer"
+              disabled={isProcessing}
+            >
+              <span className="cursor-pointer py-2">
+                {buttons["button-convert-to-pdf"]}
+              </span>
+            </Checkbox>
           </div>
 
           <div>
@@ -248,6 +256,7 @@ export default function Header({
               className="cursor-pointer"
               disabled={!isSaveButtonEnabled}
               onClick={handleSaveClick}
+              aria-label={buttons["button-save"]}
             >
               {isProcessing ? "Processando..." : buttons["button-save"]}
               {selectedColumnsCount > 0 && !isProcessing

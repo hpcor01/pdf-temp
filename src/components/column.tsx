@@ -68,7 +68,7 @@ export function ColumnComponent({ column, index }: ColumnProps) {
       if (/\.(jpe?g|png|gif|webp|avif|svg)(\?|$)/i.test(url)) {
         const fileName =
           decodeURIComponent(
-            new URL(url).pathname.split("/").pop() || "image",
+            new URL(url).pathname.split("/").pop() || "image"
           ) || "image";
         const newImage = {
           id: crypto.randomUUID(),
@@ -125,6 +125,7 @@ export function ColumnComponent({ column, index }: ColumnProps) {
                   checked={isSelected}
                   onCheckedChange={handleCheckboxChange}
                   className="cursor-pointer"
+                  aria-label={`Selecionar coluna ${column.title}`}
                 />
                 {isEditing ? (
                   <Input
@@ -140,6 +141,7 @@ export function ColumnComponent({ column, index }: ColumnProps) {
                     }}
                     autoFocus
                     className="h-7 text-sm"
+                    aria-label={`Editar título da coluna ${column.title}`}
                   />
                 ) : (
                   <p className="font-medium truncate">{column.title}</p>
@@ -169,7 +171,10 @@ export function ColumnComponent({ column, index }: ColumnProps) {
               </div>
             </div>
           </div>
-          <div className="flex-grow overflow-y-auto max-h-[calc(100vh-200px)] p-2">
+          <section
+            className="flex-grow overflow-y-auto max-h-[calc(100vh-200px)] p-2"
+            aria-label={`Imagens na coluna ${column.title}`}
+          >
             {column.items.map((item, itemIndex) => (
               <ImageCard
                 key={item.id}
@@ -181,7 +186,7 @@ export function ColumnComponent({ column, index }: ColumnProps) {
               />
             ))}
             {provided.placeholder}
-          </div>
+          </section>
         </section>
       )}
     </Droppable>

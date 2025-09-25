@@ -30,7 +30,7 @@ export function Board() {
           source.droppableId,
           destination.droppableId,
           draggableId,
-          destination.index,
+          destination.index
         );
       } else {
         // Different column
@@ -38,11 +38,11 @@ export function Board() {
           source.droppableId,
           destination.droppableId,
           draggableId,
-          destination.index,
+          destination.index
         );
       }
     },
-    [moveImage],
+    [moveImage]
   );
 
   const handleAddColumn = (title?: string) => {
