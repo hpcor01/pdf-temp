@@ -172,6 +172,43 @@ export function KanbanProvider({ children }: { children: ReactNode }) {
     [columns]
   );
 
+  const saveSelectedColumns = useCallback(
+    async (convertToPDF: boolean, savePath: string) => {
+      // Get selected columns
+      const selectedColumnsList = columns.filter(
+        (column) => selectedColumns[column.id]
+      );
+
+      if (selectedColumnsList.length === 0) {
+        console.warn("No columns selected for saving");
+        return;
+      }
+
+      // In a real implementation, this would use the File System Access API
+      // or a backend service to save files
+      console.log("Saving columns:", {
+        columns: selectedColumnsList,
+        convertToPDF,
+        savePath,
+      });
+
+      // For demonstration purposes, we'll just log what would be saved
+      // In a real app, you would:
+      // 1. Use the File System Access API to select a save directory
+      // 2. If convertToPDF is true, convert each column's images to PDF
+      // 3. If convertToPDF is false, save each image individually
+      // 4. Save to the specified path
+
+      // Mock implementation for now
+      alert(
+        `Would save ${selectedColumnsList.length} columns to ${savePath} as ${
+          convertToPDF ? "PDF" : "images"
+        }`
+      );
+    },
+    [columns, selectedColumns]
+  );
+
   return (
     <KanbanContext.Provider
       value={{
@@ -188,6 +225,7 @@ export function KanbanProvider({ children }: { children: ReactNode }) {
         toggleColumnSelection,
         toggleAllColumnsSelection,
         areAllColumnsSelected,
+        saveSelectedColumns,
       }}
     >
       {children}

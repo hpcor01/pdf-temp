@@ -35,4 +35,8 @@ export interface KanbanContextType {
   toggleColumnSelection: (columnId: string, selected: boolean) => void;
   toggleAllColumnsSelection: (selected: boolean) => void;
   areAllColumnsSelected: boolean;
+  saveSelectedColumns: (
+    convertToPDF: boolean,
+    savePath: string
+  ) => Promise<void>;
 }
