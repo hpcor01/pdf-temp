@@ -1,6 +1,6 @@
 "use client";
 
-import { Moon, Sun } from "lucide-react";
+import { Check, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,10 +10,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useLanguageKey } from "@/hooks/use-i18n";
+import { cn } from "@/lib/utils";
 import type { ThemeOption } from "@/types/theme";
 
 export function ModeToggle() {
-  const { setTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
   const label = useLanguageKey("buttons.toggle-button-theme.label");
 
   const themes: ThemeOption[] = [
@@ -49,10 +50,16 @@ export function ModeToggle() {
         {themes.map(({ value, label }) => (
           <DropdownMenuItem
             key={value}
-            className="cursor-pointer"
+            className="cursor-pointer flex justify-between"
             onClick={() => setTheme(value)}
           >
             {label}
+            <Check
+              className={cn(
+                "ml-2 h-4 w-4",
+                theme === value ? "opacity-100 text-primary" : "opacity-0"
+              )}
+            />
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>

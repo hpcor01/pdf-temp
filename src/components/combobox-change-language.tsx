@@ -26,13 +26,9 @@ export default function ComboboxChangeLanguage() {
   const { locale, t, setLocale } = useI18nContext();
   const [open, setOpen] = React.useState(false);
 
-  const placeholder = useLanguageKey("combobox.placeholder") as string;
-  const searchPlaceholder = useLanguageKey(
-    "combobox.search-placeholder"
-  ) as string;
-  const noLanguageFound = useLanguageKey(
-    "combobox.no-language-found"
-  ) as string;
+  const placeholder = useLanguageKey("combobox.placeholder");
+  const searchPlaceholder = useLanguageKey("combobox.search-placeholder");
+  const noLanguageFound = useLanguageKey("combobox.no-language-found");
 
   const languages = Object.entries(t["languages-selected"].locales).map(
     ([code, info]) => {
@@ -85,7 +81,9 @@ export default function ComboboxChangeLanguage() {
                   <Check
                     className={cn(
                       "ml-auto",
-                      value === lang.value ? "opacity-100" : "opacity-0"
+                      value === lang.value
+                        ? "opacity-100 text-primary"
+                        : "opacity-0"
                     )}
                   />
                 </CommandItem>
