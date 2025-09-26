@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "@/app/globals.css";
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 import { I18nProvider } from "@/providers/i18n-provider";
 import { KanbanProvider } from "@/providers/kanban-provider";
@@ -58,6 +59,7 @@ export default function RootLayout({
           >
             <KanbanProvider>{children}</KanbanProvider>
             <Analytics />
+            <SpeedInsights />
           </ThemeProvider>
         </I18nProvider>
       </body>

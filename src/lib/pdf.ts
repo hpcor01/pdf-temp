@@ -2,32 +2,6 @@ import jsPDF from "jspdf";
 import type { Column } from "@/types/kanban";
 
 /**
- * Type definitions for the File System Access API
- * These APIs are not yet available in TypeScript's standard DOM types
- */
-interface FileSystemFileHandle {
-  createWritable(): Promise<FileSystemWritableFileStream>;
-}
-
-interface FileSystemWritableFileStream {
-  write(contents: Blob): Promise<void>;
-  close(): Promise<void>;
-}
-
-// Extend the global Window interface
-declare global {
-  interface Window {
-    showSaveFilePicker?: (options: {
-      suggestedName: string;
-      types: Array<{
-        description: string;
-        accept: Record<string, string[]>;
-      }>;
-    }) => Promise<FileSystemFileHandle>;
-  }
-}
-
-/**
  * Extrai a URL original caso seja uma imagem otimizada pelo Next.js
  */
 function extractOriginalImageUrl(nextImageUrl: string): string {
@@ -134,7 +108,7 @@ async function generatePDFForColumn(column: Column): Promise<void> {
       // Ajuste para caber na página mantendo proporção
       const ratio = Math.min(
         pageWidth / canvas.width,
-        pageHeight / canvas.height,
+        pageHeight / canvas.height
       );
       const imgW = canvas.width * ratio;
       const imgH = canvas.height * ratio;
@@ -155,7 +129,7 @@ async function generatePDFForColumn(column: Column): Promise<void> {
  */
 export async function generatePDFForColumns(
   columns: Column[],
-  selected: Record<string, boolean>,
+  selected: Record<string, boolean>
 ): Promise<void> {
   const list = columns.filter((c) => selected[c.id]);
   for (const col of list) {

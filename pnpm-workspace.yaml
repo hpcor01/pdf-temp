@@ -1,4 +1,5 @@
 onlyBuiltDependencies:
-  - "@tailwindcss/oxide"
+  - '@tailwindcss/oxide'
+  - '@vercel/speed-insights'
   - core-js
   - sharp
