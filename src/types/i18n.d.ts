@@ -1,4 +1,3 @@
-// Define the structure of your language files based on pt-br.json
 export interface LanguageStructure {
   "languages-selected": {
     label: string;
@@ -58,7 +57,6 @@ export interface LanguageStructure {
   };
 }
 
-// Type for the locale keys
 export type SupportedLocale =
   | "pt-br"
   | "en-en"
@@ -68,7 +66,6 @@ export type SupportedLocale =
   | "el-gr"
   | "he-il";
 
-// Type-safe access to translation keys
 type DotPrefix<T extends string> = T extends "" ? "" : `${T}.`;
 
 type DotNestedKeys<T> = T extends object
@@ -85,7 +82,6 @@ export type I18nKeys = DotNestedKeys<LanguageStructure>;
 
 export type I18nJSON = LanguageStructure;
 
-// Context type for the i18n provider
 export interface I18nContextType {
   locale: SupportedLocale;
   t: I18nJSON;

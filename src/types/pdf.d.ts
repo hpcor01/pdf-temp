@@ -1,7 +1,3 @@
-/**
- * Type definitions for the File System Access API
- * These APIs are not yet available in TypeScript's standard DOM types
- */
 export interface FileSystemFileHandle {
   createWritable(): Promise<FileSystemWritableFileStream>;
 }
@@ -11,7 +7,6 @@ export interface FileSystemWritableFileStream {
   close(): Promise<void>;
 }
 
-// Extend the global Window interface
 declare global {
   interface Window {
     showSaveFilePicker?: (

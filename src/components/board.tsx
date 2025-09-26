@@ -1,3 +1,5 @@
+"use client";
+
 import { DragDropContext, type DropResult } from "@hello-pangea/dnd";
 import dynamic from "next/dynamic";
 import { useCallback } from "react";
@@ -5,7 +7,6 @@ import { useKanban } from "@/providers/kanban-provider";
 import type { ColumnProps } from "@/types/column";
 import { BtnCreateColumn } from "./btn-create-column";
 
-// Dynamically import ColumnComponent for code splitting
 const ColumnComponent = dynamic<ColumnProps>(
   () => import("./column").then((mod) => mod.ColumnComponent),
   {
@@ -35,19 +36,14 @@ export function Board() {
     (result: DropResult) => {
       const { source, destination, draggableId, type } = result;
 
-      // Dropped outside the list
       if (!destination) return;
 
-      // If dragging a column
       if (type === "COLUMN") {
         if (source.index === destination.index) return;
-        // We could implement column reordering here if needed
         return;
       }
 
-      // If dragging an image
       if (source.droppableId === destination.droppableId) {
-        // Same column, but position changed
         if (source.index === destination.index) return;
 
         moveImage(
@@ -57,7 +53,6 @@ export function Board() {
           destination.index
         );
       } else {
-        // Different column
         moveImage(
           source.droppableId,
           destination.droppableId,

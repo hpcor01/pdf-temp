@@ -17,6 +17,8 @@ export function ImageCard({
     onRotate(columnId, item.id, newRotation);
   };
 
+  const positionNumber = index + 1;
+
   return (
     <Draggable draggableId={item.id} index={index}>
       {(provided) => (
@@ -27,6 +29,10 @@ export function ImageCard({
           className="mb-2"
         >
           <Card className="relative w-full overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 group">
+            <div className="absolute top-2 left-2 z-20 bg-black/70 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center select-none cursor-default">
+              {positionNumber}
+            </div>
+
             <div
               className="
                 absolute top-0 left-0 w-full flex justify-center gap-2 py-2

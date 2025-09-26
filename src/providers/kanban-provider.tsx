@@ -37,14 +37,12 @@ export function KanbanProvider({ children }: { children: ReactNode }) {
       };
       setColumns((prev) => [...prev, newColumn]);
     },
-    [columns.length],
+    [columns.length]
   );
 
   const removeColumn = useCallback((id: string) => {
-    // Prevent removing the first column
     if (id === "column-1") return;
     setColumns((prev) => prev.filter((col) => col.id !== id));
-    // Also remove from selected columns
     setSelectedColumns((prev) => {
       const newSelected = { ...prev };
       delete newSelected[id];
@@ -54,7 +52,7 @@ export function KanbanProvider({ children }: { children: ReactNode }) {
 
   const renameColumn = useCallback((id: string, title: string) => {
     setColumns((prev) =>
-      prev.map((col) => (col.id === id ? { ...col, title } : col)),
+      prev.map((col) => (col.id === id ? { ...col, title } : col))
     );
   }, []);
 
@@ -64,11 +62,11 @@ export function KanbanProvider({ children }: { children: ReactNode }) {
         prev.map((col) =>
           col.id === columnId
             ? { ...col, items: [...col.items, ...images] }
-            : col,
-        ),
+            : col
+        )
       );
     },
-    [],
+    []
   );
 
   const removeImage = useCallback((columnId: string, imageId: string) => {
@@ -76,8 +74,8 @@ export function KanbanProvider({ children }: { children: ReactNode }) {
       prev.map((col) =>
         col.id === columnId
           ? { ...col, items: col.items.filter((img) => img.id !== imageId) }
-          : col,
-      ),
+          : col
+      )
     );
   }, []);
 
@@ -89,14 +87,14 @@ export function KanbanProvider({ children }: { children: ReactNode }) {
             ? {
                 ...col,
                 items: col.items.map((img) =>
-                  img.id === imageId ? { ...img, rotation } : img,
+                  img.id === imageId ? { ...img, rotation } : img
                 ),
               }
-            : col,
-        ),
+            : col
+        )
       );
     },
-    [],
+    []
   );
 
   const moveImage = useCallback(
@@ -104,15 +102,15 @@ export function KanbanProvider({ children }: { children: ReactNode }) {
       sourceColumnId: string,
       destColumnId: string,
       imageId: string,
-      destIndex: number,
+      destIndex: number
     ) => {
       setColumns((prev) => {
         const newColumns = [...prev];
         const sourceColumnIndex = newColumns.findIndex(
-          (col) => col.id === sourceColumnId,
+          (col) => col.id === sourceColumnId
         );
         const destColumnIndex = newColumns.findIndex(
-          (col) => col.id === destColumnId,
+          (col) => col.id === destColumnId
         );
 
         if (sourceColumnIndex === -1 || destColumnIndex === -1) return prev;
@@ -121,25 +119,21 @@ export function KanbanProvider({ children }: { children: ReactNode }) {
         const destColumn = newColumns[destColumnIndex];
 
         const imageIndex = sourceColumn.items.findIndex(
-          (img) => img.id === imageId,
+          (img) => img.id === imageId
         );
 
         if (imageIndex === -1) return prev;
 
         const [movedImage] = sourceColumn.items.splice(imageIndex, 1);
 
-        // If moving within the same column
         if (sourceColumnId === destColumnId) {
           sourceColumn.items.splice(destIndex, 0, movedImage);
-        } else {
-          // Moving to a different column
-          destColumn.items.splice(destIndex, 0, movedImage);
-        }
+        } else destColumn.items.splice(destIndex, 0, movedImage);
 
         return newColumns;
       });
     },
-    [],
+    []
   );
 
   const moveColumn = useCallback((sourceIndex: number, destIndex: number) => {
@@ -158,7 +152,7 @@ export function KanbanProvider({ children }: { children: ReactNode }) {
         [columnId]: selected,
       }));
     },
-    [],
+    []
   );
 
   const toggleAllColumnsSelection = useCallback(
@@ -169,14 +163,13 @@ export function KanbanProvider({ children }: { children: ReactNode }) {
       });
       setSelectedColumns(newSelected);
     },
-    [columns],
+    [columns]
   );
 
   const saveSelectedColumns = useCallback(
     async (convertToPDF: boolean, savePath: string) => {
-      // Get selected columns
       const selectedColumnsList = columns.filter(
-        (column) => selectedColumns[column.id],
+        (column) => selectedColumns[column.id]
       );
 
       if (selectedColumnsList.length === 0) {
@@ -184,29 +177,19 @@ export function KanbanProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      // In a real implementation, this would use the File System Access API
-      // or a backend service to save files
       console.log("Saving columns:", {
         columns: selectedColumnsList,
         convertToPDF,
         savePath,
       });
 
-      // For demonstration purposes, we'll just log what would be saved
-      // In a real app, you would:
-      // 1. Use the File System Access API to select a save directory
-      // 2. If convertToPDF is true, convert each column's images to PDF
-      // 3. If convertToPDF is false, save each image individually
-      // 4. Save to the specified path
-
-      // Mock implementation for now
       alert(
         `Would save ${selectedColumnsList.length} columns to ${savePath} as ${
           convertToPDF ? "PDF" : "images"
-        }`,
+        }`
       );
     },
-    [columns, selectedColumns],
+    [columns, selectedColumns]
   );
 
   return (
