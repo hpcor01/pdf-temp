@@ -11,18 +11,6 @@ export interface LanguageStructure {
         label: string;
         flag: string;
       };
-      "fr-fr": {
-        label: string;
-        flag: string;
-      };
-      "it-it": {
-        label: string;
-        flag: string;
-      };
-      "es-es": {
-        label: string;
-        flag: string;
-      };
       "el-gr": {
         label: string;
         flag: string;
@@ -45,6 +33,10 @@ export interface LanguageStructure {
     "button-save": string;
     "button-convert-to-pdf": string;
     "button-remove-background": string;
+    "button-toggle-previewer-image": {
+      active: string;
+      disabled: string;
+    };
     "button-toggle-selected-all": {
       active: string;
       disabled: string;
@@ -57,14 +49,7 @@ export interface LanguageStructure {
   };
 }
 
-export type SupportedLocale =
-  | "pt-br"
-  | "en-en"
-  | "fr-fr"
-  | "it-it"
-  | "es-es"
-  | "el-gr"
-  | "he-il";
+export type SupportedLocale = "pt-br" | "en-en" | "es-es" | "el-gr" | "he-il";
 
 type DotPrefix<T extends string> = T extends "" ? "" : `${T}.`;
 

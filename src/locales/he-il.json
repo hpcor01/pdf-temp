@@ -11,18 +11,6 @@
         "label": "אנגלית",
         "flag": "en-EN"
       },
-      "fr-fr": {
-        "label": "צרפתית",
-        "flag": "fr-FR"
-      },
-      "it-it": {
-        "label": "איטלקית",
-        "flag": "it-IT"
-      },
-      "es-es": {
-        "label": "ספרדית",
-        "flag": "es-ES"
-      },
       "el-gr": {
         "label": "יוונית",
         "flag": "el-GR"
@@ -45,6 +33,10 @@
     "button-save": "שמור",
     "button-convert-to-pdf": "המר ל-PDF",
     "button-remove-background": "הסר רקע",
+    "button-toggle-previewer-image": {
+      "active": "הצג תמונה",
+      "disabled": "הסתר תמונה"
+    },
     "button-toggle-selected-all": {
       "active": "בחר הכל",
       "disabled": "הסר סימון מהכל"

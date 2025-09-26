@@ -11,18 +11,6 @@
         "label": "Αγγλικά",
         "flag": "en-EN"
       },
-      "fr-fr": {
-        "label": "Γαλλικά",
-        "flag": "fr-FR"
-      },
-      "it-it": {
-        "label": "Ιταλικά",
-        "flag": "it-IT"
-      },
-      "es-es": {
-        "label": "Ισπανικά",
-        "flag": "es-ES"
-      },
       "el-gr": {
         "label": "Ελληνικά",
         "flag": "el-GR"
@@ -45,6 +33,10 @@
     "button-save": "Αποθήκευση",
     "button-convert-to-pdf": "Μετατροπή σε PDF",
     "button-remove-background": "Αφαίρεση φόντου",
+    "button-toggle-previewer-image": {
+      "active": "Εμφάνιση εικόνας",
+      "disabled": "Απόκρυψη εικόνας"
+    },
     "button-toggle-selected-all": {
       "active": "Επιλογή όλων",
       "disabled": "Αποεπιλογή όλων"

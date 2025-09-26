@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useCallback, useId, useState } from "react";
 import ComboboxChangeLanguage from "@/components/combobox-change-language";
 import { ModeToggle } from "@/components/mode-toggle";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import { useLanguageKey } from "@/hooks/use-i18n";
 import { generatePDFForColumns } from "@/lib/pdf";
 import { removeBackgroundBatch } from "@/lib/rem-bg";
 import { useKanban } from "@/providers/kanban-provider";
+import { usePreview } from "@/providers/preview-provider";
 import type { HeaderProps } from "@/types/header";
 import type { Column } from "@/types/kanban";
 
@@ -23,14 +24,27 @@ export default function Header({
     selectedColumns,
     columns,
   } = useKanban();
+
+  const {
+    previewImage,
+    previewPosition,
+    isClickPreview,
+    isPreviewerImageChecked,
+    setIsPreviewerImageChecked,
+  } = usePreview();
+
   const buttons = useLanguageKey("buttons");
   const toggleButtonLabels = useLanguageKey(
     "buttons.button-toggle-selected-all"
+  );
+  const toggleButtonPreviewerImages = useLanguageKey(
+    "buttons.button-toggle-previewer-image"
   );
 
   const removeBgId = useId();
   const convertToPDF = useId();
   const toggleAllColumns = useId();
+  const togglePreviewerImage = useId();
 
   const [isConvertToPDFChecked, setIsConvertToPDFChecked] = useState(true);
   const [isRemoveBgChecked, setIsRemoveBgChecked] = useState(true);
@@ -59,6 +73,10 @@ export default function Header({
     setIsRemoveBgChecked(checked);
   };
 
+  const handlePreviewerImageChange = (checked: boolean) => {
+    setIsPreviewerImageChecked(checked);
+  };
+
   const showToast = (
     variant: "default" | "destructive",
     title: string,
@@ -82,6 +100,11 @@ export default function Header({
     link.click();
     document.body.removeChild(link);
   };
+
+  // Close preview
+  const closePreview = useCallback(() => {
+    // The actual closing is handled by the context
+  }, []);
 
   const handleSaveClick = async () => {
     try {
@@ -204,6 +227,22 @@ export default function Header({
                 {areAllColumnsSelected
                   ? toggleButtonLabels.disabled
                   : toggleButtonLabels.active}
+              </span>
+            </Checkbox>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Checkbox
+              id={togglePreviewerImage}
+              checked={isPreviewerImageChecked}
+              onCheckedChange={handlePreviewerImageChange}
+              className="cursor-pointer"
+              disabled={isProcessing}
+            >
+              <span className="cursor-pointer py-2">
+                {isPreviewerImageChecked
+                  ? toggleButtonPreviewerImages.active
+                  : toggleButtonPreviewerImages.disabled}
               </span>
             </Checkbox>
           </div>

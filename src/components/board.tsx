@@ -4,8 +4,10 @@ import { DragDropContext, type DropResult } from "@hello-pangea/dnd";
 import dynamic from "next/dynamic";
 import { useCallback } from "react";
 import { useKanban } from "@/providers/kanban-provider";
+import { usePreview } from "@/providers/preview-provider";
 import type { ColumnProps } from "@/types/column";
 import { BtnCreateColumn } from "./btn-create-column";
+import { PreviewerImage } from "./previewer-image";
 
 const ColumnComponent = dynamic<ColumnProps>(
   () => import("./column").then((mod) => mod.ColumnComponent),
@@ -31,6 +33,12 @@ const ColumnComponent = dynamic<ColumnProps>(
 
 export function Board() {
   const { columns, moveImage, addColumn } = useKanban();
+  const {
+    previewImage,
+    isClickPreview,
+    isPreviewerImageChecked,
+    clearPreview,
+  } = usePreview();
 
   const onDragEnd = useCallback(
     (result: DropResult) => {
@@ -68,15 +76,35 @@ export function Board() {
     addColumn(title || "");
   };
 
+  // Check if we should show the preview panel (split view)
+  const showPreviewPanel =
+    isPreviewerImageChecked && previewImage && isClickPreview;
+
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex h-full">
       <DragDropContext onDragEnd={onDragEnd}>
-        <div className="flex overflow-x-auto gap-4 p-4 flex-grow">
+        <div
+          className={`flex overflow-x-auto gap-4 p-4 flex-grow ${
+            showPreviewPanel ? "w-3/5" : "w-full"
+          }`}
+        >
           {columns.map((column, index) => (
             <ColumnComponent key={column.id} column={column} index={index} />
           ))}
         </div>
       </DragDropContext>
+
+      {showPreviewPanel && (
+        <div className="w-2/5 h-full border-l border-border">
+          <PreviewerImage
+            image={previewImage}
+            position={null}
+            isClickPreview={true}
+            onClose={clearPreview}
+          />
+        </div>
+      )}
+
       <BtnCreateColumn onClick={handleAddColumn} />
     </div>
   );
