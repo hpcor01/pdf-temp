@@ -3,6 +3,7 @@ import { RotateCw, X } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { usePreview } from "@/providers/preview-provider";
 import type { ImageCardProps } from "@/types/image-card";
 
 export function ImageCard({
@@ -12,9 +13,42 @@ export function ImageCard({
   onRemove,
   onRotate,
 }: ImageCardProps) {
+  const { setPreviewImage, clearPreview, isPreviewerImageChecked } =
+    usePreview();
+
   const handleRotate = (): void => {
     const newRotation = (item.rotation + 90) % 360;
     onRotate(columnId, item.id, newRotation);
+  };
+
+  const positionNumber = index + 1;
+
+  const handleMouseEnter = (e: React.MouseEvent) => {
+    setPreviewImage(item, { x: e.clientX, y: e.clientY });
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    setPreviewImage(item, { x: e.clientX, y: e.clientY });
+  };
+
+  const handleMouseLeave = () => {
+    clearPreview();
+  };
+
+  // New click handler for opening the large preview
+  const handleClick = () => {
+    // Only open the preview if "Mostrar imagem" is enabled
+    if (isPreviewerImageChecked) {
+      setPreviewImage(item, null, true); // true indicates click preview
+    }
+  };
+
+  // Keyboard handler for accessibility
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      handleClick();
+    }
   };
 
   return (
@@ -25,8 +59,22 @@ export function ImageCard({
           {...provided.draggableProps}
           {...provided.dragHandleProps}
           className="mb-2"
+          onMouseEnter={handleMouseEnter}
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
         >
           <Card className="relative w-full overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 group">
+            <button
+              type="button"
+              className="absolute inset-0 cursor-pointer bg-transparent border-none"
+              onClick={handleClick}
+              onKeyDown={handleKeyDown}
+              aria-label={`Preview image ${item.fileName}`}
+            />
+            <div className="absolute top-2 left-2 z-20 bg-black/70 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center select-none cursor-default">
+              {positionNumber}
+            </div>
+
             <div
               className="
                 absolute top-0 left-0 w-full flex justify-center gap-2 py-2
@@ -38,7 +86,10 @@ export function ImageCard({
             >
               <Button
                 type="button"
-                onClick={() => onRemove(columnId, item.id)}
+                onClick={(e) => {
+                  e.stopPropagation(); // Prevent card click from triggering
+                  onRemove(columnId, item.id);
+                }}
                 className="
                   p-2 rounded-full cursor-pointer bg-white/90 dark:bg-gray-800/90
                   text-gray-900 dark:text-gray-100 hover:bg-red-500 hover:text-white
@@ -51,7 +102,10 @@ export function ImageCard({
 
               <Button
                 type="button"
-                onClick={handleRotate}
+                onClick={(e) => {
+                  e.stopPropagation(); // Prevent card click from triggering
+                  handleRotate();
+                }}
                 className="
                   p-2 rounded-full cursor-pointer bg-white/90 dark:bg-gray-800/90
                   text-gray-900 dark:text-gray-100 hover:bg-blue-500 hover:text-white

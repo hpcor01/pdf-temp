@@ -6,6 +6,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 
 import { I18nProvider } from "@/providers/i18n-provider";
 import { KanbanProvider } from "@/providers/kanban-provider";
+import { PreviewProvider } from "@/providers/preview-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
 
 const geistSans = Geist({
@@ -57,7 +58,9 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <KanbanProvider>{children}</KanbanProvider>
+            <PreviewProvider>
+              <KanbanProvider>{children}</KanbanProvider>
+            </PreviewProvider>
             <Analytics />
             <SpeedInsights />
           </ThemeProvider>

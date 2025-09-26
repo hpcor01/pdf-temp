@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useCallback, useId, useState } from "react";
 import ComboboxChangeLanguage from "@/components/combobox-change-language";
 import { ModeToggle } from "@/components/mode-toggle";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import { useLanguageKey } from "@/hooks/use-i18n";
 import { generatePDFForColumns } from "@/lib/pdf";
 import { removeBackgroundBatch } from "@/lib/rem-bg";
 import { useKanban } from "@/providers/kanban-provider";
+import { usePreview } from "@/providers/preview-provider";
 import type { HeaderProps } from "@/types/header";
 import type { Column } from "@/types/kanban";
 
@@ -23,20 +24,33 @@ export default function Header({
     selectedColumns,
     columns,
   } = useKanban();
+
+  const {
+    previewImage,
+    previewPosition,
+    isClickPreview,
+    isPreviewerImageChecked,
+    setIsPreviewerImageChecked,
+  } = usePreview();
+
   const buttons = useLanguageKey("buttons");
   const toggleButtonLabels = useLanguageKey(
-    "buttons.button-toggle-selected-all",
+    "buttons.button-toggle-selected-all"
+  );
+  const toggleButtonPreviewerImages = useLanguageKey(
+    "buttons.button-toggle-previewer-image"
   );
 
   const removeBgId = useId();
   const convertToPDF = useId();
   const toggleAllColumns = useId();
+  const togglePreviewerImage = useId();
 
   const [isConvertToPDFChecked, setIsConvertToPDFChecked] = useState(true);
   const [isRemoveBgChecked, setIsRemoveBgChecked] = useState(true);
   const [toastOpen, setToastOpen] = useState(false);
   const [toastVariant, setToastVariant] = useState<"default" | "destructive">(
-    "default",
+    "default"
   );
   const [toastTitle, setToastTitle] = useState("");
   const [toastDescription, setToastDescription] = useState("");
@@ -59,17 +73,20 @@ export default function Header({
     setIsRemoveBgChecked(checked);
   };
 
+  const handlePreviewerImageChange = (checked: boolean) => {
+    setIsPreviewerImageChecked(checked);
+  };
+
   const showToast = (
     variant: "default" | "destructive",
     title: string,
-    description: string,
+    description: string
   ) => {
     setToastVariant(variant);
     setToastTitle(title);
     setToastDescription(description);
     setToastOpen(true);
 
-    // Auto close toast after 5 seconds
     setTimeout(() => {
       setToastOpen(false);
     }, 5000);
@@ -84,18 +101,21 @@ export default function Header({
     document.body.removeChild(link);
   };
 
+  // Close preview
+  const closePreview = useCallback(() => {
+    // The actual closing is handled by the context
+  }, []);
+
   const handleSaveClick = async () => {
     try {
       setIsProcessing(true);
 
-      // Show processing toast
       showToast(
         "default",
         "Processando...",
-        "Seu arquivo está sendo gerado, por favor aguarde.",
+        "Seu arquivo está sendo gerado, por favor aguarde."
       );
 
-      // Get selected columns
       const selectedCols = columns.filter((col) => selectedColumns[col.id]);
 
       if (selectedCols.length === 0) {
@@ -103,14 +123,12 @@ export default function Header({
         showToast(
           "destructive",
           "Nenhuma coluna selecionada",
-          "Selecione pelo menos uma coluna para salvar.",
+          "Selecione pelo menos uma coluna para salvar."
         );
         return;
       }
 
-      // Case 1: Remove background + Convert to PDF
       if (isRemoveBgChecked && isConvertToPDFChecked) {
-        // Process all images to remove background
         const processedColumns: Column[] = [];
 
         for (const col of selectedCols) {
@@ -121,7 +139,6 @@ export default function Header({
           });
         }
 
-        // Generate PDFs with processed images
         for (const col of processedColumns) {
           await generatePDFForColumns([col], { [col.id]: true });
         }
@@ -130,28 +147,21 @@ export default function Header({
         showToast(
           "default",
           "PDFs gerados",
-          `${selectedCols.length} PDF(s) foram salvos com fundo removido.`,
+          `${selectedCols.length} PDF(s) foram salvos com fundo removido.`
         );
-      }
-      // Case 2: Convert to PDF only (no background removal)
-      else if (!isRemoveBgChecked && isConvertToPDFChecked) {
+      } else if (!isRemoveBgChecked && isConvertToPDFChecked) {
         await generatePDFForColumns(columns, selectedColumns);
         setIsProcessing(false);
         showToast(
           "default",
           "PDF gerado",
-          `${selectedColumnsCount} PDF(s) foram salvos.`,
+          `${selectedColumnsCount} PDF(s) foram salvos.`
         );
-      }
-      // Case 3: Remove background only (no PDF conversion)
-      else if (isRemoveBgChecked && !isConvertToPDFChecked) {
-        // Process all images and download individually
+      } else if (isRemoveBgChecked && !isConvertToPDFChecked) {
         let downloadCount = 0;
 
         for (const col of selectedCols) {
           const processedItems = await removeBackgroundBatch(col.items);
-
-          // Download each processed image
           for (const item of processedItems) {
             triggerDownload(item.src, item.fileName);
             downloadCount++;
@@ -162,16 +172,14 @@ export default function Header({
         showToast(
           "default",
           "Imagens baixadas",
-          `${downloadCount} imagem(s) foram baixadas com fundo removido.`,
+          `${downloadCount} imagem(s) foram baixadas com fundo removido.`
         );
-      }
-      // Case 4: No processing (original behavior)
-      else {
+      } else {
         setIsProcessing(false);
         showToast(
           "default",
           "Download iniciado",
-          `Baixando imagens individuais...`,
+          `Baixando imagens individuais...`
         );
       }
     } catch (error: unknown) {
@@ -219,6 +227,22 @@ export default function Header({
                 {areAllColumnsSelected
                   ? toggleButtonLabels.disabled
                   : toggleButtonLabels.active}
+              </span>
+            </Checkbox>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Checkbox
+              id={togglePreviewerImage}
+              checked={isPreviewerImageChecked}
+              onCheckedChange={handlePreviewerImageChange}
+              className="cursor-pointer"
+              disabled={isProcessing}
+            >
+              <span className="cursor-pointer py-2">
+                {isPreviewerImageChecked
+                  ? toggleButtonPreviewerImages.active
+                  : toggleButtonPreviewerImages.disabled}
               </span>
             </Checkbox>
           </div>

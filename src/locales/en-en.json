@@ -11,18 +11,6 @@
         "label": "English",
         "flag": "en-EN"
       },
-      "fr-fr": {
-        "label": "French",
-        "flag": "fr-FR"
-      },
-      "it-it": {
-        "label": "Italian",
-        "flag": "it-IT"
-      },
-      "es-es": {
-        "label": "Spanish",
-        "flag": "es-ES"
-      },
       "el-gr": {
         "label": "Greek",
         "flag": "el-GR"
@@ -45,6 +33,10 @@
     "button-save": "Save",
     "button-convert-to-pdf": "Convert to PDF",
     "button-remove-background": "Remove background",
+    "button-toggle-previewer-image": {
+      "active": "Show image",
+      "disabled": "Hide image"
+    },
     "button-toggle-selected-all": {
       "active": "Select all",
       "disabled": "Deselect all"

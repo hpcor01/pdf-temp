@@ -1,30 +1,10 @@
-import type { LoginRequest, User } from "@/types/auth";
+import type { LoginRequest, LoginResponse, User } from "@/types/auth";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_KEY_BACK_END || "";
 
-export interface LoginResponse {
-  branch: {
-    address: string;
-    availableSpaces: number;
-    id: string;
-    name: string;
-  };
-  email: string;
-  id: string;
-  role: string;
-  type: string;
-  username: string;
-}
-
-/**
- * Authenticates a user with email and password
- * @param email User's email
- * @param password User's password
- * @returns Promise resolving to user data
- */
 export async function login(
   email: string,
-  password: string,
+  password: string
 ): Promise<LoginResponse> {
   if (!API_BASE_URL) {
     throw new Error("API base URL is not configured");
@@ -50,17 +30,11 @@ export async function login(
   } catch (error) {
     console.error("Login error:", error);
     throw new Error(
-      "Failed to login. Please check your credentials and try again.",
+      "Failed to login. Please check your credentials and try again."
     );
   }
 }
 
-/**
- * Gets the currently authenticated user
- * @returns Promise resolving to user data or null if not authenticated
- */
 export async function getCurrentUser(): Promise<User | null> {
-  // This would typically get a token from storage and fetch user data
-  // For now, we'll return null as a placeholder
   return null;
 }

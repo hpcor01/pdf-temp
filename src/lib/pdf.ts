@@ -1,9 +1,6 @@
 import jsPDF from "jspdf";
 import type { Column } from "@/types/kanban";
 
-/**
- * Extrai a URL original caso seja uma imagem otimizada pelo Next.js
- */
 function extractOriginalImageUrl(nextImageUrl: string): string {
   try {
     if (nextImageUrl.includes("/_next/image?url=")) {
@@ -18,9 +15,6 @@ function extractOriginalImageUrl(nextImageUrl: string): string {
   }
 }
 
-/**
- * Carrega a imagem em memória
- */
 function loadImage(src: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -31,14 +25,10 @@ function loadImage(src: string): Promise<HTMLImageElement> {
   });
 }
 
-/**
- * Salva o PDF no navegador (FileSystemAccess API ou fallback .save)
- */
 async function savePDF(doc: jsPDF, name: string): Promise<void> {
   const safeName = name.replace(/[/\\?%*:|"<>]/g, "-");
   const blob = doc.output("blob");
 
-  // Check if the File System Access API is supported
   if ("showSaveFilePicker" in window && window.showSaveFilePicker) {
     try {
       const handle = await window.showSaveFilePicker({
@@ -60,15 +50,9 @@ async function savePDF(doc: jsPDF, name: string): Promise<void> {
     }
   }
 
-  // Fallback: download direto
   doc.save(`${safeName}.pdf`);
 }
 
-/**
- * Gera um PDF com todas as imagens de uma coluna
- * ✅ Cada imagem é uma página
- * ✅ Mantém rotação aplicada
- */
 async function generatePDFForColumn(column: Column): Promise<void> {
   const doc = new jsPDF({ orientation: "landscape", unit: "px", format: "a4" });
   const pageWidth = doc.internal.pageSize.getWidth();
@@ -82,11 +66,9 @@ async function generatePDFForColumn(column: Column): Promise<void> {
       const src = extractOriginalImageUrl(item.src);
       const img = await loadImage(src);
 
-      // Canvas para aplicar rotação antes de inserir no PDF
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
 
-      // Check if context is available
       if (!ctx) {
         throw new Error("Could not get 2D context for canvas");
       }
@@ -105,7 +87,6 @@ async function generatePDFForColumn(column: Column): Promise<void> {
       ctx.rotate(radians);
       ctx.drawImage(img, -img.width / 2, -img.height / 2);
 
-      // Ajuste para caber na página mantendo proporção
       const ratio = Math.min(
         pageWidth / canvas.width,
         pageHeight / canvas.height
@@ -124,9 +105,6 @@ async function generatePDFForColumn(column: Column): Promise<void> {
   await savePDF(doc, column.title);
 }
 
-/**
- * Gera PDFs para todas as colunas selecionadas
- */
 export async function generatePDFForColumns(
   columns: Column[],
   selected: Record<string, boolean>

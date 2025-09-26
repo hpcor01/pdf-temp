@@ -1,3 +1,5 @@
+"use client";
+
 import { Droppable } from "@hello-pangea/dnd";
 import { Pencil, Trash2 } from "lucide-react";
 import { type DragEvent, useEffect, useState } from "react";
@@ -102,6 +104,15 @@ export function ColumnComponent({ column, index }: ColumnProps) {
     toggleColumnSelection(column.id, checked);
   };
 
+  // Calculate total images in this column
+  const totalImages = column.items.length;
+
+  // Get the header element to dispatch mouse events
+  const dispatchMouseEventToHeader = (event: React.MouseEvent, image: any) => {
+    // This would require a more complex implementation to communicate with the header
+    // For now, we'll implement a simpler solution by passing callbacks
+  };
+
   return (
     <Droppable droppableId={column.id}>
       {(provided) => (
@@ -144,7 +155,12 @@ export function ColumnComponent({ column, index }: ColumnProps) {
                     aria-label={`Editar título da coluna ${column.title}`}
                   />
                 ) : (
-                  <p className="font-medium truncate">{column.title}</p>
+                  <div className="flex flex-col">
+                    <p className="font-medium truncate">{column.title}</p>
+                    <span className="text-xs text-muted-foreground">
+                      Total: {totalImages}
+                    </span>
+                  </div>
                 )}
               </div>
               <div className="flex gap-1">
