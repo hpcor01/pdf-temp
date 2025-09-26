@@ -3,7 +3,7 @@
     "label": "Επιλογή γλωσσών",
     "locales": {
       "pt-br": {
-        "label": "Βραζιλιάνικη Πορτογαλικά",
+        "label": "Πορτογαλικά Βραζιλίας",
         "flag": "pt-BR",
         "default-selected": true
       },
@@ -18,6 +18,10 @@
       "he-il": {
         "label": "Εβραϊκά",
         "flag": "he-IL"
+      },
+      "es-es": {
+        "label": "Ισπανικά",
+        "flag": "es-ES"
       }
     }
   },

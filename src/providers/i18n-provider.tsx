@@ -3,6 +3,7 @@
 import { createContext, type ReactNode, useContext, useState } from "react";
 import elGr from "@/locales/el-gr.json";
 import enEn from "@/locales/en-en.json";
+import esEs from "@/locales/es-es.json";
 import heIl from "@/locales/he-il.json";
 import ptBr from "@/locales/pt-br.json";
 import type { LanguageStructure } from "@/types/i18n";
@@ -10,6 +11,7 @@ import type { LanguageStructure } from "@/types/i18n";
 const locales = {
   "el-gr": elGr,
   "en-en": enEn,
+  "es-es": esEs,
   "he-il": heIl,
   "pt-br": ptBr,
 } as const;

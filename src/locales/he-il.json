@@ -18,6 +18,10 @@
       "he-il": {
         "label": "עברית",
         "flag": "he-IL"
+      },
+      "es-es": {
+        "label": "ספרדית",
+        "flag": "es-ES"
       }
     }
   },

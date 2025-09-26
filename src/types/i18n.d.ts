@@ -19,6 +19,10 @@ export interface LanguageStructure {
         label: string;
         flag: string;
       };
+      "es-es": {
+        label: string;
+        flag: string;
+      };
     };
   };
   buttons: {
