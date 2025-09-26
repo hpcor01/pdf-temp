@@ -1,5 +1,5 @@
 import { Draggable } from "@hello-pangea/dnd";
-import { RotateCw, X } from "lucide-react";
+import { RotateCw, ScanSearch, X } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -13,8 +13,7 @@ export function ImageCard({
   onRemove,
   onRotate,
 }: ImageCardProps) {
-  const { setPreviewImage, clearPreview, isPreviewerImageChecked } =
-    usePreview();
+  const { setPreviewImage, isPreviewerImageChecked } = usePreview();
 
   const handleRotate = (): void => {
     const newRotation = (item.rotation + 90) % 360;
@@ -23,19 +22,15 @@ export function ImageCard({
 
   const positionNumber = index + 1;
 
-  const handleMouseEnter = (e: React.MouseEvent) => {
-    setPreviewImage(item, { x: e.clientX, y: e.clientY });
-  };
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    setPreviewImage(item, { x: e.clientX, y: e.clientY });
-  };
-
-  const handleMouseLeave = () => {
-    clearPreview();
-  };
-
   const handleClick = () => {
+    if (isPreviewerImageChecked) {
+      setPreviewImage(item, null, true);
+    }
+  };
+
+  // New zoom handler for the zoom button
+  const handleZoom = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent card click from triggering
     if (isPreviewerImageChecked) {
       setPreviewImage(item, null, true);
     }
@@ -56,9 +51,6 @@ export function ImageCard({
           {...provided.draggableProps}
           {...provided.dragHandleProps}
           className="mb-2"
-          onMouseEnter={handleMouseEnter}
-          onMouseMove={handleMouseMove}
-          onMouseLeave={handleMouseLeave}
         >
           <Card className="relative w-full overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 group">
             <Button
@@ -84,7 +76,7 @@ export function ImageCard({
               <Button
                 type="button"
                 onClick={(e) => {
-                  e.stopPropagation();
+                  e.stopPropagation(); // Prevent card click from triggering
                   onRemove(columnId, item.id);
                 }}
                 className="
@@ -100,7 +92,7 @@ export function ImageCard({
               <Button
                 type="button"
                 onClick={(e) => {
-                  e.stopPropagation();
+                  e.stopPropagation(); // Prevent card click from triggering
                   handleRotate();
                 }}
                 className="
@@ -111,6 +103,20 @@ export function ImageCard({
                 aria-label={`Rotacionar imagem ${item.fileName}`}
               >
                 <RotateCw className="w-4 h-4" />
+              </Button>
+
+              {/* New zoom button */}
+              <Button
+                type="button"
+                onClick={handleZoom}
+                className="
+                  p-2 rounded-full cursor-pointer bg-white/90 dark:bg-gray-800/90
+                  text-gray-900 dark:text-gray-100 hover:bg-green-500 hover:text-white
+                  transition-all duration-200 shadow-md
+                "
+                aria-label={`Zoom na imagem ${item.fileName}`}
+              >
+                <ScanSearch className="w-4 h-4" />
               </Button>
             </div>
 

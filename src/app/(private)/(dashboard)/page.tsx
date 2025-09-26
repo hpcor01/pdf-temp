@@ -40,7 +40,6 @@ export default function Dashboard() {
             rotation: 0,
             size: 0,
           };
-          // Add image to the target column
           addImagesToColumn(columnId, [newImage]);
           return;
         }
@@ -56,7 +55,6 @@ export default function Dashboard() {
           rotation: 0,
           size: file.size,
         }));
-        // Add images to the target column
         addImagesToColumn(columnId, newImages);
       }
     },
