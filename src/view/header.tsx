@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useId, useState } from "react";
+import { useId, useState } from "react";
 import ComboboxChangeLanguage from "@/components/combobox-change-language";
 import { ModeToggle } from "@/components/mode-toggle";
 import { Button } from "@/components/ui/button";
@@ -25,13 +25,7 @@ export default function Header({
     columns,
   } = useKanban();
 
-  const {
-    previewImage,
-    previewPosition,
-    isClickPreview,
-    isPreviewerImageChecked,
-    setIsPreviewerImageChecked,
-  } = usePreview();
+  const { isPreviewerImageChecked, setIsPreviewerImageChecked } = usePreview();
 
   const buttons = useLanguageKey("buttons");
   const toggleButtonLabels = useLanguageKey(
@@ -100,11 +94,6 @@ export default function Header({
     link.click();
     document.body.removeChild(link);
   };
-
-  // Close preview
-  const closePreview = useCallback(() => {
-    // The actual closing is handled by the context
-  }, []);
 
   const handleSaveClick = async () => {
     try {
@@ -208,6 +197,22 @@ export default function Header({
         >
           <ModeToggle />
           <ComboboxChangeLanguage />
+
+          <div className="flex items-center gap-2">
+            <Checkbox
+              id={togglePreviewerImage}
+              checked={isPreviewerImageChecked}
+              onCheckedChange={handlePreviewerImageChange}
+              className="cursor-pointer"
+              disabled={isProcessing}
+            >
+              <span className="cursor-pointer py-2">
+                {isPreviewerImageChecked
+                  ? toggleButtonPreviewerImages.active
+                  : toggleButtonPreviewerImages.disabled}
+              </span>
+            </Checkbox>
+          </div>
         </section>
 
         <section
@@ -227,22 +232,6 @@ export default function Header({
                 {areAllColumnsSelected
                   ? toggleButtonLabels.disabled
                   : toggleButtonLabels.active}
-              </span>
-            </Checkbox>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <Checkbox
-              id={togglePreviewerImage}
-              checked={isPreviewerImageChecked}
-              onCheckedChange={handlePreviewerImageChange}
-              className="cursor-pointer"
-              disabled={isProcessing}
-            >
-              <span className="cursor-pointer py-2">
-                {isPreviewerImageChecked
-                  ? toggleButtonPreviewerImages.active
-                  : toggleButtonPreviewerImages.disabled}
               </span>
             </Checkbox>
           </div>
