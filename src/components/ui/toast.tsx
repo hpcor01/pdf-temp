@@ -1,7 +1,8 @@
 import { cva, type VariantProps } from "class-variance-authority";
-import { Terminal } from "lucide-react";
+import { Terminal, X } from "lucide-react";
 import type * as React from "react";
 import { cn } from "@/lib/utils";
+import { Button } from "./button";
 
 const toastVariants = cva(
   "fixed top-4 right-4 z-50 w-full max-w-sm rounded-lg border p-4 shadow-lg transition-all duration-300 ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-80 data-[state=closed]:slide-out-to-right-full data-[state=open]:slide-in-from-right-full",
@@ -16,7 +17,7 @@ const toastVariants = cva(
     defaultVariants: {
       variant: "default",
     },
-  },
+  }
 );
 
 interface ToastProps
@@ -56,7 +57,7 @@ function Toast({
             <h3
               className={cn(
                 "font-medium leading-none tracking-tight",
-                variant === "destructive" ? "text-destructive-foreground" : "",
+                variant === "destructive" ? "text-destructive-foreground" : ""
               )}
             >
               {title}
@@ -68,35 +69,23 @@ function Toast({
                 "text-sm opacity-90",
                 variant === "destructive"
                   ? "text-destructive-foreground/90"
-                  : "text-muted-foreground",
+                  : "text-muted-foreground"
               )}
             >
               {description}
             </p>
           )}
         </div>
-        <button
+        <Button
           type="button"
+          variant="ghost"
+          size="icon"
           className="text-muted-foreground hover:text-foreground"
           onClick={() => onOpenChange(false)}
           aria-label="Close"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            role="img"
-            aria-label="Close"
-          >
-            <title>Close</title>
-            <path d="M18 6L6 18M6 6l12 12" />
-          </svg>
-        </button>
+          <X className="h-5 w-5" />
+        </Button>
       </div>
     </div>
   );

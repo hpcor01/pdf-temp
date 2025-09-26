@@ -4,6 +4,7 @@ import { X } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import type { PreviewerImageProps } from "@/types/previewer";
+import { Button } from "./ui/button";
 
 export function PreviewerImage({
   image,
@@ -19,7 +20,7 @@ export function PreviewerImage({
     if (image) {
       setIsVisible(true);
       if (isClickPreview) {
-        setZoomLevel(1); // Reset zoom when opening click preview
+        setZoomLevel(1);
       }
     } else {
       setIsVisible(false);
@@ -42,14 +43,13 @@ export function PreviewerImage({
     };
   }, [isVisible, onClose]);
 
-  // Handle zoom with mouse wheel
   useEffect(() => {
     const handleWheel = (e: WheelEvent) => {
       if (isClickPreview && image) {
         e.preventDefault();
         setZoomLevel((prevZoom) => {
           const newZoom = e.deltaY < 0 ? prevZoom * 1.1 : prevZoom * 0.9;
-          return Math.min(Math.max(0.5, newZoom), 3); // Limit zoom between 0.5x and 3x
+          return Math.min(Math.max(0.5, newZoom), 3);
         });
       }
     };
@@ -68,20 +68,19 @@ export function PreviewerImage({
 
   if (!image) return null;
 
-  // Render the click preview (split view)
   if (isClickPreview) {
     return (
       <div ref={previewRef} className="h-full bg-card flex flex-col">
         <div className="p-4 border-b border-border flex justify-between items-center">
           <h2 className="text-lg font-semibold">Image Preview</h2>
-          <button
+          <Button
             type="button"
             onClick={onClose}
             className="text-muted-foreground hover:text-foreground"
             aria-label="Close preview"
           >
             <X className="w-6 h-6" />
-          </button>
+          </Button>
         </div>
 
         <div className="flex-grow flex items-center justify-center p-4 overflow-auto">
@@ -118,7 +117,6 @@ export function PreviewerImage({
     );
   }
 
-  // Render the hover preview (existing functionality)
   if (position) {
     // Calculate position to avoid going off-screen
     const calculatePosition = () => {
@@ -166,14 +164,14 @@ export function PreviewerImage({
       >
         <div className="flex justify-between items-start mb-2">
           <h3 className="font-medium text-sm truncate">{image.fileName}</h3>
-          <button
+          <Button
             type="button"
             onClick={onClose}
             className="text-muted-foreground hover:text-foreground ml-2"
             aria-label="Close preview"
           >
             <X className="w-5 h-5" />
-          </button>
+          </Button>
         </div>
 
         <div className="relative rounded-md overflow-hidden bg-gray-100 dark:bg-gray-800">

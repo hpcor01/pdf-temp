@@ -35,15 +35,12 @@ export function ImageCard({
     clearPreview();
   };
 
-  // New click handler for opening the large preview
   const handleClick = () => {
-    // Only open the preview if "Mostrar imagem" is enabled
     if (isPreviewerImageChecked) {
-      setPreviewImage(item, null, true); // true indicates click preview
+      setPreviewImage(item, null, true);
     }
   };
 
-  // Keyboard handler for accessibility
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
@@ -64,7 +61,7 @@ export function ImageCard({
           onMouseLeave={handleMouseLeave}
         >
           <Card className="relative w-full overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 group">
-            <button
+            <Button
               type="button"
               className="absolute inset-0 cursor-pointer bg-transparent border-none"
               onClick={handleClick}
@@ -87,7 +84,7 @@ export function ImageCard({
               <Button
                 type="button"
                 onClick={(e) => {
-                  e.stopPropagation(); // Prevent card click from triggering
+                  e.stopPropagation();
                   onRemove(columnId, item.id);
                 }}
                 className="
@@ -103,7 +100,7 @@ export function ImageCard({
               <Button
                 type="button"
                 onClick={(e) => {
-                  e.stopPropagation(); // Prevent card click from triggering
+                  e.stopPropagation();
                   handleRotate();
                 }}
                 className="
