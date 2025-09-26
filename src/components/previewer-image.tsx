@@ -3,14 +3,7 @@
 import { X } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import type { ImageItem } from "@/types/kanban";
-
-interface PreviewerImageProps {
-  image: ImageItem | null;
-  position: { x: number; y: number } | null;
-  isClickPreview: boolean;
-  onClose: () => void;
-}
+import type { PreviewerImageProps } from "@/types/previewer";
 
 export function PreviewerImage({
   image,
