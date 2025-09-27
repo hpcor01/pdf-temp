@@ -28,7 +28,7 @@ const ColumnComponent = dynamic<ColumnProps>(
         </div>
       </div>
     ),
-  }
+  },
 );
 
 export function Board() {
@@ -58,18 +58,18 @@ export function Board() {
           source.droppableId,
           destination.droppableId,
           draggableId,
-          destination.index
+          destination.index,
         );
       } else {
         moveImage(
           source.droppableId,
           destination.droppableId,
           draggableId,
-          destination.index
+          destination.index,
         );
       }
     },
-    [moveImage]
+    [moveImage],
   );
 
   const handleAddColumn = (title?: string) => {

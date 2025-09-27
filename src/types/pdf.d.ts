@@ -10,7 +10,7 @@ export interface FileSystemWritableFileStream {
 declare global {
   interface Window {
     showSaveFilePicker?: (
-      options: ShowSaveFilePickerOptions
+      options: ShowSaveFilePickerOptions,
     ) => Promise<FileSystemFileHandle>;
     showSaveFilePicker?: (options: {
       suggestedName: string;

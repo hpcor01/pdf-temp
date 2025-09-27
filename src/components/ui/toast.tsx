@@ -17,7 +17,7 @@ const toastVariants = cva(
     defaultVariants: {
       variant: "default",
     },
-  }
+  },
 );
 
 interface ToastProps
@@ -57,7 +57,7 @@ function Toast({
             <h3
               className={cn(
                 "font-medium leading-none tracking-tight",
-                variant === "destructive" ? "text-destructive-foreground" : ""
+                variant === "destructive" ? "text-destructive-foreground" : "",
               )}
             >
               {title}
@@ -69,7 +69,7 @@ function Toast({
                 "text-sm opacity-90",
                 variant === "destructive"
                   ? "text-destructive-foreground/90"
-                  : "text-muted-foreground"
+                  : "text-muted-foreground",
               )}
             >
               {description}

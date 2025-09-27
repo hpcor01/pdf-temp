@@ -89,7 +89,7 @@ async function generatePDFForColumn(column: Column): Promise<void> {
 
       const ratio = Math.min(
         pageWidth / canvas.width,
-        pageHeight / canvas.height
+        pageHeight / canvas.height,
       );
       const imgW = canvas.width * ratio;
       const imgH = canvas.height * ratio;
@@ -107,7 +107,7 @@ async function generatePDFForColumn(column: Column): Promise<void> {
 
 export async function generatePDFForColumns(
   columns: Column[],
-  selected: Record<string, boolean>
+  selected: Record<string, boolean>,
 ): Promise<void> {
   const list = columns.filter((c) => selected[c.id]);
   for (const col of list) {
