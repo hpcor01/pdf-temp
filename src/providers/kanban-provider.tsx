@@ -177,12 +177,6 @@ export function KanbanProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      console.log("Saving columns:", {
-        columns: selectedColumnsList,
-        convertToPDF,
-        savePath,
-      });
-
       alert(
         `Would save ${selectedColumnsList.length} columns to ${savePath} as ${
           convertToPDF ? "PDF" : "images"

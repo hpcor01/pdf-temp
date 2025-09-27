@@ -3,10 +3,11 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "@/app/globals.css";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-
+import { UpdateToast } from "@/components/update-toast";
 import { I18nProvider } from "@/providers/i18n-provider";
 import { KanbanProvider } from "@/providers/kanban-provider";
 import { PreviewProvider } from "@/providers/preview-provider";
+import { PreviewerProvider } from "@/providers/previewer-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
 
 const geistSans = Geist({
@@ -59,12 +60,16 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <PreviewProvider>
-              <KanbanProvider>{children}</KanbanProvider>
+              <PreviewerProvider>
+                <KanbanProvider>{children}</KanbanProvider>
+              </PreviewerProvider>
             </PreviewProvider>
             <Analytics />
             <SpeedInsights />
           </ThemeProvider>
         </I18nProvider>
+
+        <UpdateToast />
       </body>
     </html>
   );

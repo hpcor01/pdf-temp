@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import { useCallback, useEffect } from "react";
 import { useKanban } from "@/providers/kanban-provider";
 import { usePreview } from "@/providers/preview-provider";
+import { usePreviewer } from "@/providers/previewer-provider";
 import type { ColumnProps } from "@/types/column";
 import { BtnCreateColumn } from "./btn-create-column";
 import { PreviewerImage } from "./previewer-image";
@@ -33,12 +34,8 @@ const ColumnComponent = dynamic<ColumnProps>(
 
 export function Board() {
   const { columns, moveImage, addColumn } = useKanban();
-  const {
-    previewImage,
-    isClickPreview,
-    isPreviewerImageChecked,
-    clearPreview,
-  } = usePreview();
+  const { previewImage, isClickPreview, clearPreview } = usePreview();
+  const { isPreviewerOpen } = usePreviewer();
 
   const onDragEnd = useCallback(
     (result: DropResult) => {
@@ -90,16 +87,15 @@ export function Board() {
     };
   }, [isClickPreview, clearPreview]);
 
-  // Check if we should show the preview panel (split view)
-  const showPreviewPanel =
-    isPreviewerImageChecked && previewImage && isClickPreview;
+  const showPreviewPanel = previewImage && isClickPreview;
+  const showPreviewerPanel = isPreviewerOpen;
 
   return (
     <div className="flex h-full">
       <DragDropContext onDragEnd={onDragEnd}>
         <div
           className={`flex overflow-x-auto gap-4 p-4 flex-grow ${
-            showPreviewPanel ? "w-3/5" : "w-full"
+            showPreviewPanel || showPreviewerPanel ? "w-3/5" : "w-full"
           }`}
         >
           {columns.map((column, index) => (
@@ -110,19 +106,10 @@ export function Board() {
 
       <BtnCreateColumn
         onClick={handleAddColumn}
-        showPreviewPanel={showPreviewPanel}
+        showPreviewPanel={showPreviewPanel || showPreviewerPanel}
       />
 
-      {showPreviewPanel && (
-        <div className="w-2/5 h-full border-l border-border">
-          <PreviewerImage
-            image={previewImage}
-            position={null}
-            isClickPreview={true}
-            onClose={clearPreview}
-          />
-        </div>
-      )}
+      <PreviewerImage />
     </div>
   );
 }

@@ -38,8 +38,8 @@
     "button-convert-to-pdf": "המר ל-PDF",
     "button-remove-background": "הסר רקע",
     "button-toggle-previewer-image": {
-      "active": "הצג תמונה",
-      "disabled": "הסתר תמונה"
+      "active": "הדגשת תמונה הופעלה",
+      "disabled": "הדגשת תמונה הושבתה"
     },
     "button-toggle-selected-all": {
       "active": "בחר הכל",

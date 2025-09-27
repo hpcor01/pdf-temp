@@ -38,8 +38,8 @@
     "button-convert-to-pdf": "Μετατροπή σε PDF",
     "button-remove-background": "Αφαίρεση φόντου",
     "button-toggle-previewer-image": {
-      "active": "Εμφάνιση εικόνας",
-      "disabled": "Απόκρυψη εικόνας"
+      "active": "Ενεργοποίηση επισήμανσης εικόνας",
+      "disabled": "Απενεργοποίηση επισήμανσης εικόνας"
     },
     "button-toggle-selected-all": {
       "active": "Επιλογή όλων",

@@ -80,10 +80,7 @@ export default function Header({
     setToastTitle(title);
     setToastDescription(description);
     setToastOpen(true);
-
-    setTimeout(() => {
-      setToastOpen(false);
-    }, 5000);
+    setTimeout(() => setToastOpen(false), 5000);
   };
 
   const triggerDownload = (url: string, filename: string) => {
