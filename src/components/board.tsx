@@ -2,7 +2,7 @@
 
 import { DragDropContext, type DropResult } from "@hello-pangea/dnd";
 import dynamic from "next/dynamic";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { useKanban } from "@/providers/kanban-provider";
 import { usePreview } from "@/providers/preview-provider";
 import type { ColumnProps } from "@/types/column";
@@ -28,7 +28,7 @@ const ColumnComponent = dynamic<ColumnProps>(
         </div>
       </div>
     ),
-  }
+  },
 );
 
 export function Board() {
@@ -58,23 +58,37 @@ export function Board() {
           source.droppableId,
           destination.droppableId,
           draggableId,
-          destination.index
+          destination.index,
         );
       } else {
         moveImage(
           source.droppableId,
           destination.droppableId,
           draggableId,
-          destination.index
+          destination.index,
         );
       }
     },
-    [moveImage]
+    [moveImage],
   );
 
   const handleAddColumn = (title?: string) => {
     addColumn(title || "");
   };
+
+  // Handle escape key to close preview
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isClickPreview) {
+        clearPreview();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isClickPreview, clearPreview]);
 
   // Check if we should show the preview panel (split view)
   const showPreviewPanel =
@@ -94,6 +108,11 @@ export function Board() {
         </div>
       </DragDropContext>
 
+      <BtnCreateColumn
+        onClick={handleAddColumn}
+        showPreviewPanel={showPreviewPanel}
+      />
+
       {showPreviewPanel && (
         <div className="w-2/5 h-full border-l border-border">
           <PreviewerImage
@@ -104,8 +123,6 @@ export function Board() {
           />
         </div>
       )}
-
-      <BtnCreateColumn onClick={handleAddColumn} />
     </div>
   );
 }

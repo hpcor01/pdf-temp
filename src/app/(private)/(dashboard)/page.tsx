@@ -9,7 +9,7 @@ import Header from "@/view/header";
 export default function Dashboard() {
   const [isDragging, setIsDragging] = useState(false);
   const [_dragOverColumnId, setDragOverColumnId] = useState<string | null>(
-    null
+    null,
   );
   const { addImagesToColumn, columns } = useKanban();
 
@@ -31,7 +31,7 @@ export default function Dashboard() {
         if (/\.(jpe?g|png|gif|webp|avif|svg)(\?|$)/i.test(url)) {
           const fileName =
             decodeURIComponent(
-              new URL(url).pathname.split("/").pop() || "image"
+              new URL(url).pathname.split("/").pop() || "image",
             ) || "image";
           const newImage: ImageItem = {
             id: crypto.randomUUID(),
@@ -40,7 +40,6 @@ export default function Dashboard() {
             rotation: 0,
             size: 0,
           };
-          // Add image to the target column
           addImagesToColumn(columnId, [newImage]);
           return;
         }
@@ -56,11 +55,10 @@ export default function Dashboard() {
           rotation: 0,
           size: file.size,
         }));
-        // Add images to the target column
         addImagesToColumn(columnId, newImages);
       }
     },
-    [addImagesToColumn, columns]
+    [addImagesToColumn, columns],
   );
 
   return (

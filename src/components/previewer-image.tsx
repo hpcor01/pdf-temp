@@ -1,16 +1,10 @@
 "use client";
 
-import { X } from "lucide-react";
+import { RefreshCw, RotateCw, X, ZoomIn, ZoomOut } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import type { ImageItem } from "@/types/kanban";
-
-interface PreviewerImageProps {
-  image: ImageItem | null;
-  position: { x: number; y: number } | null;
-  isClickPreview: boolean;
-  onClose: () => void;
-}
+import type { PreviewerImageProps } from "@/types/previewer";
+import { Button } from "./ui/button";
 
 export function PreviewerImage({
   image,
@@ -20,18 +14,25 @@ export function PreviewerImage({
 }: PreviewerImageProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(1);
+  const [rotation, setRotation] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [imagePosition, setImagePosition] = useState({ x: 0, y: 0 });
+  const [_initialPosition, setInitialPosition] = useState({ x: 0, y: 0 });
   const previewRef = useRef<HTMLDivElement>(null);
+  const imageRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (image) {
       setIsVisible(true);
-      if (isClickPreview) {
-        setZoomLevel(1); // Reset zoom when opening click preview
-      }
+      setZoomLevel(1);
+      setRotation(image.rotation || 0);
+      setImagePosition({ x: 0, y: 0 });
+      setInitialPosition({ x: 0, y: 0 });
     } else {
       setIsVisible(false);
     }
-  }, [image, isClickPreview]);
+  }, [image]);
 
   useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
@@ -49,14 +50,13 @@ export function PreviewerImage({
     };
   }, [isVisible, onClose]);
 
-  // Handle zoom with mouse wheel
   useEffect(() => {
     const handleWheel = (e: WheelEvent) => {
       if (isClickPreview && image) {
         e.preventDefault();
         setZoomLevel((prevZoom) => {
           const newZoom = e.deltaY < 0 ? prevZoom * 1.1 : prevZoom * 0.9;
-          return Math.min(Math.max(0.5, newZoom), 3); // Limit zoom between 0.5x and 3x
+          return Math.min(Math.max(0.1, newZoom), 5);
         });
       }
     };
@@ -73,48 +73,153 @@ export function PreviewerImage({
     };
   }, [isClickPreview, image]);
 
+  // Handle mouse events for dragging
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (zoomLevel > 1) {
+      setIsDragging(true);
+      setDragStart({
+        x: e.clientX - imagePosition.x,
+        y: e.clientY - imagePosition.y,
+      });
+    }
+  };
+
+  // Zoom functions
+  const handleZoomIn = () => {
+    setZoomLevel((prev) => Math.min(prev * 1.2, 5));
+  };
+
+  const handleZoomOut = () => {
+    setZoomLevel((prev) => Math.max(prev / 1.2, 0.1));
+  };
+
+  const handleReset = () => {
+    setZoomLevel(1);
+    setRotation(0);
+    setImagePosition({ x: 0, y: 0 });
+    setInitialPosition({ x: 0, y: 0 });
+  };
+
+  const handleRotate = () => {
+    setRotation((prev) => (prev + 90) % 360);
+  };
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (isDragging) {
+        const newX = e.clientX - dragStart.x;
+        const newY = e.clientY - dragStart.y;
+        setImagePosition({ x: newX, y: newY });
+      }
+    };
+
+    const handleMouseUp = () => {
+      if (isDragging) {
+        setIsDragging(false);
+        setInitialPosition(imagePosition);
+      }
+    };
+
+    if (isDragging) {
+      window.addEventListener("mousemove", handleMouseMove);
+      window.addEventListener("mouseup", handleMouseUp);
+    }
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [isDragging, dragStart, imagePosition]);
+
   if (!image) return null;
 
-  // Render the click preview (split view)
   if (isClickPreview) {
     return (
-      <div ref={previewRef} className="h-full bg-card flex flex-col">
+      <div ref={previewRef} className="h-[80vh] bg-card flex flex-col">
         <div className="p-4 border-b border-border flex justify-between items-center">
           <h2 className="text-lg font-semibold">Image Preview</h2>
-          <button
-            type="button"
-            onClick={onClose}
-            className="text-muted-foreground hover:text-foreground"
-            aria-label="Close preview"
-          >
-            <X className="w-6 h-6" />
-          </button>
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              onClick={handleZoomOut}
+              className="cursor-pointer text-muted-foreground hover:text-foreground"
+              aria-label="Zoom out"
+            >
+              <ZoomOut className="w-5 h-5" />
+            </Button>
+            <Button
+              type="button"
+              onClick={handleZoomIn}
+              className="cursor-pointer text-muted-foreground hover:text-foreground"
+              aria-label="Zoom in"
+            >
+              <ZoomIn className="w-5 h-5" />
+            </Button>
+            <Button
+              type="button"
+              onClick={handleRotate}
+              className="cursor-pointer text-muted-foreground hover:text-foreground"
+              aria-label="Rotate image"
+            >
+              <RotateCw className="w-5 h-5" />
+            </Button>
+            <Button
+              type="button"
+              onClick={handleReset}
+              className="cursor-pointer text-muted-foreground hover:text-foreground"
+              aria-label="Reset view"
+            >
+              <RefreshCw className="w-5 h-5" />
+            </Button>
+            <Button
+              type="button"
+              onClick={onClose}
+              className="cursor-pointer text-muted-foreground hover:text-foreground"
+              aria-label="Close preview"
+            >
+              <X className="w-5 h-5" />
+            </Button>
+          </div>
         </div>
 
-        <div className="flex-grow flex items-center justify-center p-4 overflow-auto">
-          <Image
-            src={image.src}
-            alt={image.fileName}
-            width={0}
-            height={0}
-            sizes="100vw"
+        <button
+          type="button"
+          className="flex-grow flex items-center justify-center p-4 overflow-hidden cursor-grab active:cursor-grabbing bg-transparent border-none"
+          onMouseDown={handleMouseDown}
+          aria-label="Pan image"
+        >
+          <div
+            ref={imageRef}
             style={{
-              transform: `rotate(${image.rotation}deg) scale(${zoomLevel})`,
-              width: "auto",
-              height: "auto",
-              maxWidth: "100%",
-              maxHeight: "100%",
-              objectFit: "contain",
-              transition: "transform 0.2s ease",
+              transform: `translate(${imagePosition.x}px, ${imagePosition.y}px)`,
+              transition: isDragging ? "none" : "transform 0.2s ease",
             }}
-            className="transition-transform duration-200"
-          />
-        </div>
+          >
+            <Image
+              src={image.src}
+              alt={image.fileName}
+              width={0}
+              height={0}
+              sizes="100vw"
+              style={{
+                transform: `rotate(${rotation}deg) scale(${zoomLevel})`,
+                width: "auto",
+                height: "auto",
+                maxWidth: "100%",
+                maxHeight: "100%",
+                objectFit: "contain",
+                transition: isDragging ? "none" : "transform 0.2s ease",
+              }}
+              className="transition-transform duration-200 max-h-full max-w-full"
+              draggable={false}
+            />
+          </div>
+        </button>
 
         <div className="border-t border-border p-2 bg-card">
           <div className="text-xs text-muted-foreground flex flex-wrap justify-between gap-2">
             <span className="truncate max-w-[30%]">{image.fileName}</span>
-            <span>Rotation: {image.rotation}°</span>
+            <span>Rotation: {rotation}°</span>
             {image.size && image.size > 0 && (
               <span>Size: {(image.size / 1024).toFixed(2)} KB</span>
             )}
@@ -125,7 +230,6 @@ export function PreviewerImage({
     );
   }
 
-  // Render the hover preview (existing functionality)
   if (position) {
     // Calculate position to avoid going off-screen
     const calculatePosition = () => {
@@ -163,7 +267,7 @@ export function PreviewerImage({
         ref={previewRef}
         className={`fixed z-50 bg-card border border-border rounded-lg shadow-2xl p-4 transition-opacity duration-200 ${
           isVisible ? "opacity-100" : "opacity-0"
-        }`}
+        } max-h-[90vh] overflow-hidden`}
         style={{
           top: `${top}px`,
           left: `${left}px`,
@@ -173,17 +277,17 @@ export function PreviewerImage({
       >
         <div className="flex justify-between items-start mb-2">
           <h3 className="font-medium text-sm truncate">{image.fileName}</h3>
-          <button
+          <Button
             type="button"
             onClick={onClose}
-            className="text-muted-foreground hover:text-foreground ml-2"
+            className="cursor-pointer text-muted-foreground hover:text-foreground ml-2"
             aria-label="Close preview"
           >
             <X className="w-5 h-5" />
-          </button>
+          </Button>
         </div>
 
-        <div className="relative rounded-md overflow-hidden bg-gray-100 dark:bg-gray-800">
+        <div className="relative rounded-md overflow-hidden bg-gray-100 dark:bg-gray-800 max-h-[70vh]">
           <Image
             src={image.src}
             alt={image.fileName}
@@ -191,18 +295,18 @@ export function PreviewerImage({
             height={0}
             sizes="100vw"
             style={{
-              transform: `rotate(${image.rotation}deg)`,
+              transform: `rotate(${rotation}deg)`,
               width: "100%",
               height: "auto",
               maxHeight: "400px",
               objectFit: "contain",
             }}
-            className="transition-transform duration-200"
+            className="transition-transform duration-200 max-h-full w-full object-contain"
           />
         </div>
 
         <div className="mt-2 text-xs text-muted-foreground">
-          <p>Position: {image.rotation}°</p>
+          <p>Position: {rotation}°</p>
           {image.size && image.size > 0 && (
             <p>Size: {(image.size / 1024).toFixed(2)} KB</p>
           )}

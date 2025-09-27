@@ -2,20 +2,7 @@
 
 import { createContext, type ReactNode, useContext, useState } from "react";
 import type { ImageItem } from "@/types/kanban";
-
-interface PreviewContextType {
-  previewImage: ImageItem | null;
-  previewPosition: { x: number; y: number } | null;
-  isClickPreview: boolean;
-  isPreviewerImageChecked: boolean;
-  setPreviewImage: (
-    image: ImageItem | null,
-    position?: { x: number; y: number } | null,
-    isClickPreview?: boolean
-  ) => void;
-  clearPreview: () => void;
-  setIsPreviewerImageChecked: (checked: boolean) => void;
-}
+import type { PreviewContextType } from "@/types/previewer";
 
 const PreviewContext = createContext<PreviewContextType | undefined>(undefined);
 
@@ -32,7 +19,7 @@ export function PreviewProvider({ children }: { children: ReactNode }) {
   const setPreviewImage = (
     image: ImageItem | null,
     position: { x: number; y: number } | null = null,
-    isClickPreview: boolean = false
+    isClickPreview: boolean = false,
   ) => {
     setPreviewImageState(image);
     setPreviewPosition(position);
