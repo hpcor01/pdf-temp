@@ -1,0 +1,15 @@
+// Type definitions for environment variables
+declare namespace NodeJS {
+  interface ProcessEnv {
+    // Vercel environment variables
+    VERCEL?: string;
+    VERCEL_ENV?: "development" | "preview" | "production";
+    VERCEL_GIT_COMMIT_SHA?: string;
+    VERCEL_URL?: string;
+
+    // Custom environment variables
+    NEXT_PUBLIC_VERSION?: string;
+    NEXT_PUBLIC_POLL_INTERVAL?: string;
+    NEXT_PUBLIC_AUTO_RELOAD_DELAY?: string;
+  }
+}

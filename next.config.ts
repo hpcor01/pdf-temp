@@ -15,6 +15,11 @@ const nextConfig: NextConfig = {
   // Optional: desativa sourcemaps em produção
   productionBrowserSourceMaps: false,
 
+  // Expose the build version to the frontend
+  env: {
+    NEXT_PUBLIC_VERSION: process.env.VERCEL_GIT_COMMIT_SHA || "development",
+  },
+
   // Configure images
   images: {
     remotePatterns: [

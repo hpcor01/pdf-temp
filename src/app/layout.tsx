@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "@/app/globals.css";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-
+import { UpdateToast } from "@/components/update-toast";
 import { I18nProvider } from "@/providers/i18n-provider";
 import { KanbanProvider } from "@/providers/kanban-provider";
 import { PreviewProvider } from "@/providers/preview-provider";
@@ -65,6 +65,8 @@ export default function RootLayout({
             <SpeedInsights />
           </ThemeProvider>
         </I18nProvider>
+        {/* Update toast for automatic version checking */}
+        <UpdateToast />
       </body>
     </html>
   );
