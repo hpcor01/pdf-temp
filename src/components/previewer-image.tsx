@@ -142,7 +142,7 @@ export function PreviewerImage({
             <Button
               type="button"
               onClick={handleZoomOut}
-              className="text-muted-foreground hover:text-foreground"
+              className="cursor-pointer text-muted-foreground hover:text-foreground"
               aria-label="Zoom out"
             >
               <ZoomOut className="w-5 h-5" />
@@ -150,7 +150,7 @@ export function PreviewerImage({
             <Button
               type="button"
               onClick={handleZoomIn}
-              className="text-muted-foreground hover:text-foreground"
+              className="cursor-pointer text-muted-foreground hover:text-foreground"
               aria-label="Zoom in"
             >
               <ZoomIn className="w-5 h-5" />
@@ -158,7 +158,7 @@ export function PreviewerImage({
             <Button
               type="button"
               onClick={handleRotate}
-              className="text-muted-foreground hover:text-foreground"
+              className="cursor-pointer text-muted-foreground hover:text-foreground"
               aria-label="Rotate image"
             >
               <RotateCw className="w-5 h-5" />
@@ -166,7 +166,7 @@ export function PreviewerImage({
             <Button
               type="button"
               onClick={handleReset}
-              className="text-muted-foreground hover:text-foreground"
+              className="cursor-pointer text-muted-foreground hover:text-foreground"
               aria-label="Reset view"
             >
               <RefreshCw className="w-5 h-5" />
@@ -174,7 +174,7 @@ export function PreviewerImage({
             <Button
               type="button"
               onClick={onClose}
-              className="text-muted-foreground hover:text-foreground"
+              className="cursor-pointer text-muted-foreground hover:text-foreground"
               aria-label="Close preview"
             >
               <X className="w-5 h-5" />
@@ -280,7 +280,7 @@ export function PreviewerImage({
           <Button
             type="button"
             onClick={onClose}
-            className="text-muted-foreground hover:text-foreground ml-2"
+            className="cursor-pointer text-muted-foreground hover:text-foreground ml-2"
             aria-label="Close preview"
           >
             <X className="w-5 h-5" />
