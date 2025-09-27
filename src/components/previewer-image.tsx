@@ -113,7 +113,7 @@ export function PreviewerImage() {
       >
         <div className="p-4 border-b flex justify-between items-center">
           <h2 className="text-lg font-semibold uppercase cursor-default select-none">
-            Image Preview
+            Pré visualização da imagem
           </h2>
           <div className="flex gap-2 items-center">
             <Button
