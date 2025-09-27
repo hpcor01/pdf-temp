@@ -1,9 +1,10 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { useLanguageKey } from "@/hooks/use-i18n";
 
 export default function NotFound() {
-  // Not found translations
   const notFoundTranslations = useLanguageKey("notFound");
 
   return (
