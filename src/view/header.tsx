@@ -29,10 +29,10 @@ export default function Header({
 
   const buttons = useLanguageKey("buttons");
   const toggleButtonLabels = useLanguageKey(
-    "buttons.button-toggle-selected-all"
+    "buttons.button-toggle-selected-all",
   );
   const toggleButtonPreviewerImages = useLanguageKey(
-    "buttons.button-toggle-previewer-image"
+    "buttons.button-toggle-previewer-image",
   );
 
   const removeBgId = useId();
@@ -44,7 +44,7 @@ export default function Header({
   const [isRemoveBgChecked, setIsRemoveBgChecked] = useState(true);
   const [toastOpen, setToastOpen] = useState(false);
   const [toastVariant, setToastVariant] = useState<"default" | "destructive">(
-    "default"
+    "default",
   );
   const [toastTitle, setToastTitle] = useState("");
   const [toastDescription, setToastDescription] = useState("");
@@ -74,7 +74,7 @@ export default function Header({
   const showToast = (
     variant: "default" | "destructive",
     title: string,
-    description: string
+    description: string,
   ) => {
     setToastVariant(variant);
     setToastTitle(title);
@@ -99,7 +99,7 @@ export default function Header({
       showToast(
         "default",
         "Processando...",
-        "Seu arquivo está sendo gerado, por favor aguarde."
+        "Seu arquivo está sendo gerado, por favor aguarde.",
       );
 
       const selectedCols = columns.filter((col) => selectedColumns[col.id]);
@@ -109,7 +109,7 @@ export default function Header({
         showToast(
           "destructive",
           "Nenhuma coluna selecionada",
-          "Selecione pelo menos uma coluna para salvar."
+          "Selecione pelo menos uma coluna para salvar.",
         );
         return;
       }
@@ -133,7 +133,7 @@ export default function Header({
         showToast(
           "default",
           "PDFs gerados",
-          `${selectedCols.length} PDF(s) foram salvos com fundo removido.`
+          `${selectedCols.length} PDF(s) foram salvos com fundo removido.`,
         );
       } else if (!isRemoveBgChecked && isConvertToPDFChecked) {
         await generatePDFForColumns(columns, selectedColumns);
@@ -141,7 +141,7 @@ export default function Header({
         showToast(
           "default",
           "PDF gerado",
-          `${selectedColumnsCount} PDF(s) foram salvos.`
+          `${selectedColumnsCount} PDF(s) foram salvos.`,
         );
       } else if (isRemoveBgChecked && !isConvertToPDFChecked) {
         let downloadCount = 0;
@@ -158,14 +158,14 @@ export default function Header({
         showToast(
           "default",
           "Imagens baixadas",
-          `${downloadCount} imagem(s) foram baixadas com fundo removido.`
+          `${downloadCount} imagem(s) foram baixadas com fundo removido.`,
         );
       } else {
         setIsProcessing(false);
         showToast(
           "default",
           "Download iniciado",
-          `Baixando imagens individuais...`
+          `Baixando imagens individuais...`,
         );
       }
     } catch (error: unknown) {

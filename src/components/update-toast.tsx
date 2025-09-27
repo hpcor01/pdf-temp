@@ -22,7 +22,7 @@ export function UpdateToast() {
       // Set auto-reload timeout if configured
       const autoReloadDelay = parseInt(
         process.env.NEXT_PUBLIC_AUTO_RELOAD_DELAY || "0",
-        10
+        10,
       );
 
       if (autoReloadDelay > 0) {
