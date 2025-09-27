@@ -135,10 +135,7 @@ export function PreviewerImage({
 
   if (isClickPreview) {
     return (
-      <div
-        ref={previewRef}
-        className="h-full max-h-screen bg-card flex flex-col"
-      >
+      <div ref={previewRef} className="h-[80vh] bg-card flex flex-col">
         <div className="p-4 border-b border-border flex justify-between items-center">
           <h2 className="text-lg font-semibold">Image Preview</h2>
           <div className="flex gap-2">
