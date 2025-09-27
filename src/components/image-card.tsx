@@ -1,11 +1,12 @@
 import { Draggable } from "@hello-pangea/dnd";
-import { RotateCw, ScanSearch, X } from "lucide-react";
+import { RotateCw, X, ZoomIn } from "lucide-react";
 import Image from "next/image";
 import { useRef, useState } from "react";
 import { MousePreviewerImage } from "@/components/mouse-previewer-image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { usePreview } from "@/providers/preview-provider";
+import { usePreviewer } from "@/providers/previewer-provider";
 import type { ImageCardProps } from "@/types/image-card";
 
 export function ImageCard({
@@ -15,13 +16,8 @@ export function ImageCard({
   onRemove,
   onRotate,
 }: ImageCardProps) {
-  const {
-    setPreviewImage,
-    isPreviewerImageChecked,
-    previewImage,
-    isClickPreview,
-    clearPreview,
-  } = usePreview();
+  const { setPreviewImage, isPreviewerImageChecked } = usePreview();
+  const { openPreviewer } = usePreviewer();
   const [showMousePreview, setShowMousePreview] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const cardRef = useRef<HTMLDivElement>(null);
@@ -37,11 +33,8 @@ export function ImageCard({
     setPreviewImage(item, null, true);
   };
 
-  const handleZoom = (e: React.MouseEvent) => {
-    e.stopPropagation();
-
-    if (previewImage?.id === item.id && isClickPreview) clearPreview();
-    else setPreviewImage(item, null, true);
+  const handleZoom = () => {
+    openPreviewer(item);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -139,15 +132,18 @@ export function ImageCard({
 
                 <Button
                   type="button"
-                  onClick={handleZoom}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleZoom();
+                  }}
                   className="
                     p-2 rounded-full cursor-pointer bg-white/90 dark:bg-gray-800/90
                     text-gray-900 dark:text-gray-100 hover:bg-green-500 hover:text-white
                     transition-all duration-200 shadow-md
                   "
-                  aria-label={`Zoom na imagem ${item.fileName}`}
+                  aria-label={`Zoom image ${item.fileName}`}
                 >
-                  <ScanSearch className="w-4 h-4" />
+                  <ZoomIn className="w-4 h-4" />
                 </Button>
               </div>
 
@@ -174,7 +170,6 @@ export function ImageCard({
         )}
       </Draggable>
 
-      {/* Hover preview - only shows when isPreviewerImageChecked is true */}
       {showMousePreview && isPreviewerImageChecked && (
         <MousePreviewerImage
           image={item}
