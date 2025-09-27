@@ -38,8 +38,8 @@
     "button-convert-to-pdf": "Convertir a PDF",
     "button-remove-background": "Eliminar fondo",
     "button-toggle-previewer-image": {
-      "active": "Mostrar imagen",
-      "disabled": "Ocultar imagen"
+      "active": "Resaltado de imagen activado",
+      "disabled": "Resaltado de imagen desactivado"
     },
     "button-toggle-selected-all": {
       "active": "Seleccionar todo",

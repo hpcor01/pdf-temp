@@ -13,6 +13,7 @@ export function PreviewerImage() {
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const imageRef = useRef<HTMLDivElement>(null);
+  const previewRef = useRef<HTMLDivElement>(null);
 
   // Reset zoom and position when a new image is opened
   useEffect(() => {
@@ -78,100 +79,127 @@ export function PreviewerImage() {
     setPosition({ x: 0, y: 0 });
   };
 
+  // Handle click outside to close preview
+  const handleOverlayClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      closePreviewer();
+    }
+  };
+
+  // Handle keyboard events for accessibility
+  const handleOverlayKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Escape") {
+      closePreviewer();
+    }
+  };
+
   if (!isPreviewerOpen || !previewImage) {
     return null;
   }
 
   return (
-    <div className="fixed right-0 w-[30%] h-[80vh] bg-background border-l shadow-lg z-50 flex flex-col">
-      <div className="p-4 border-b flex justify-between items-center">
-        <h2 className="text-lg font-semibold uppercase cursor-default select-none">
-          Image Preview
-        </h2>
-        <div className="flex gap-2 items-center">
-          <Button
-            className="cursor-pointer"
-            variant="outline"
-            size="icon"
-            onClick={handleZoomOut}
-            aria-label="Zoom out"
-            disabled={zoomLevel <= 0.1}
-          >
-            <Minus className="h-4 w-4" />
-          </Button>
-          <Button
-            className="cursor-pointer"
-            variant="outline"
-            size="sm"
-            onClick={handleResetZoom}
-            aria-label="Reset zoom"
-          >
-            {Math.round(zoomLevel * 100)}%
-          </Button>
-          <Button
-            className="cursor-pointer"
-            variant="outline"
-            size="icon"
-            onClick={handleZoomIn}
-            aria-label="Zoom in"
-            disabled={zoomLevel >= 5}
-          >
-            <Plus className="h-4 w-4" />
-          </Button>
-          <Button
-            className="cursor-pointer"
-            variant="ghost"
-            size="icon"
-            onClick={closePreviewer}
-            aria-label="Close preview"
-          >
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
-
-      <Button
-        type="button"
-        className="flex-grow flex items-center justify-center p-4 overflow-hidden relative bg-transparent hover:bg-transparent"
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
-        onWheel={handleWheel}
-        onKeyDown={(e) => {
-          if (e.key === "Escape") closePreviewer();
-        }}
-        tabIndex={0}
-        aria-label="Image preview container. Use mouse wheel to zoom, click and drag to pan"
+    <div
+      className="fixed inset-0 z-50 flex justify-end"
+      onClick={handleOverlayClick}
+      onKeyDown={handleOverlayKeyDown}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Image preview modal"
+      tabIndex={-1}
+    >
+      <div
+        ref={previewRef}
+        className="w-[30%] h-full bg-background border-l shadow-lg flex flex-col"
       >
-        <div
-          ref={imageRef}
-          className="cursor-move"
-          style={{
-            transform: `translate(${position.x}px, ${position.y}px) scale(${zoomLevel})`,
-            transformOrigin: "center center",
-            transition: isDragging ? "none" : "transform 0.2s",
-          }}
-        >
-          <Image
-            src={previewImage.src}
-            alt={previewImage.fileName}
-            width={0}
-            height={0}
-            sizes="100vw"
-            style={{
-              transform: `rotate(${previewImage.rotation}deg)`,
-              width: "auto",
-              height: "auto",
-              maxHeight: "100vh",
-              maxWidth: "100%",
-              objectFit: "contain",
-            }}
-            className="rounded-lg shadow-lg"
-            draggable={false}
-          />
+        <div className="p-4 border-b flex justify-between items-center">
+          <h2 className="text-lg font-semibold uppercase cursor-default select-none">
+            Image Preview
+          </h2>
+          <div className="flex gap-2 items-center">
+            <Button
+              className="cursor-pointer"
+              variant="outline"
+              size="icon"
+              onClick={handleZoomOut}
+              aria-label="Zoom out"
+              disabled={zoomLevel <= 0.1}
+            >
+              <Minus className="h-4 w-4" />
+            </Button>
+            <Button
+              className="cursor-pointer"
+              variant="outline"
+              size="sm"
+              onClick={handleResetZoom}
+              aria-label="Reset zoom"
+            >
+              {Math.round(zoomLevel * 100)}%
+            </Button>
+            <Button
+              className="cursor-pointer"
+              variant="outline"
+              size="icon"
+              onClick={handleZoomIn}
+              aria-label="Zoom in"
+              disabled={zoomLevel >= 5}
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
+            <Button
+              className="cursor-pointer"
+              variant="ghost"
+              size="icon"
+              onClick={closePreviewer}
+              aria-label="Close preview"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
-      </Button>
+
+        <Button
+          type="button"
+          className="flex-grow flex items-center justify-center p-4 overflow-hidden relative bg-transparent hover:bg-transparent"
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseUp}
+          onWheel={handleWheel}
+          onKeyDown={(e) => {
+            if (e.key === "Escape") closePreviewer();
+          }}
+          tabIndex={0}
+          aria-label="Image preview container. Use mouse wheel to zoom, click and drag to pan"
+        >
+          <div
+            ref={imageRef}
+            className="cursor-move"
+            style={{
+              transform: `translate(${position.x}px, ${position.y}px) scale(${zoomLevel})`,
+              transformOrigin: "center center",
+              transition: isDragging ? "none" : "transform 0.2s",
+            }}
+          >
+            <Image
+              src={previewImage.src}
+              alt={previewImage.fileName}
+              width={0}
+              height={0}
+              sizes="100vw"
+              style={{
+                transform: `rotate(${previewImage.rotation}deg)`,
+                width: "auto",
+                height: "auto",
+                maxHeight: "100vh",
+                maxWidth: "100%",
+                objectFit: "contain",
+              }}
+              className="rounded-lg shadow-lg"
+              draggable={false}
+            />
+          </div>
+        </Button>
+      </div>
     </div>
   );
 }

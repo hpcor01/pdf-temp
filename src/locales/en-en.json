@@ -38,8 +38,8 @@
     "button-convert-to-pdf": "Convert to PDF",
     "button-remove-background": "Remove background",
     "button-toggle-previewer-image": {
-      "active": "Show image",
-      "disabled": "Hide image"
+      "active": "Enabled image highlight",
+      "disabled": "Disabled image highlight"
     },
     "button-toggle-selected-all": {
       "active": "Select all",
