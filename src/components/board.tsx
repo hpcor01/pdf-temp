@@ -28,17 +28,12 @@ const ColumnComponent = dynamic<ColumnProps>(
         </div>
       </div>
     ),
-  },
+  }
 );
 
 export function Board() {
   const { columns, moveImage, addColumn } = useKanban();
-  const {
-    previewImage,
-    isClickPreview,
-    isPreviewerImageChecked,
-    clearPreview,
-  } = usePreview();
+  const { previewImage, isClickPreview, clearPreview } = usePreview();
 
   const onDragEnd = useCallback(
     (result: DropResult) => {
@@ -58,18 +53,18 @@ export function Board() {
           source.droppableId,
           destination.droppableId,
           draggableId,
-          destination.index,
+          destination.index
         );
       } else {
         moveImage(
           source.droppableId,
           destination.droppableId,
           draggableId,
-          destination.index,
+          destination.index
         );
       }
     },
-    [moveImage],
+    [moveImage]
   );
 
   const handleAddColumn = (title?: string) => {
@@ -90,9 +85,7 @@ export function Board() {
     };
   }, [isClickPreview, clearPreview]);
 
-  // Check if we should show the preview panel (split view)
-  const showPreviewPanel =
-    isPreviewerImageChecked && previewImage && isClickPreview;
+  const showPreviewPanel = previewImage && isClickPreview;
 
   return (
     <div className="flex h-full">
