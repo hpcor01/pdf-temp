@@ -5,6 +5,7 @@ import { useRef, useState } from "react";
 import { MousePreviewerImage } from "@/components/mouse-previewer-image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { useLanguageKey } from "@/hooks/use-i18n";
 import { usePreview } from "@/providers/preview-provider";
 import { usePreviewer } from "@/providers/previewer-provider";
 import type { ImageCardProps } from "@/types/image-card";
@@ -21,6 +22,9 @@ export function ImageCard({
   const [showMousePreview, setShowMousePreview] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const cardRef = useRef<HTMLDivElement>(null);
+
+  // Image card translations
+  const imageCardTranslations = useLanguageKey("imageCard");
 
   const handleRotate = (): void => {
     const newRotation = (item.rotation + 90) % 360;
@@ -83,10 +87,16 @@ export function ImageCard({
                 className="absolute inset-0 cursor-pointer bg-transparent border-none"
                 onClick={handleClick}
                 onKeyDown={handleKeyDown}
-                aria-label={`Preview image ${item.fileName}`}
+                aria-label={imageCardTranslations.previewImage.replace(
+                  "{{fileName}}",
+                  item.fileName,
+                )}
               />
               <div className="absolute top-2 left-2 z-20 bg-black/70 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center select-none cursor-default">
-                {positionNumber}
+                {imageCardTranslations.positionNumber.replace(
+                  "{{number}}",
+                  positionNumber.toString(),
+                )}
               </div>
 
               <div
@@ -96,7 +106,7 @@ export function ImageCard({
                   transition-opacity duration-300 z-10
                 "
                 role="toolbar"
-                aria-label="Image actions"
+                aria-label={imageCardTranslations.imageActions}
               >
                 <Button
                   type="button"
@@ -109,7 +119,10 @@ export function ImageCard({
                     text-gray-900 dark:text-gray-100 hover:bg-red-500 hover:text-white
                     transition-all duration-200 shadow-md
                   "
-                  aria-label={`Remover imagem ${item.fileName}`}
+                  aria-label={imageCardTranslations.removeImage.replace(
+                    "{{fileName}}",
+                    item.fileName,
+                  )}
                 >
                   <X className="w-4 h-4" />
                 </Button>
@@ -125,7 +138,10 @@ export function ImageCard({
                     text-gray-900 dark:text-gray-100 hover:bg-blue-500 hover:text-white
                     transition-all duration-200 shadow-md
                   "
-                  aria-label={`Rotacionar imagem ${item.fileName}`}
+                  aria-label={imageCardTranslations.rotateImage.replace(
+                    "{{fileName}}",
+                    item.fileName,
+                  )}
                 >
                   <RotateCw className="w-4 h-4" />
                 </Button>
@@ -141,7 +157,10 @@ export function ImageCard({
                     text-gray-900 dark:text-gray-100 hover:bg-green-500 hover:text-white
                     transition-all duration-200 shadow-md
                   "
-                  aria-label={`Zoom image ${item.fileName}`}
+                  aria-label={imageCardTranslations.zoomImage.replace(
+                    "{{fileName}}",
+                    item.fileName,
+                  )}
                 >
                   <ZoomIn className="w-4 h-4" />
                 </Button>

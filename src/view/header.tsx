@@ -35,6 +35,9 @@ export default function Header({
     "buttons.button-toggle-previewer-image",
   );
 
+  // Header translations
+  const headerTranslations = useLanguageKey("header");
+
   const removeBgId = useId();
   const convertToPDF = useId();
   const toggleAllColumns = useId();
@@ -98,8 +101,8 @@ export default function Header({
 
       showToast(
         "default",
-        "Processando...",
-        "Seu arquivo está sendo gerado, por favor aguarde.",
+        headerTranslations.processing,
+        headerTranslations.generatingFile,
       );
 
       const selectedCols = columns.filter((col) => selectedColumns[col.id]);
@@ -108,8 +111,8 @@ export default function Header({
         setIsProcessing(false);
         showToast(
           "destructive",
-          "Nenhuma coluna selecionada",
-          "Selecione pelo menos uma coluna para salvar.",
+          headerTranslations.noColumnSelected_title,
+          headerTranslations.noColumnSelected_description,
         );
         return;
       }
@@ -132,16 +135,22 @@ export default function Header({
         setIsProcessing(false);
         showToast(
           "default",
-          "PDFs gerados",
-          `${selectedCols.length} PDF(s) foram salvos com fundo removido.`,
+          headerTranslations.pdfsGenerated_title,
+          headerTranslations.pdfsGenerated_description.replace(
+            "{{count}}",
+            selectedCols.length.toString(),
+          ),
         );
       } else if (!isRemoveBgChecked && isConvertToPDFChecked) {
         await generatePDFForColumns(columns, selectedColumns);
         setIsProcessing(false);
         showToast(
           "default",
-          "PDF gerado",
-          `${selectedColumnsCount} PDF(s) foram salvos.`,
+          headerTranslations.pdfGenerated_title,
+          headerTranslations.pdfGenerated_description.replace(
+            "{{count}}",
+            selectedColumnsCount.toString(),
+          ),
         );
       } else if (isRemoveBgChecked && !isConvertToPDFChecked) {
         let downloadCount = 0;
@@ -157,23 +166,34 @@ export default function Header({
         setIsProcessing(false);
         showToast(
           "default",
-          "Imagens baixadas",
-          `${downloadCount} imagem(s) foram baixadas com fundo removido.`,
+          headerTranslations.imagesDownloaded_title,
+          headerTranslations.imagesDownloaded_description.replace(
+            "{{count}}",
+            downloadCount.toString(),
+          ),
         );
       } else {
         setIsProcessing(false);
         showToast(
           "default",
-          "Download iniciado",
-          `Baixando imagens individuais...`,
+          headerTranslations.downloadStarted_title,
+          headerTranslations.downloadStarted_description,
         );
       }
     } catch (error: unknown) {
       setIsProcessing(false);
       if (error instanceof Error && error?.name === "AbortError") {
-        showToast("default", "Cancelado", "Operação de salvamento cancelada.");
+        showToast(
+          "default",
+          headerTranslations.cancelled_title,
+          headerTranslations.cancelled_description,
+        );
       } else {
-        showToast("destructive", "Erro", "Falha ao processar as imagens.");
+        showToast(
+          "destructive",
+          headerTranslations.error_title,
+          headerTranslations.error_description,
+        );
       }
     }
   };
@@ -190,7 +210,7 @@ export default function Header({
       <header className="flex flex-wrap gap-4 justify-between items-center border-1 rounded-b-lg p-2.5">
         <section
           className="flex flex-wrap items-center gap-4"
-          aria-label="Navigation"
+          aria-label={useLanguageKey("comboboxChangeLanguage.selectLanguage")}
         >
           <ModeToggle />
           <ComboboxChangeLanguage />
@@ -268,7 +288,9 @@ export default function Header({
               onClick={handleSaveClick}
               aria-label={buttons["button-save"]}
             >
-              {isProcessing ? "Processando..." : buttons["button-save"]}
+              {isProcessing
+                ? headerTranslations.processing
+                : buttons["button-save"]}
               {selectedColumnsCount > 0 && !isProcessing
                 ? ` (${selectedColumnsCount})`
                 : ""}

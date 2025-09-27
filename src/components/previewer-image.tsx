@@ -4,6 +4,7 @@ import { Minus, Plus, X } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useLanguageKey } from "@/hooks/use-i18n";
 import { usePreviewer } from "@/providers/previewer-provider";
 
 export function PreviewerImage() {
@@ -14,6 +15,9 @@ export function PreviewerImage() {
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const imageRef = useRef<HTMLDivElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
+
+  // Previewer image translations
+  const previewerImageTranslations = useLanguageKey("previewerImage");
 
   // Reset zoom and position when a new image is opened
   useEffect(() => {
@@ -104,7 +108,7 @@ export function PreviewerImage() {
       onKeyDown={handleOverlayKeyDown}
       role="dialog"
       aria-modal="true"
-      aria-label="Image preview modal"
+      aria-label={previewerImageTranslations.modalLabel}
       tabIndex={-1}
     >
       <div
@@ -113,7 +117,7 @@ export function PreviewerImage() {
       >
         <div className="p-4 border-b flex justify-between items-center">
           <h2 className="text-lg font-semibold uppercase cursor-default select-none">
-            Pré visualização da imagem
+            {previewerImageTranslations.previewTitle}
           </h2>
           <div className="flex gap-2 items-center">
             <Button
@@ -121,7 +125,7 @@ export function PreviewerImage() {
               variant="outline"
               size="icon"
               onClick={handleZoomOut}
-              aria-label="Zoom out"
+              aria-label={previewerImageTranslations.zoomOut}
               disabled={zoomLevel <= 0.1}
             >
               <Minus className="h-4 w-4" />
@@ -131,16 +135,19 @@ export function PreviewerImage() {
               variant="outline"
               size="sm"
               onClick={handleResetZoom}
-              aria-label="Reset zoom"
+              aria-label={previewerImageTranslations.resetZoom}
             >
-              {Math.round(zoomLevel * 100)}%
+              {previewerImageTranslations.zoomLevel.replace(
+                "{{percentage}}",
+                Math.round(zoomLevel * 100).toString(),
+              )}
             </Button>
             <Button
               className="cursor-pointer"
               variant="outline"
               size="icon"
               onClick={handleZoomIn}
-              aria-label="Zoom in"
+              aria-label={previewerImageTranslations.zoomIn}
               disabled={zoomLevel >= 5}
             >
               <Plus className="h-4 w-4" />
@@ -150,7 +157,7 @@ export function PreviewerImage() {
               variant="ghost"
               size="icon"
               onClick={closePreviewer}
-              aria-label="Close preview"
+              aria-label={previewerImageTranslations.closePreview}
             >
               <X className="h-4 w-4" />
             </Button>
@@ -169,7 +176,7 @@ export function PreviewerImage() {
             if (e.key === "Escape") closePreviewer();
           }}
           tabIndex={0}
-          aria-label="Image preview container. Use mouse wheel to zoom, click and drag to pan"
+          aria-label={previewerImageTranslations.previewContainer}
         >
           <div
             ref={imageRef}

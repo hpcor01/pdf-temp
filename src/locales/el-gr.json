@@ -50,5 +50,76 @@
     "placeholder": "Επιλέξτε γλώσσα...",
     "search-placeholder": "Αναζήτηση γλώσσας...",
     "no-language-found": "Δεν βρέθηκε καμία γλώσσα."
+  },
+  "header": {
+    "processing": "Επεξεργασία...",
+    "generatingFile": "Το αρχείο σας δημιουργείται, παρακαλώ περιμένετε.",
+    "noColumnSelected_title": "Δεν επιλέχθηκε στήλη",
+    "noColumnSelected_description": "Επιλέξτε τουλάχιστον μία στήλη για αποθήκευση.",
+    "pdfsGenerated_title": "Δημιουργήθηκαν PDFs",
+    "pdfsGenerated_description": "{{count}} PDF(s) αποθηκεύτηκαν με αφαιρεμένο φόντο.",
+    "pdfGenerated_title": "Δημιουργήθηκε PDF",
+    "pdfGenerated_description": "{{count}} PDF(s) αποθηκεύτηκαν.",
+    "imagesDownloaded_title": "Οι εικόνες κατέβηκαν",
+    "imagesDownloaded_description": "{{count}} εικόνα(ες) κατέβηκαν με αφαιρεμένο φόντο.",
+    "downloadStarted_title": "Η λήψη ξεκίνησε",
+    "downloadStarted_description": "Λήψη μεμονωμένων εικόνων...",
+    "cancelled_title": "Ακυρώθηκε",
+    "cancelled_description": "Η λειτουργία αποθήκευσης ακυρώθηκε.",
+    "error_title": "Σφάλμα",
+    "error_description": "Αποτυχία επεξεργασίας εικόνων."
+  },
+  "comboboxChangeLanguage": {
+    "selectLanguage": "Επιλογή γλώσσας"
+  },
+  "column": {
+    "dragDropArea": "Περιοχή μεταφοράς και απόθεσης εικόνων",
+    "columnLabel": "Στήλη {{title}}",
+    "selectColumn": "Επιλογή στήλης {{title}}",
+    "editColumnTitle": "Επεξεργασία τίτλου στήλης {{title}}",
+    "editColumn": "Επεξεργασία στήλης",
+    "removeColumn": "Αφαίρεση στήλης",
+    "imagesInColumn": "Εικόνες στη στήλη {{title}}",
+    "totalImages": "Σύνολο: {{count}}"
+  },
+  "imageCard": {
+    "positionNumber": "{{number}}",
+    "imageActions": "Ενέργειες εικόνας",
+    "removeImage": "Αφαίρεση εικόνας {{fileName}}",
+    "rotateImage": "Περιστροφή εικόνας {{fileName}}",
+    "zoomImage": "Ζουμ εικόνας {{fileName}}",
+    "previewImage": "Προεπισκόπηση εικόνας {{fileName}}"
+  },
+  "mousePreviewer": {
+    "closePreview": "Κλείσιμο προεπισκόπησης",
+    "rotation": "Περιστροφή: {{degrees}}°",
+    "size": "Μέγεθος: {{size}} KB"
+  },
+  "previewerImage": {
+    "modalLabel": "Παράθυρο προεπισκόπησης εικόνας",
+    "previewTitle": "Προεπισκόπηση εικόνας",
+    "zoomOut": "Σμίκρυνση",
+    "resetZoom": "Επαναφορά ζουμ",
+    "zoomIn": "Μεγέθυνση",
+    "closePreview": "Κλείσιμο προεπισκόπησης",
+    "zoomLevel": "{{percentage}}%",
+    "previewContainer": "Περιοχή προεπισκόπησης εικόνας. Χρησιμοποιήστε τη ροδέλα του ποντικιού για ζουμ, κάντε κλικ και σύρετε για μετακίνηση"
+  },
+  "btnCreateColumn": {
+    "createColumn": "Δημιουργία νέας στήλης"
+  },
+  "updateToast": {
+    "newVersion_title": "Νέα έκδοση διαθέσιμη",
+    "newVersion_description": "Μια νέα έκδοση της εφαρμογής είναι διαθέσιμη. Κάντε κλικ στο Ενημέρωση για να φορτώσετε τη νέα έκδοση.",
+    "closeNotification": "Κλείσιμο ειδοποίησης",
+    "updating": "Ενημέρωση...",
+    "update": "Ενημέρωση",
+    "later": "Αργότερα"
+  },
+  "notFound": {
+    "pageTitle": "Η σελίδα δεν βρέθηκε",
+    "pageDescription": "Η σελίδα που ζητήσατε έχει αλλάξει ή βρίσκεται υπό ανάπτυξη",
+    "imageAlt": "Εικόνα ενός γάτου που κρέμεται στον αριθμό 404 υποδηλώνοντας ότι η σελίδα δεν βρέθηκε",
+    "backToDashboard": "Επιστροφή στον Πίνακα Ελέγχου"
   }
 }

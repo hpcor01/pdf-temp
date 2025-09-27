@@ -50,5 +50,76 @@
     "placeholder": "Select language...",
     "search-placeholder": "Search language...",
     "no-language-found": "No language found."
+  },
+  "header": {
+    "processing": "Processing...",
+    "generatingFile": "Your file is being generated, please wait.",
+    "noColumnSelected_title": "No column selected",
+    "noColumnSelected_description": "Select at least one column to save.",
+    "pdfsGenerated_title": "PDFs generated",
+    "pdfsGenerated_description": "{{count}} PDF(s) were saved with background removed.",
+    "pdfGenerated_title": "PDF generated",
+    "pdfGenerated_description": "{{count}} PDF(s) were saved.",
+    "imagesDownloaded_title": "Images downloaded",
+    "imagesDownloaded_description": "{{count}} image(s) were downloaded with background removed.",
+    "downloadStarted_title": "Download started",
+    "downloadStarted_description": "Downloading individual images...",
+    "cancelled_title": "Cancelled",
+    "cancelled_description": "Save operation cancelled.",
+    "error_title": "Error",
+    "error_description": "Failed to process images."
+  },
+  "comboboxChangeLanguage": {
+    "selectLanguage": "Select language"
+  },
+  "column": {
+    "dragDropArea": "Drag and drop images area",
+    "columnLabel": "{{title}} column",
+    "selectColumn": "Select column {{title}}",
+    "editColumnTitle": "Edit column title {{title}}",
+    "editColumn": "Edit column",
+    "removeColumn": "Remove column",
+    "imagesInColumn": "Images in column {{title}}",
+    "totalImages": "Total: {{count}}"
+  },
+  "imageCard": {
+    "positionNumber": "{{number}}",
+    "imageActions": "Image actions",
+    "removeImage": "Remove image {{fileName}}",
+    "rotateImage": "Rotate image {{fileName}}",
+    "zoomImage": "Zoom image {{fileName}}",
+    "previewImage": "Preview image {{fileName}}"
+  },
+  "mousePreviewer": {
+    "closePreview": "Close preview",
+    "rotation": "Rotation: {{degrees}}°",
+    "size": "Size: {{size}} KB"
+  },
+  "previewerImage": {
+    "modalLabel": "Image preview modal",
+    "previewTitle": "Image preview",
+    "zoomOut": "Zoom out",
+    "resetZoom": "Reset zoom",
+    "zoomIn": "Zoom in",
+    "closePreview": "Close preview",
+    "zoomLevel": "{{percentage}}%",
+    "previewContainer": "Image preview container. Use mouse wheel to zoom, click and drag to pan"
+  },
+  "btnCreateColumn": {
+    "createColumn": "Create new column"
+  },
+  "updateToast": {
+    "newVersion_title": "New version available",
+    "newVersion_description": "A new version of the application is available. Click Update to load the new version.",
+    "closeNotification": "Close notification",
+    "updating": "Updating...",
+    "update": "Update",
+    "later": "Later"
+  },
+  "notFound": {
+    "pageTitle": "Page not found",
+    "pageDescription": "The page you requested has changed or is under development",
+    "imageAlt": "Image of a cat hanging on the number 404 indicating that the page was not found",
+    "backToDashboard": "Back to Dashboard"
   }
 }

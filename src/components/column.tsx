@@ -7,6 +7,7 @@ import { ImageCard } from "@/components/image-card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
+import { useLanguageKey } from "@/hooks/use-i18n";
 import { useKanban } from "@/providers/kanban-provider";
 import type { ColumnProps } from "@/types/column";
 
@@ -21,6 +22,10 @@ export function ColumnComponent({ column, index }: ColumnProps) {
     toggleColumnSelection,
     areAllColumnsSelected,
   } = useKanban();
+
+  // Column translations
+  const columnTranslations = useLanguageKey("column");
+
   const [isEditing, setIsEditing] = useState(false);
   const [title, setTitle] = useState(column.title);
   const [isDragOver, setIsDragOver] = useState(false);
@@ -121,7 +126,10 @@ export function ColumnComponent({ column, index }: ColumnProps) {
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
-          aria-label={`${column.title} column`}
+          aria-label={columnTranslations.columnLabel.replace(
+            "{{title}}",
+            column.title,
+          )}
         >
           <div className="p-3 border-b border-border">
             <div className="flex items-center justify-between mb-2">
@@ -130,7 +138,10 @@ export function ColumnComponent({ column, index }: ColumnProps) {
                   checked={isSelected}
                   onCheckedChange={handleCheckboxChange}
                   className="cursor-pointer"
-                  aria-label={`Selecionar coluna ${column.title}`}
+                  aria-label={columnTranslations.selectColumn.replace(
+                    "{{title}}",
+                    column.title,
+                  )}
                 />
                 {isEditing ? (
                   <Input
@@ -146,13 +157,19 @@ export function ColumnComponent({ column, index }: ColumnProps) {
                     }}
                     autoFocus
                     className="h-7 text-sm"
-                    aria-label={`Editar título da coluna ${column.title}`}
+                    aria-label={columnTranslations.editColumnTitle.replace(
+                      "{{title}}",
+                      column.title,
+                    )}
                   />
                 ) : (
                   <div className="flex flex-col">
                     <p className="font-medium truncate">{column.title}</p>
                     <span className="text-xs text-muted-foreground">
-                      Total: {totalImages}
+                      {columnTranslations.totalImages.replace(
+                        "{{count}}",
+                        totalImages.toString(),
+                      )}
                     </span>
                   </div>
                 )}
@@ -163,7 +180,7 @@ export function ColumnComponent({ column, index }: ColumnProps) {
                   size="sm"
                   onClick={() => setIsEditing(true)}
                   className="h-7 w-7 p-0 cursor-pointer"
-                  aria-label="Editar coluna"
+                  aria-label={columnTranslations.editColumn}
                 >
                   <Pencil className="w-4 h-4" />
                 </Button>
@@ -173,7 +190,7 @@ export function ColumnComponent({ column, index }: ColumnProps) {
                     size="sm"
                     onClick={handleRemoveColumn}
                     className="h-7 w-7 p-0 text-red-500 hover:text-red-700 cursor-pointer"
-                    aria-label="Remover coluna"
+                    aria-label={columnTranslations.removeColumn}
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>
@@ -183,7 +200,10 @@ export function ColumnComponent({ column, index }: ColumnProps) {
           </div>
           <section
             className="flex-grow overflow-y-auto max-h-[calc(100vh-200px)] p-2"
-            aria-label={`Imagens na coluna ${column.title}`}
+            aria-label={columnTranslations.imagesInColumn.replace(
+              "{{title}}",
+              column.title,
+            )}
           >
             {column.items.map((item, itemIndex) => (
               <ImageCard

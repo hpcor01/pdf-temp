@@ -51,6 +51,77 @@ export interface LanguageStructure {
     "search-placeholder": string;
     "no-language-found": string;
   };
+  header: {
+    processing: string;
+    generatingFile: string;
+    noColumnSelected_title: string;
+    noColumnSelected_description: string;
+    pdfsGenerated_title: string;
+    pdfsGenerated_description: string;
+    pdfGenerated_title: string;
+    pdfGenerated_description: string;
+    imagesDownloaded_title: string;
+    imagesDownloaded_description: string;
+    downloadStarted_title: string;
+    downloadStarted_description: string;
+    cancelled_title: string;
+    cancelled_description: string;
+    error_title: string;
+    error_description: string;
+  };
+  comboboxChangeLanguage: {
+    selectLanguage: string;
+  };
+  column: {
+    dragDropArea: string;
+    columnLabel: string;
+    selectColumn: string;
+    editColumnTitle: string;
+    editColumn: string;
+    removeColumn: string;
+    imagesInColumn: string;
+    totalImages: string;
+  };
+  imageCard: {
+    positionNumber: string;
+    imageActions: string;
+    removeImage: string;
+    rotateImage: string;
+    zoomImage: string;
+    previewImage: string;
+  };
+  mousePreviewer: {
+    closePreview: string;
+    rotation: string;
+    size: string;
+  };
+  previewerImage: {
+    modalLabel: string;
+    previewTitle: string;
+    zoomOut: string;
+    resetZoom: string;
+    zoomIn: string;
+    closePreview: string;
+    zoomLevel: string;
+    previewContainer: string;
+  };
+  btnCreateColumn: {
+    createColumn: string;
+  };
+  updateToast: {
+    newVersion_title: string;
+    newVersion_description: string;
+    closeNotification: string;
+    updating: string;
+    update: string;
+    later: string;
+  };
+  notFound: {
+    pageTitle: string;
+    pageDescription: string;
+    imageAlt: string;
+    backToDashboard: string;
+  };
 }
 
 export type SupportedLocale = "pt-br" | "en-en" | "es-es" | "el-gr" | "he-il";

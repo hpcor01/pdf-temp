@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useRef } from "react";
+import { useLanguageKey } from "@/hooks/use-i18n";
 import type { MousePreviewerImageProps } from "@/types/previewer";
 import { Button } from "./ui/button";
 
@@ -11,6 +12,9 @@ export function MousePreviewerImage({
   onClose,
 }: MousePreviewerImageProps) {
   const previewRef = useRef<HTMLDivElement>(null);
+
+  // Mouse previewer translations
+  const mousePreviewerTranslations = useLanguageKey("mousePreviewer");
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -78,7 +82,7 @@ export function MousePreviewerImage({
           type="button"
           onClick={onClose}
           className="cursor-pointer text-muted-foreground hover:text-foreground ml-2 bg-transparent border-none"
-          aria-label="Close preview"
+          aria-label={mousePreviewerTranslations.closePreview}
         >
           <div className="w-5 h-5 flex items-center justify-center">
             <div className="w-4 h-0.5 bg-current rotate-45 absolute"></div>
@@ -106,9 +110,19 @@ export function MousePreviewerImage({
       </div>
 
       <div className="mt-2 text-xs text-muted-foreground">
-        <p>Rotation: {image.rotation || 0}°</p>
+        <p>
+          {mousePreviewerTranslations.rotation.replace(
+            "{{degrees}}",
+            (image.rotation || 0).toString(),
+          )}
+        </p>
         {image.size && image.size > 0 && (
-          <p>Size: {(image.size / 1024).toFixed(2)} KB</p>
+          <p>
+            {mousePreviewerTranslations.size.replace(
+              "{{size}}",
+              (image.size / 1024).toFixed(2),
+            )}
+          </p>
         )}
       </div>
     </div>

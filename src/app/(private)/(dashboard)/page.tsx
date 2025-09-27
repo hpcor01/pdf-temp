@@ -2,6 +2,7 @@
 
 import { type DragEvent, useCallback, useState } from "react";
 import { Board } from "@/components/board";
+import { useLanguageKey } from "@/hooks/use-i18n";
 import { useKanban } from "@/providers/kanban-provider";
 import type { ImageItem } from "@/types/kanban";
 import Header from "@/view/header";
@@ -12,6 +13,9 @@ export default function Dashboard() {
     null,
   );
   const { addImagesToColumn, columns } = useKanban();
+
+  // Column translations for drag drop area
+  const columnTranslations = useLanguageKey("column");
 
   const handleDrop = useCallback(
     async (e: DragEvent<HTMLElement>, targetColumnId?: string) => {
@@ -81,7 +85,7 @@ export default function Dashboard() {
           setDragOverColumnId(null);
         }}
         onDrop={(e) => handleDrop(e)}
-        aria-label="Área para arrastar e soltar imagens"
+        aria-label={columnTranslations.dragDropArea}
       >
         <Board />
       </section>

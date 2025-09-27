@@ -50,5 +50,76 @@
     "placeholder": "Seleccionar idioma...",
     "search-placeholder": "Buscar idioma...",
     "no-language-found": "No se encontró el idioma."
+  },
+  "header": {
+    "processing": "Procesando...",
+    "generatingFile": "Su archivo se está generando, por favor espere.",
+    "noColumnSelected_title": "Ninguna columna seleccionada",
+    "noColumnSelected_description": "Seleccione al menos una columna para guardar.",
+    "pdfsGenerated_title": "PDFs generados",
+    "pdfsGenerated_description": "{{count}} PDF(s) fueron guardados con el fondo eliminado.",
+    "pdfGenerated_title": "PDF generado",
+    "pdfGenerated_description": "{{count}} PDF(s) fueron guardados.",
+    "imagesDownloaded_title": "Imágenes descargadas",
+    "imagesDownloaded_description": "{{count}} imagen(es) fueron descargadas con el fondo eliminado.",
+    "downloadStarted_title": "Descarga iniciada",
+    "downloadStarted_description": "Descargando imágenes individuales...",
+    "cancelled_title": "Cancelado",
+    "cancelled_description": "Operación de guardado cancelada.",
+    "error_title": "Error",
+    "error_description": "Error al procesar las imágenes."
+  },
+  "comboboxChangeLanguage": {
+    "selectLanguage": "Seleccionar idioma"
+  },
+  "column": {
+    "dragDropArea": "Área para arrastrar y soltar imágenes",
+    "columnLabel": "Columna {{title}}",
+    "selectColumn": "Seleccionar columna {{title}}",
+    "editColumnTitle": "Editar título de columna {{title}}",
+    "editColumn": "Editar columna",
+    "removeColumn": "Eliminar columna",
+    "imagesInColumn": "Imágenes en columna {{title}}",
+    "totalImages": "Total: {{count}}"
+  },
+  "imageCard": {
+    "positionNumber": "{{number}}",
+    "imageActions": "Acciones de imagen",
+    "removeImage": "Eliminar imagen {{fileName}}",
+    "rotateImage": "Rotar imagen {{fileName}}",
+    "zoomImage": "Zoom de imagen {{fileName}}",
+    "previewImage": "Previsualizar imagen {{fileName}}"
+  },
+  "mousePreviewer": {
+    "closePreview": "Cerrar previsualización",
+    "rotation": "Rotación: {{degrees}}°",
+    "size": "Tamaño: {{size}} KB"
+  },
+  "previewerImage": {
+    "modalLabel": "Modal de previsualización de imagen",
+    "previewTitle": "Previsualización de imagen",
+    "zoomOut": "Reducir zoom",
+    "resetZoom": "Restablecer zoom",
+    "zoomIn": "Aumentar zoom",
+    "closePreview": "Cerrar previsualización",
+    "zoomLevel": "{{percentage}}%",
+    "previewContainer": "Contenedor de previsualización de imagen. Use la rueda del mouse para hacer zoom, haga clic y arrastre para mover"
+  },
+  "btnCreateColumn": {
+    "createColumn": "Crear nueva columna"
+  },
+  "updateToast": {
+    "newVersion_title": "Nueva versión disponible",
+    "newVersion_description": "Una nueva versión de la aplicación está disponible. Haga clic en Actualizar para cargar la nueva versión.",
+    "closeNotification": "Cerrar notificación",
+    "updating": "Actualizando...",
+    "update": "Actualizar",
+    "later": "Después"
+  },
+  "notFound": {
+    "pageTitle": "Página no encontrada",
+    "pageDescription": "La página que solicitó ha cambiado o está en desarrollo",
+    "imageAlt": "Imagen de un gato colgando del número 404 indicando que la página no fue encontrada",
+    "backToDashboard": "Volver al Panel"
   }
 }

@@ -1,5 +1,6 @@
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useLanguageKey } from "@/hooks/use-i18n";
 import type { BtnCreateColumnProps } from "@/types/buttons";
 
 export function BtnCreateColumn({ onClick }: BtnCreateColumnProps) {
@@ -7,11 +8,14 @@ export function BtnCreateColumn({ onClick }: BtnCreateColumnProps) {
     onClick(undefined);
   };
 
+  // Btn create column translations
+  const btnCreateColumnTranslations = useLanguageKey("btnCreateColumn");
+
   return (
     <Button
       onClick={handleClick}
       className="cursor-pointer fixed bottom-6 right-6 rounded-full w-14 h-14 shadow-lg"
-      aria-label="Criar nova coluna"
+      aria-label={btnCreateColumnTranslations.createColumn}
     >
       <Plus className="w-6 h-6 text-white" />
     </Button>

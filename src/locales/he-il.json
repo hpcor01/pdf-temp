@@ -50,5 +50,76 @@
     "placeholder": "בחר שפה.",
     "search-placeholder": "חפש שפה.",
     "no-language-found": "לא נמצאה שפה."
+  },
+  "header": {
+    "processing": "מעבד...",
+    "generatingFile": "הקובץ שלך נוצר, אנא המתן.",
+    "noColumnSelected_title": "לא נבחרה עמודה",
+    "noColumnSelected_description": "בחר עמודה אחת לפחות לשמירה.",
+    "pdfsGenerated_title": "נוצרו קובצי PDF",
+    "pdfsGenerated_description": "{{count}} קובצי PDF נשמרו ללא רקע.",
+    "pdfGenerated_title": "נוצר קובץ PDF",
+    "pdfGenerated_description": "{{count}} קובצי PDF נשמרו.",
+    "imagesDownloaded_title": "התמונות ירדו",
+    "imagesDownloaded_description": "{{count}} תמונות ירדו ללא רקע.",
+    "downloadStarted_title": "ההורדה החלה",
+    "downloadStarted_description": "מוריד תמונות בודדות...",
+    "cancelled_title": "בוטל",
+    "cancelled_description": "פעולת השמירה בוטלה.",
+    "error_title": "שגיאה",
+    "error_description": "נכשל בעיבוד התמונות."
+  },
+  "comboboxChangeLanguage": {
+    "selectLanguage": "בחר שפה"
+  },
+  "column": {
+    "dragDropArea": "אזור גרירה ושחרור של תמונות",
+    "columnLabel": "עמודה {{title}}",
+    "selectColumn": "בחר עמודה {{title}}",
+    "editColumnTitle": "ערוך כותרת עמודה {{title}}",
+    "editColumn": "ערוך עמודה",
+    "removeColumn": "הסר עמודה",
+    "imagesInColumn": "תמונות בעמודה {{title}}",
+    "totalImages": "סה\"כ: {{count}}"
+  },
+  "imageCard": {
+    "positionNumber": "{{number}}",
+    "imageActions": "פעולות תמונה",
+    "removeImage": "הסר תמונה {{fileName}}",
+    "rotateImage": "סובב תמונה {{fileName}}",
+    "zoomImage": "זום תמונה {{fileName}}",
+    "previewImage": "תצוגה מקדימה של תמונה {{fileName}}"
+  },
+  "mousePreviewer": {
+    "closePreview": "סגור תצוגה מקדימה",
+    "rotation": "סיבוב: {{degrees}}°",
+    "size": "גודל: {{size}} KB"
+  },
+  "previewerImage": {
+    "modalLabel": "חלון תצוגה מקדימה של תמונה",
+    "previewTitle": "תצוגה מקדימה של תמונה",
+    "zoomOut": "הקטן זום",
+    "resetZoom": "איפוס זום",
+    "zoomIn": "הגדל זום",
+    "closePreview": "סגור תצוגה מקדימה",
+    "zoomLevel": "{{percentage}}%",
+    "previewContainer": "מיכל תצוגה מקדימה של תמונה. השתמש בגלגל העכבר לזום, לחץ וגרור להזזה"
+  },
+  "btnCreateColumn": {
+    "createColumn": "צור עמודה חדשה"
+  },
+  "updateToast": {
+    "newVersion_title": "גרסה חדשה זמינה",
+    "newVersion_description": "גרסה חדשה של היישום זמינה. לחץ על עדכן כדי לטעון את הגרסה החדשה.",
+    "closeNotification": "סגור הודעה",
+    "updating": "מעדכן...",
+    "update": "עדכן",
+    "later": "מאוחר יותר"
+  },
+  "notFound": {
+    "pageTitle": "הדף לא נמצא",
+    "pageDescription": "הדף שביקשת השתנה או נמצא בפיתוח",
+    "imageAlt": "תמונה של חתול התלוי במספר 404 המציין שהדף לא נמצא",
+    "backToDashboard": "חזרה ללוח המחוונים"
   }
 }
