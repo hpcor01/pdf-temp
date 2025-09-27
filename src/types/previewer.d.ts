@@ -21,7 +21,7 @@ export interface PreviewContextType {
   setPreviewImage: (
     image: ImageItem | null,
     position?: { x: number; y: number } | null,
-    isClickPreview?: boolean
+    isClickPreview?: boolean,
   ) => void;
   clearPreview: () => void;
   setIsPreviewerImageChecked: (checked: boolean) => void;
