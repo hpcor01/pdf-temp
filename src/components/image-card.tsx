@@ -15,7 +15,13 @@ export function ImageCard({
   onRemove,
   onRotate,
 }: ImageCardProps) {
-  const { setPreviewImage, isPreviewerImageChecked } = usePreview();
+  const {
+    setPreviewImage,
+    isPreviewerImageChecked,
+    previewImage,
+    isClickPreview,
+    clearPreview,
+  } = usePreview();
   const [showMousePreview, setShowMousePreview] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const cardRef = useRef<HTMLDivElement>(null);
@@ -28,15 +34,14 @@ export function ImageCard({
   const positionNumber = index + 1;
 
   const handleClick = () => {
-    // Always open PreviewerImage on click, regardless of isPreviewerImageChecked
     setPreviewImage(item, null, true);
   };
 
   const handleZoom = (e: React.MouseEvent) => {
     e.stopPropagation();
-    // Always open PreviewerImage on zoom button click, regardless of isPreviewerImageChecked
-    // This is the key change - we're explicitly setting isClickPreview to true
-    setPreviewImage(item, null, true);
+
+    if (previewImage?.id === item.id && isClickPreview) clearPreview();
+    else setPreviewImage(item, null, true);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -47,7 +52,6 @@ export function ImageCard({
   };
 
   const handleMouseEnter = (e: React.MouseEvent) => {
-    // Hover preview only shows when isPreviewerImageChecked is true
     if (isPreviewerImageChecked) {
       setMousePosition({ x: e.clientX, y: e.clientY });
       setShowMousePreview(true);
@@ -59,7 +63,6 @@ export function ImageCard({
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    // Update mouse position only when hover preview is active
     if (isPreviewerImageChecked && showMousePreview) {
       setMousePosition({ x: e.clientX, y: e.clientY });
     }
