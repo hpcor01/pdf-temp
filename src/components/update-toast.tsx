@@ -55,7 +55,7 @@ export function UpdateToast() {
   };
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 animate-in slide-in-from-bottom-4 duration-300">
+    <div className="fixed inset-0 z-50 flex items-center justify-center animate-in slide-in-from-bottom-4 duration-300">
       <div className="bg-background border border-border rounded-lg shadow-lg p-4 max-w-sm">
         <div className="flex items-start gap-3">
           <div className="flex-1">

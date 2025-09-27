@@ -1,9 +1,5 @@
 import { NextResponse } from "next/server";
-
-// Define the version response type
-interface VersionResponse {
-  version: string;
-}
+import type { VersionResponse } from "@/types/api-update";
 
 /**
  * GET /api/version
