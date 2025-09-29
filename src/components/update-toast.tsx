@@ -17,7 +17,7 @@ export function UpdateToast() {
     useState<NodeJS.Timeout | null>(null);
 
   // Update toast translations
-  const updateToastTranslations = useLanguageKey("updateToast");
+  const updateToastTranslations = useLanguageKey("update-toast");
 
   useEffect(() => {
     if (hasUpdate) {
@@ -64,10 +64,10 @@ export function UpdateToast() {
         <div className="flex items-start gap-3">
           <div className="flex-1">
             <h3 className="font-medium text-foreground">
-              {updateToastTranslations.newVersion_title}
+              {updateToastTranslations["new-version-title"]}
             </h3>
             <p className="text-sm text-muted-foreground mt-1">
-              {updateToastTranslations.newVersion_description}
+              {updateToastTranslations["new-version-description"]}
             </p>
           </div>
           <Button
@@ -75,7 +75,7 @@ export function UpdateToast() {
             size="sm"
             onClick={handleDismiss}
             className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground"
-            aria-label={updateToastTranslations.closeNotification}
+            aria-label={updateToastTranslations["close-notification"]}
           >
             <X className="w-4 h-4" />
           </Button>

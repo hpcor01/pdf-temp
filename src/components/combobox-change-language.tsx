@@ -30,7 +30,7 @@ export default function ComboboxChangeLanguage() {
   const searchPlaceholder = useLanguageKey("combobox.search-placeholder");
   const noLanguageFound = useLanguageKey("combobox.no-language-found");
   const selectLanguageLabel = useLanguageKey(
-    "comboboxChangeLanguage.selectLanguage",
+    "combobox-change-language.select-language",
   );
 
   const languages = Object.entries(t["languages-selected"].locales).map(

@@ -17,7 +17,7 @@ export function PreviewerImage() {
   const previewRef = useRef<HTMLDivElement>(null);
 
   // Previewer image translations
-  const previewerImageTranslations = useLanguageKey("previewerImage");
+  const previewerImageTranslations = useLanguageKey("previewer-image");
 
   // Reset zoom and position when a new image is opened
   useEffect(() => {
@@ -108,7 +108,7 @@ export function PreviewerImage() {
       onKeyDown={handleOverlayKeyDown}
       role="dialog"
       aria-modal="true"
-      aria-label={previewerImageTranslations.modalLabel}
+      aria-label={previewerImageTranslations["modal-label"]}
       tabIndex={-1}
     >
       <div
@@ -117,7 +117,7 @@ export function PreviewerImage() {
       >
         <div className="p-4 border-b flex justify-between items-center">
           <h2 className="text-lg font-semibold uppercase cursor-default select-none">
-            {previewerImageTranslations.previewTitle}
+            {previewerImageTranslations["preview-title"]}
           </h2>
           <div className="flex gap-2 items-center">
             <Button
@@ -125,7 +125,7 @@ export function PreviewerImage() {
               variant="outline"
               size="icon"
               onClick={handleZoomOut}
-              aria-label={previewerImageTranslations.zoomOut}
+              aria-label={previewerImageTranslations["zoom-out"]}
               disabled={zoomLevel <= 0.1}
             >
               <Minus className="h-4 w-4" />
@@ -135,9 +135,9 @@ export function PreviewerImage() {
               variant="outline"
               size="sm"
               onClick={handleResetZoom}
-              aria-label={previewerImageTranslations.resetZoom}
+              aria-label={previewerImageTranslations["reset-zoom"]}
             >
-              {previewerImageTranslations.zoomLevel.replace(
+              {previewerImageTranslations["zoom-level"].replace(
                 "{{percentage}}",
                 Math.round(zoomLevel * 100).toString(),
               )}
@@ -147,7 +147,7 @@ export function PreviewerImage() {
               variant="outline"
               size="icon"
               onClick={handleZoomIn}
-              aria-label={previewerImageTranslations.zoomIn}
+              aria-label={previewerImageTranslations["zoom-in"]}
               disabled={zoomLevel >= 5}
             >
               <Plus className="h-4 w-4" />
@@ -157,7 +157,7 @@ export function PreviewerImage() {
               variant="ghost"
               size="icon"
               onClick={closePreviewer}
-              aria-label={previewerImageTranslations.closePreview}
+              aria-label={previewerImageTranslations["close-preview"]}
             >
               <X className="h-4 w-4" />
             </Button>
@@ -176,7 +176,7 @@ export function PreviewerImage() {
             if (e.key === "Escape") closePreviewer();
           }}
           tabIndex={0}
-          aria-label={previewerImageTranslations.previewContainer}
+          aria-label={previewerImageTranslations["preview-container"]}
         >
           <div
             ref={imageRef}

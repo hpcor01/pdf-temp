@@ -53,73 +53,87 @@
   },
   "header": {
     "processing": "Processando...",
-    "generatingFile": "Seu arquivo está sendo gerado, por favor aguarde.",
-    "noColumnSelected_title": "Nenhuma coluna selecionada",
-    "noColumnSelected_description": "Selecione pelo menos uma coluna para salvar.",
-    "pdfsGenerated_title": "PDFs gerados",
-    "pdfsGenerated_description": "{{count}} PDF(s) foram salvos com fundo removido.",
-    "pdfGenerated_title": "PDF gerado",
-    "pdfGenerated_description": "{{count}} PDF(s) foram salvos.",
-    "imagesDownloaded_title": "Imagens baixadas",
-    "imagesDownloaded_description": "{{count}} imagem(s) foram baixadas com fundo removido.",
-    "downloadStarted_title": "Download iniciado",
-    "downloadStarted_description": "Baixando imagens individuais...",
-    "cancelled_title": "Cancelado",
-    "cancelled_description": "Operação de salvamento cancelada.",
-    "error_title": "Erro",
-    "error_description": "Falha ao processar as imagens."
+    "generating-file": "Seu arquivo está sendo gerado, por favor aguarde.",
+    "no-column-selected-title": "Nenhuma coluna selecionada",
+    "no-column-selected-description": "Selecione pelo menos uma coluna para salvar.",
+    "pdfs-generated-title": "PDFs gerados",
+    "pdfs-generated-description": "{{count}} PDF(s) foram salvos com fundo removido.",
+    "pdf-generated-title": "PDF gerado",
+    "pdf-generated-description": "{{count}} PDF(s) foram salvos.",
+    "images-downloaded-title": "Imagens baixadas",
+    "images-downloaded-description": "{{count}} imagem(s) foram baixadas com fundo removido.",
+    "download-started-title": "Download iniciado",
+    "download-started-description": "Baixando imagens individuais...",
+    "cancelled-title": "Cancelado",
+    "cancelled-description": "Operação de salvamento cancelada.",
+    "error-title": "Erro",
+    "error-description": "Falha ao processar as imagens.",
+    "partial-error-title": "Erro parcial",
+    "unsupported-browser-title": "Navegador não suportado",
+    "unsupported-browser-description": "Seu navegador não suporta o salvamento automático em pasta. Use um navegador moderno como Chrome ou Edge.",
+    "error-accessing-folder-title": "Erro ao acessar pasta"
   },
-  "comboboxChangeLanguage": {
-    "selectLanguage": "Selecionar idioma"
+  "combobox-change-language": {
+    "select-language": "Selecionar idioma"
   },
   "column": {
-    "dragDropArea": "Área para arrastar e soltar imagens",
-    "columnLabel": "Coluna {{title}}",
-    "selectColumn": "Selecionar coluna {{title}}",
-    "editColumnTitle": "Editar título da coluna {{title}}",
-    "editColumn": "Editar coluna",
-    "removeColumn": "Remover coluna",
-    "imagesInColumn": "Imagens na coluna {{title}}",
-    "totalImages": "Total: {{count}}"
+    "drag-drop-area": "Área para arrastar e soltar imagens",
+    "column-label": "Coluna {{title}}",
+    "select-column": "Selecionar coluna {{title}}",
+    "edit-column-title": "Editar título da coluna {{title}}",
+    "edit-column": "Editar coluna",
+    "remove-column": "Remover coluna",
+    "images-in-column": "Imagens na coluna {{title}}",
+    "total-images": "Total: {{count}}"
   },
-  "imageCard": {
-    "positionNumber": "{{number}}",
-    "imageActions": "Ações da imagem",
-    "removeImage": "Remover imagem {{fileName}}",
-    "rotateImage": "Rotacionar imagem {{fileName}}",
-    "zoomImage": "Zoom da imagem {{fileName}}",
-    "previewImage": "Pré-visualizar imagem {{fileName}}"
+  "image-card": {
+    "position-number": "{{number}}",
+    "image-actions": "Ações da imagem",
+    "remove-image": "Remover imagem {{fileName}}",
+    "rotate-image": "Rotacionar imagem {{fileName}}",
+    "zoom-image": "Zoom da imagem {{fileName}}",
+    "preview-image": "Pré-visualizar imagem {{fileName}}"
   },
-  "mousePreviewer": {
-    "closePreview": "Fechar pré-visualização",
+  "mouse-previewer": {
+    "close-preview": "Fechar pré-visualização",
     "rotation": "Rotação: {{degrees}}°",
     "size": "Tamanho: {{size}} KB"
   },
-  "previewerImage": {
-    "modalLabel": "Modal de pré-visualização de imagem",
-    "previewTitle": "Pré visualização da imagem",
-    "zoomOut": "Diminuir zoom",
-    "resetZoom": "Redefinir zoom",
-    "zoomIn": "Aumentar zoom",
-    "closePreview": "Fechar pré-visualização",
-    "zoomLevel": "{{percentage}}%",
-    "previewContainer": "Contêiner de pré-visualização de imagem. Use a roda do mouse para dar zoom, clique e arraste para mover"
+  "previewer-image": {
+    "modal-label": "Modal de pré-visualização de imagem",
+    "preview-title": "Pré visualização da imagem",
+    "zoom-out": "Diminuir zoom",
+    "reset-zoom": "Redefinir zoom",
+    "zoom-in": "Aumentar zoom",
+    "close-preview": "Fechar pré-visualização",
+    "zoom-level": "{{percentage}}%",
+    "preview-container": "Contêiner de pré-visualização de imagem. Use a roda do mouse para dar zoom, clique e arraste para mover"
   },
-  "btnCreateColumn": {
-    "createColumn": "Criar nova coluna"
+  "btn-create-column": {
+    "create-column": "Criar nova coluna"
   },
-  "updateToast": {
-    "newVersion_title": "Nova versão disponível",
-    "newVersion_description": "Uma nova versão do aplicativo está disponível. Clique em Atualizar para carregar a nova versão.",
-    "closeNotification": "Fechar notificação",
+  "update-toast": {
+    "new-version-title": "Nova versão disponível",
+    "new-version-description": "Uma nova versão do aplicativo está disponível. Clique em Atualizar para carregar a nova versão.",
+    "close-notification": "Fechar notificação",
     "updating": "Atualizando...",
     "update": "Atualizar",
     "later": "Depois"
   },
-  "notFound": {
-    "pageTitle": "Página não encontrada",
-    "pageDescription": "A página que você solicitou mudou ou esta em desenvolvimento",
-    "imageAlt": "Imagem de um gato pendurado no numero 404 indicando que a página não foi encontrada",
-    "backToDashboard": "Voltar para Dashboard"
+  "save-location-toggle": {
+    "folder-selected-title": "Pasta de salvamento selecionada",
+    "folder-selected-description": "A pasta \"{path}\" será usada para salvar todos os arquivos.",
+    "error-selecting-folder-title": "Erro ao selecionar pasta",
+    "error-selecting-folder-description": "Não foi possível acessar a pasta selecionada. Verifique se a pasta está disponível e tente novamente.",
+    "single-folder": " (uma pasta única)",
+    "folder-per-column": " (uma pasta por coluna)",
+    "default-folder": "pasta padrão",
+    "select-folder-prompt": "Selecione a pasta onde deseja salvar (OneDrive é compatível):"
+  },
+  "not-found": {
+    "page-title": "Página não encontrada",
+    "page-description": "A página que você solicitou mudou ou esta em desenvolvimento",
+    "image-alt": "Imagem de um gato pendurado no numero 404 indicando que a página não foi encontrada",
+    "back-to-dashboard": "Voltar para Dashboard"
   }
 }

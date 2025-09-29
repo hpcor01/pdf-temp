@@ -53,73 +53,87 @@
   },
   "header": {
     "processing": "Processing...",
-    "generatingFile": "Your file is being generated, please wait.",
-    "noColumnSelected_title": "No column selected",
-    "noColumnSelected_description": "Select at least one column to save.",
-    "pdfsGenerated_title": "PDFs generated",
-    "pdfsGenerated_description": "{{count}} PDF(s) were saved with background removed.",
-    "pdfGenerated_title": "PDF generated",
-    "pdfGenerated_description": "{{count}} PDF(s) were saved.",
-    "imagesDownloaded_title": "Images downloaded",
-    "imagesDownloaded_description": "{{count}} image(s) were downloaded with background removed.",
-    "downloadStarted_title": "Download started",
-    "downloadStarted_description": "Downloading individual images...",
-    "cancelled_title": "Cancelled",
-    "cancelled_description": "Save operation cancelled.",
-    "error_title": "Error",
-    "error_description": "Failed to process images."
+    "generating-file": "Your file is being generated, please wait.",
+    "no-column-selected-title": "No column selected",
+    "no-column-selected-description": "Select at least one column to save.",
+    "pdfs-generated-title": "PDFs generated",
+    "pdfs-generated-description": "{{count}} PDF(s) were saved with background removed.",
+    "pdf-generated-title": "PDF generated",
+    "pdf-generated-description": "{{count}} PDF(s) were saved.",
+    "images-downloaded-title": "Images downloaded",
+    "images-downloaded-description": "{{count}} image(s) were downloaded with background removed.",
+    "download-started-title": "Download started",
+    "download-started-description": "Downloading individual images...",
+    "cancelled-title": "Cancelled",
+    "cancelled-description": "Save operation cancelled.",
+    "error-title": "Error",
+    "error-description": "Failed to process images.",
+    "partial-error-title": "Partial error",
+    "unsupported-browser-title": "Unsupported browser",
+    "unsupported-browser-description": "Your browser does not support automatic folder saving. Use a modern browser like Chrome or Edge.",
+    "error-accessing-folder-title": "Error accessing folder"
   },
-  "comboboxChangeLanguage": {
-    "selectLanguage": "Select language"
+  "combobox-change-language": {
+    "select-language": "Select language"
   },
   "column": {
-    "dragDropArea": "Drag and drop images area",
-    "columnLabel": "{{title}} column",
-    "selectColumn": "Select column {{title}}",
-    "editColumnTitle": "Edit column title {{title}}",
-    "editColumn": "Edit column",
-    "removeColumn": "Remove column",
-    "imagesInColumn": "Images in column {{title}}",
-    "totalImages": "Total: {{count}}"
+    "drag-drop-area": "Drag and drop images area",
+    "column-label": "{{title}} column",
+    "select-column": "Select column {{title}}",
+    "edit-column-title": "Edit column title {{title}}",
+    "edit-column": "Edit column",
+    "remove-column": "Remove column",
+    "images-in-column": "Images in column {{title}}",
+    "total-images": "Total: {{count}}"
   },
-  "imageCard": {
-    "positionNumber": "{{number}}",
-    "imageActions": "Image actions",
-    "removeImage": "Remove image {{fileName}}",
-    "rotateImage": "Rotate image {{fileName}}",
-    "zoomImage": "Zoom image {{fileName}}",
-    "previewImage": "Preview image {{fileName}}"
+  "image-card": {
+    "position-number": "{{number}}",
+    "image-actions": "Image actions",
+    "remove-image": "Remove image {{fileName}}",
+    "rotate-image": "Rotate image {{fileName}}",
+    "zoom-image": "Zoom image {{fileName}}",
+    "preview-image": "Preview image {{fileName}}"
   },
-  "mousePreviewer": {
-    "closePreview": "Close preview",
+  "mouse-previewer": {
+    "close-preview": "Close preview",
     "rotation": "Rotation: {{degrees}}°",
     "size": "Size: {{size}} KB"
   },
-  "previewerImage": {
-    "modalLabel": "Image preview modal",
-    "previewTitle": "Image preview",
-    "zoomOut": "Zoom out",
-    "resetZoom": "Reset zoom",
-    "zoomIn": "Zoom in",
-    "closePreview": "Close preview",
-    "zoomLevel": "{{percentage}}%",
-    "previewContainer": "Image preview container. Use mouse wheel to zoom, click and drag to pan"
+  "previewer-image": {
+    "modal-label": "Image preview modal",
+    "preview-title": "Image preview",
+    "zoom-out": "Zoom out",
+    "reset-zoom": "Reset zoom",
+    "zoom-in": "Zoom in",
+    "close-preview": "Close preview",
+    "zoom-level": "{{percentage}}%",
+    "preview-container": "Image preview container. Use mouse wheel to zoom, click and drag to pan"
   },
-  "btnCreateColumn": {
-    "createColumn": "Create new column"
+  "btn-create-column": {
+    "create-column": "Create new column"
   },
-  "updateToast": {
-    "newVersion_title": "New version available",
-    "newVersion_description": "A new version of the application is available. Click Update to load the new version.",
-    "closeNotification": "Close notification",
+  "update-toast": {
+    "new-version-title": "New version available",
+    "new-version-description": "A new version of the application is available. Click Update to load the new version.",
+    "close-notification": "Close notification",
     "updating": "Updating...",
     "update": "Update",
     "later": "Later"
   },
-  "notFound": {
-    "pageTitle": "Page not found",
-    "pageDescription": "The page you requested has changed or is under development",
-    "imageAlt": "Image of a cat hanging on the number 404 indicating that the page was not found",
-    "backToDashboard": "Back to Dashboard"
+  "save-location-toggle": {
+    "folder-selected-title": "Save location folder selected",
+    "folder-selected-description": "The folder \"{path}\" will be used to save all files.",
+    "error-selecting-folder-title": "Error selecting folder",
+    "error-selecting-folder-description": "Could not access the selected folder. Check if the folder is available and try again.",
+    "single-folder": " (single folder)",
+    "folder-per-column": " (folder per column)",
+    "default-folder": "default folder",
+    "select-folder-prompt": "Select the folder where you want to save (OneDrive is compatible):"
+  },
+  "not-found": {
+    "page-title": "Page not found",
+    "page-description": "The page you requested has changed or is under development",
+    "image-alt": "Image of a cat hanging on the number 404 indicating that the page was not found",
+    "back-to-dashboard": "Back to Dashboard"
   }
 }

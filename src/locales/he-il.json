@@ -53,73 +53,87 @@
   },
   "header": {
     "processing": "מעבד...",
-    "generatingFile": "הקובץ שלך נוצר, אנא המתן.",
-    "noColumnSelected_title": "לא נבחרה עמודה",
-    "noColumnSelected_description": "בחר עמודה אחת לפחות לשמירה.",
-    "pdfsGenerated_title": "נוצרו קובצי PDF",
-    "pdfsGenerated_description": "{{count}} קובצי PDF נשמרו ללא רקע.",
-    "pdfGenerated_title": "נוצר קובץ PDF",
-    "pdfGenerated_description": "{{count}} קובצי PDF נשמרו.",
-    "imagesDownloaded_title": "התמונות ירדו",
-    "imagesDownloaded_description": "{{count}} תמונות ירדו ללא רקע.",
-    "downloadStarted_title": "ההורדה החלה",
-    "downloadStarted_description": "מוריד תמונות בודדות...",
-    "cancelled_title": "בוטל",
-    "cancelled_description": "פעולת השמירה בוטלה.",
-    "error_title": "שגיאה",
-    "error_description": "נכשל בעיבוד התמונות."
+    "generating-file": "הקובץ שלך נוצר, אנא המתן.",
+    "no-column-selected-title": "לא נבחרה עמודה",
+    "no-column-selected-description": "בחר עמודה אחת לפחות לשמירה.",
+    "pdfs-generated-title": "נוצרו קובצי PDF",
+    "pdfs-generated-description": "{{count}} קובצי PDF נשמרו ללא רקע.",
+    "pdf-generated-title": "נוצר קובץ PDF",
+    "pdf-generated-description": "{{count}} קובצי PDF נשמרו.",
+    "images-downloaded-title": "התמונות ירדו",
+    "images-downloaded-description": "{{count}} תמונות ירדו ללא רקע.",
+    "download-started-title": "ההורדה החלה",
+    "download-started-description": "מוריד תמונות בודדות...",
+    "cancelled-title": "בוטל",
+    "cancelled-description": "פעולת השמירה בוטלה.",
+    "error-title": "שגיאה",
+    "error-description": "נכשל בעיבוד התמונות.",
+    "partial-error-title": "שגיאה חלקית",
+    "unsupported-browser-title": "דפדפן לא נתמך",
+    "unsupported-browser-description": "הדפדפן שלך אינו תומך בשמירה אוטומטית בתיקיה. השתמש בדפדפן מודרני כמו Chrome או Edge.",
+    "error-accessing-folder-title": "שגיאה בגישה לתיקיה"
   },
-  "comboboxChangeLanguage": {
-    "selectLanguage": "בחר שפה"
+  "combobox-change-language": {
+    "select-language": "בחר שפה"
   },
   "column": {
-    "dragDropArea": "אזור גרירה ושחרור של תמונות",
-    "columnLabel": "עמודה {{title}}",
-    "selectColumn": "בחר עמודה {{title}}",
-    "editColumnTitle": "ערוך כותרת עמודה {{title}}",
-    "editColumn": "ערוך עמודה",
-    "removeColumn": "הסר עמודה",
-    "imagesInColumn": "תמונות בעמודה {{title}}",
-    "totalImages": "סה\"כ: {{count}}"
+    "drag-drop-area": "אזור גרירה ושחרור של תמונות",
+    "column-label": "עמודה {{title}}",
+    "select-column": "בחר עמודה {{title}}",
+    "edit-column-title": "ערוך כותרת עמודה {{title}}",
+    "edit-column": "ערוך עמודה",
+    "remove-column": "הסר עמודה",
+    "images-in-column": "תמונות בעמודה {{title}}",
+    "total-images": "סה\"כ: {{count}}"
   },
-  "imageCard": {
-    "positionNumber": "{{number}}",
-    "imageActions": "פעולות תמונה",
-    "removeImage": "הסר תמונה {{fileName}}",
-    "rotateImage": "סובב תמונה {{fileName}}",
-    "zoomImage": "זום תמונה {{fileName}}",
-    "previewImage": "תצוגה מקדימה של תמונה {{fileName}}"
+  "image-card": {
+    "position-number": "{{number}}",
+    "image-actions": "פעולות תמונה",
+    "remove-image": "הסר תמונה {{fileName}}",
+    "rotate-image": "סובב תמונה {{fileName}}",
+    "zoom-image": "זום תמונה {{fileName}}",
+    "preview-image": "תצוגה מקדימה של תמונה {{fileName}}"
   },
-  "mousePreviewer": {
-    "closePreview": "סגור תצוגה מקדימה",
+  "mouse-previewer": {
+    "close-preview": "סגור תצוגה מקדימה",
     "rotation": "סיבוב: {{degrees}}°",
     "size": "גודל: {{size}} KB"
   },
-  "previewerImage": {
-    "modalLabel": "חלון תצוגה מקדימה של תמונה",
-    "previewTitle": "תצוגה מקדימה של תמונה",
-    "zoomOut": "הקטן זום",
-    "resetZoom": "איפוס זום",
-    "zoomIn": "הגדל זום",
-    "closePreview": "סגור תצוגה מקדימה",
-    "zoomLevel": "{{percentage}}%",
-    "previewContainer": "מיכל תצוגה מקדימה של תמונה. השתמש בגלגל העכבר לזום, לחץ וגרור להזזה"
+  "previewer-image": {
+    "modal-label": "חלון תצוגה מקדימה של תמונה",
+    "preview-title": "תצוגה מקדימה של תמונה",
+    "zoom-out": "הקטן זום",
+    "reset-zoom": "איפוס זום",
+    "zoom-in": "הגדל זום",
+    "close-preview": "סגור תצוגה מקדימה",
+    "zoom-level": "{{percentage}}%",
+    "preview-container": "מיכל תצוגה מקדימה של תמונה. השתמש בגלגל העכבר לזום, לחץ וגרור להזזה"
   },
-  "btnCreateColumn": {
-    "createColumn": "צור עמודה חדשה"
+  "btn-create-column": {
+    "create-column": "צור עמודה חדשה"
   },
-  "updateToast": {
-    "newVersion_title": "גרסה חדשה זמינה",
-    "newVersion_description": "גרסה חדשה של היישום זמינה. לחץ על עדכן כדי לטעון את הגרסה החדשה.",
-    "closeNotification": "סגור הודעה",
+  "update-toast": {
+    "new-version-title": "גרסה חדשה זמינה",
+    "new-version-description": "גרסה חדשה של היישום זמינה. לחץ על עדכן כדי לטעון את הגרסה החדשה.",
+    "close-notification": "סגור הודעה",
     "updating": "מעדכן...",
     "update": "עדכן",
     "later": "מאוחר יותר"
   },
-  "notFound": {
-    "pageTitle": "הדף לא נמצא",
-    "pageDescription": "הדף שביקשת השתנה או נמצא בפיתוח",
-    "imageAlt": "תמונה של חתול התלוי במספר 404 המציין שהדף לא נמצא",
-    "backToDashboard": "חזרה ללוח המחוונים"
+  "save-location-toggle": {
+    "folder-selected-title": "תיקיית שמירה נבחרה",
+    "folder-selected-description": "התיקייה \"{path}\" תשמש לשמירת כל הקבצים.",
+    "error-selecting-folder-title": "שגיאה בבחירת תיקייה",
+    "error-selecting-folder-description": "לא ניתן לגשת לתיקייה שנבחרה. בדוק אם התיקייה זמינה ונסה שוב.",
+    "single-folder": " (תיקייה אחת)",
+    "folder-per-column": " (תיקייה לכל עמודה)",
+    "default-folder": "תיקיית ברירת מחדל",
+    "select-folder-prompt": "בחר את התיקייה בה ברצונך לשמור (OneDrive תואם):"
+  },
+  "not-found": {
+    "page-title": "הדף לא נמצא",
+    "page-description": "הדף שביקשת השתנה או נמצא בפיתוח",
+    "image-alt": "תמונה של חתול התלוי במספר 404 המציין שהדף לא נמצא",
+    "back-to-dashboard": "חזרה ללוח המחוונים"
   }
 }

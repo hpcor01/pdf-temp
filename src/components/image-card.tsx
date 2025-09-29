@@ -1,3 +1,5 @@
+"use client"; // Make sure this is at the top
+
 import { Draggable } from "@hello-pangea/dnd";
 import { RotateCw, X, ZoomIn } from "lucide-react";
 import Image from "next/image";
@@ -24,7 +26,7 @@ export function ImageCard({
   const cardRef = useRef<HTMLDivElement>(null);
 
   // Image card translations
-  const imageCardTranslations = useLanguageKey("imageCard");
+  const imageCardTranslations = useLanguageKey("image-card");
 
   const handleRotate = (): void => {
     const newRotation = (item.rotation + 90) % 360;
@@ -65,6 +67,62 @@ export function ImageCard({
     }
   };
 
+  // Add fallbacks for translations
+  const getPreviewImageLabel = () => {
+    if (!imageCardTranslations) return `Preview image ${item.fileName}`;
+    return (
+      imageCardTranslations["preview-image"]?.replace(
+        "{{fileName}}",
+        item.fileName,
+      ) || `Preview image ${item.fileName}`
+    );
+  };
+
+  const getPositionNumberLabel = () => {
+    if (!imageCardTranslations) return positionNumber.toString();
+    return (
+      imageCardTranslations["position-number"]?.replace(
+        "{{number}}",
+        positionNumber.toString(),
+      ) || positionNumber.toString()
+    );
+  };
+
+  const getImageActionsLabel = () => {
+    if (!imageCardTranslations) return "Image actions";
+    return imageCardTranslations["image-actions"] || "Image actions";
+  };
+
+  const getRemoveImageLabel = () => {
+    if (!imageCardTranslations) return `Remove image ${item.fileName}`;
+    return (
+      imageCardTranslations["remove-image"]?.replace(
+        "{{fileName}}",
+        item.fileName,
+      ) || `Remove image ${item.fileName}`
+    );
+  };
+
+  const getRotateImageLabel = () => {
+    if (!imageCardTranslations) return `Rotate image ${item.fileName}`;
+    return (
+      imageCardTranslations["rotate-image"]?.replace(
+        "{{fileName}}",
+        item.fileName,
+      ) || `Rotate image ${item.fileName}`
+    );
+  };
+
+  const getZoomImageLabel = () => {
+    if (!imageCardTranslations) return `Zoom image ${item.fileName}`;
+    return (
+      imageCardTranslations["zoom-image"]?.replace(
+        "{{fileName}}",
+        item.fileName,
+      ) || `Zoom image ${item.fileName}`
+    );
+  };
+
   return (
     <>
       <Draggable draggableId={item.id} index={index}>
@@ -87,16 +145,10 @@ export function ImageCard({
                 className="absolute inset-0 cursor-pointer bg-transparent border-none"
                 onClick={handleClick}
                 onKeyDown={handleKeyDown}
-                aria-label={imageCardTranslations.previewImage.replace(
-                  "{{fileName}}",
-                  item.fileName,
-                )}
+                aria-label={getPreviewImageLabel()}
               />
               <div className="absolute top-2 left-2 z-20 bg-black/70 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center select-none cursor-default">
-                {imageCardTranslations.positionNumber.replace(
-                  "{{number}}",
-                  positionNumber.toString(),
-                )}
+                {getPositionNumberLabel()}
               </div>
 
               <div
@@ -106,7 +158,7 @@ export function ImageCard({
                   transition-opacity duration-300 z-10
                 "
                 role="toolbar"
-                aria-label={imageCardTranslations.imageActions}
+                aria-label={getImageActionsLabel()}
               >
                 <Button
                   type="button"
@@ -119,10 +171,7 @@ export function ImageCard({
                     text-gray-900 dark:text-gray-100 hover:bg-red-500 hover:text-white
                     transition-all duration-200 shadow-md
                   "
-                  aria-label={imageCardTranslations.removeImage.replace(
-                    "{{fileName}}",
-                    item.fileName,
-                  )}
+                  aria-label={getRemoveImageLabel()}
                 >
                   <X className="w-4 h-4" />
                 </Button>
@@ -138,10 +187,7 @@ export function ImageCard({
                     text-gray-900 dark:text-gray-100 hover:bg-blue-500 hover:text-white
                     transition-all duration-200 shadow-md
                   "
-                  aria-label={imageCardTranslations.rotateImage.replace(
-                    "{{fileName}}",
-                    item.fileName,
-                  )}
+                  aria-label={getRotateImageLabel()}
                 >
                   <RotateCw className="w-4 h-4" />
                 </Button>
@@ -157,10 +203,7 @@ export function ImageCard({
                     text-gray-900 dark:text-gray-100 hover:bg-green-500 hover:text-white
                     transition-all duration-200 shadow-md
                   "
-                  aria-label={imageCardTranslations.zoomImage.replace(
-                    "{{fileName}}",
-                    item.fileName,
-                  )}
+                  aria-label={getZoomImageLabel()}
                 >
                   <ZoomIn className="w-4 h-4" />
                 </Button>

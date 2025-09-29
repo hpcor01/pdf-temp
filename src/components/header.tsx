@@ -35,6 +35,7 @@ export function Header({
 
   const buttons = useLanguageKey("buttons");
   const headerTranslations = useLanguageKey("header");
+  const saveLocationTranslations = useLanguageKey("save-location-toggle");
 
   const [isConvertToPDFChecked, setIsConvertToPDFChecked] = useState(true);
   const [isRemoveBgChecked, setIsRemoveBgChecked] = useState(true);
@@ -79,7 +80,7 @@ export function Header({
       showToast(
         "default",
         headerTranslations.processing,
-        headerTranslations.generatingFile,
+        headerTranslations["generating-file"],
       );
 
       const selectedCols = columns.filter((col) => selectedColumns[col.id]);
@@ -88,8 +89,8 @@ export function Header({
         setIsProcessing(false);
         showToast(
           "destructive",
-          headerTranslations.noColumnSelected_title,
-          headerTranslations.noColumnSelected_description,
+          headerTranslations["no-column-selected-title"],
+          headerTranslations["no-column-selected-description"],
         );
         return;
       }
@@ -132,8 +133,8 @@ export function Header({
           if (errorCount === 0) {
             showToast(
               "default",
-              headerTranslations.pdfsGenerated_title,
-              headerTranslations.pdfsGenerated_description.replace(
+              headerTranslations["pdfs-generated-title"],
+              headerTranslations["pdfs-generated-description"].replace(
                 "{{count}}",
                 successCount.toString(),
               ),
@@ -141,7 +142,7 @@ export function Header({
           } else {
             showToast(
               "destructive",
-              "Erro parcial",
+              headerTranslations["partial-error-title"],
               `Foram salvos ${successCount} de ${selectedCols.length} arquivos. ${errorCount} arquivos falharam.`,
             );
           }
@@ -151,8 +152,8 @@ export function Header({
           // Browser doesn't support File System Access API
           showToast(
             "destructive",
-            "Navegador não suportado",
-            "Seu navegador não suporta o salvamento automático em pasta. Use um navegador moderno como Chrome ou Edge.",
+            headerTranslations["unsupported-browser-title"],
+            headerTranslations["unsupported-browser-description"],
           );
           setIsProcessing(false);
           return;
@@ -160,8 +161,8 @@ export function Header({
           // Directory handle not available
           showToast(
             "destructive",
-            "Erro ao acessar pasta",
-            "Não foi possível acessar a pasta selecionada. Verifique se a pasta está disponível e tente novamente.",
+            headerTranslations["error-accessing-folder-title"],
+            saveLocationTranslations["error-selecting-folder-description"],
           );
           setIsProcessing(false);
           return;
@@ -195,8 +196,8 @@ export function Header({
           setIsProcessing(false);
           showToast(
             "default",
-            headerTranslations.pdfsGenerated_title,
-            headerTranslations.pdfsGenerated_description.replace(
+            headerTranslations["pdfs-generated-title"],
+            headerTranslations["pdfs-generated-description"].replace(
               "{{count}}",
               "1",
             ),
@@ -210,8 +211,8 @@ export function Header({
           setIsProcessing(false);
           showToast(
             "default",
-            headerTranslations.pdfsGenerated_title,
-            headerTranslations.pdfsGenerated_description.replace(
+            headerTranslations["pdfs-generated-title"],
+            headerTranslations["pdfs-generated-description"].replace(
               "{{count}}",
               selectedCols.length.toString(),
             ),
@@ -225,8 +226,8 @@ export function Header({
           setIsProcessing(false);
           showToast(
             "default",
-            headerTranslations.pdfGenerated_title,
-            headerTranslations.pdfGenerated_description.replace(
+            headerTranslations["pdf-generated-title"],
+            headerTranslations["pdf-generated-description"].replace(
               "{{count}}",
               "1",
             ),
@@ -238,8 +239,8 @@ export function Header({
           setIsProcessing(false);
           showToast(
             "default",
-            headerTranslations.pdfGenerated_title,
-            headerTranslations.pdfGenerated_description.replace(
+            headerTranslations["pdf-generated-title"],
+            headerTranslations["pdf-generated-description"].replace(
               "{{count}}",
               selectedColumnsCount.toString(),
             ),
@@ -259,8 +260,8 @@ export function Header({
         setIsProcessing(false);
         showToast(
           "default",
-          headerTranslations.imagesDownloaded_title,
-          headerTranslations.imagesDownloaded_description.replace(
+          headerTranslations["images-downloaded-title"],
+          headerTranslations["images-downloaded-description"].replace(
             "{{count}}",
             downloadCount.toString(),
           ),
@@ -269,8 +270,8 @@ export function Header({
         setIsProcessing(false);
         showToast(
           "default",
-          headerTranslations.downloadStarted_title,
-          headerTranslations.downloadStarted_description,
+          headerTranslations["download-started-title"],
+          headerTranslations["download-started-description"],
         );
       }
     } catch (error: unknown) {
@@ -278,14 +279,14 @@ export function Header({
       if (error instanceof Error && error?.name === "AbortError") {
         showToast(
           "default",
-          headerTranslations.cancelled_title,
-          headerTranslations.cancelled_description,
+          headerTranslations["cancelled-title"],
+          headerTranslations["cancelled-description"],
         );
       } else {
         showToast(
           "destructive",
-          headerTranslations.error_title,
-          headerTranslations.error_description,
+          headerTranslations["error-title"],
+          headerTranslations["error-description"],
         );
       }
     }
@@ -294,12 +295,9 @@ export function Header({
   return (
     <>
       {isProcessing && (
-        <LoadingOverlay
-          message={`${headerTranslations.generatingFile} ${
-            saveFolderPath ? saveFolderPath : "pasta padrão"
-          }`}
-        />
+        <LoadingOverlay message={`${headerTranslations["generating-file"]}`} />
       )}
+
       <Toast
         open={toastOpen}
         onOpenChange={setToastOpen}
@@ -307,10 +305,13 @@ export function Header({
         title={toastTitle}
         description={toastDescription}
       />
+
       <header className="flex flex-wrap gap-4 justify-between items-center border-1 rounded-b-lg p-2.5">
         <section
           className="flex flex-wrap items-center gap-4"
-          aria-label={useLanguageKey("comboboxChangeLanguage.selectLanguage")}
+          aria-label={useLanguageKey(
+            "combobox-change-language.select-language",
+          )}
         >
           <ModeToggle />
           <ComboboxChangeLanguage />

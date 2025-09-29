@@ -58,7 +58,7 @@ export function ColumnComponent({ column, index }: ColumnProps) {
   };
 
   const handleDragLeave = (e: DragEvent<HTMLDivElement>) => {
-    e.stopPropagation(); // Add this to prevent event bubbling
+    e.stopPropagation();
     setIsDragOver(false);
   };
 
@@ -112,24 +112,78 @@ export function ColumnComponent({ column, index }: ColumnProps) {
   // Calculate total images in this column
   const totalImages = column.items.length;
 
+  // Add a fallback in case translations are not loaded
+  const getColumnLabel = () => {
+    if (!columnTranslations) return `Column ${column.title}`;
+    return (
+      columnTranslations["column-label"]?.replace("{{title}}", column.title) ||
+      `Column ${column.title}`
+    );
+  };
+
+  const getSelectColumnLabel = () => {
+    if (!columnTranslations) return `Select column ${column.title}`;
+    return (
+      columnTranslations["select-column"]?.replace("{{title}}", column.title) ||
+      `Select column ${column.title}`
+    );
+  };
+
+  const getEditColumnTitleLabel = () => {
+    if (!columnTranslations) return `Edit column title ${column.title}`;
+    return (
+      columnTranslations["edit-column-title"]?.replace(
+        "{{title}}",
+        column.title,
+      ) || `Edit column title ${column.title}`
+    );
+  };
+
+  const getTotalImagesLabel = () => {
+    if (!columnTranslations) return `Total: ${totalImages}`;
+    return (
+      columnTranslations["total-images"]?.replace(
+        "{{count}}",
+        totalImages.toString(),
+      ) || `Total: ${totalImages}`
+    );
+  };
+
+  const getEditColumnLabel = () => {
+    if (!columnTranslations) return "Edit column";
+    return columnTranslations["edit-column"] || "Edit column";
+  };
+
+  const getRemoveColumnLabel = () => {
+    if (!columnTranslations) return "Remove column";
+    return columnTranslations["remove-column"] || "Remove column";
+  };
+
+  const getImagesInColumnLabel = () => {
+    if (!columnTranslations) return `Images in column ${column.title}`;
+    return (
+      columnTranslations["images-in-column"]?.replace(
+        "{{title}}",
+        column.title,
+      ) || `Images in column ${column.title}`
+    );
+  };
+
   return (
     <Droppable droppableId={column.id}>
-      {(provided) => (
+      {(provided, snapshot) => (
         <section
           ref={provided.innerRef}
           {...provided.droppableProps}
           className={`flex flex-col w-64 min-w-[16rem] rounded-lg shadow transition-all duration-200 ${
-            isDragOver
+            isDragOver || snapshot.isDraggingOver
               ? "bg-primary/10 border-2 border-dashed border-primary"
               : "bg-card"
           }`}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
-          aria-label={columnTranslations.columnLabel.replace(
-            "{{title}}",
-            column.title,
-          )}
+          aria-label={getColumnLabel()}
         >
           <div className="p-3 border-b border-border">
             <div className="flex items-center justify-between mb-2">
@@ -138,10 +192,7 @@ export function ColumnComponent({ column, index }: ColumnProps) {
                   checked={isSelected}
                   onCheckedChange={handleCheckboxChange}
                   className="cursor-pointer"
-                  aria-label={columnTranslations.selectColumn.replace(
-                    "{{title}}",
-                    column.title,
-                  )}
+                  aria-label={getSelectColumnLabel()}
                 />
                 {isEditing ? (
                   <Input
@@ -157,19 +208,13 @@ export function ColumnComponent({ column, index }: ColumnProps) {
                     }}
                     autoFocus
                     className="h-7 text-sm"
-                    aria-label={columnTranslations.editColumnTitle.replace(
-                      "{{title}}",
-                      column.title,
-                    )}
+                    aria-label={getEditColumnTitleLabel()}
                   />
                 ) : (
                   <div className="flex flex-col">
                     <p className="font-medium truncate">{column.title}</p>
                     <span className="text-xs text-muted-foreground">
-                      {columnTranslations.totalImages.replace(
-                        "{{count}}",
-                        totalImages.toString(),
-                      )}
+                      {getTotalImagesLabel()}
                     </span>
                   </div>
                 )}
@@ -180,7 +225,7 @@ export function ColumnComponent({ column, index }: ColumnProps) {
                   size="sm"
                   onClick={() => setIsEditing(true)}
                   className="h-7 w-7 p-0 cursor-pointer"
-                  aria-label={columnTranslations.editColumn}
+                  aria-label={getEditColumnLabel()}
                 >
                   <Pencil className="w-4 h-4" />
                 </Button>
@@ -190,7 +235,7 @@ export function ColumnComponent({ column, index }: ColumnProps) {
                     size="sm"
                     onClick={handleRemoveColumn}
                     className="h-7 w-7 p-0 text-red-500 hover:text-red-700 cursor-pointer"
-                    aria-label={columnTranslations.removeColumn}
+                    aria-label={getRemoveColumnLabel()}
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>
@@ -200,10 +245,7 @@ export function ColumnComponent({ column, index }: ColumnProps) {
           </div>
           <section
             className="flex-grow overflow-y-auto max-h-[calc(100vh-200px)] p-2"
-            aria-label={columnTranslations.imagesInColumn.replace(
-              "{{title}}",
-              column.title,
-            )}
+            aria-label={getImagesInColumnLabel()}
           >
             {column.items.map((item, itemIndex) => (
               <ImageCard

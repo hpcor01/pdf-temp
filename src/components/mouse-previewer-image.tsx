@@ -14,7 +14,7 @@ export function MousePreviewerImage({
   const previewRef = useRef<HTMLDivElement>(null);
 
   // Mouse previewer translations
-  const mousePreviewerTranslations = useLanguageKey("mousePreviewer");
+  const mousePreviewerTranslations = useLanguageKey("mouse-previewer");
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -82,7 +82,7 @@ export function MousePreviewerImage({
           type="button"
           onClick={onClose}
           className="cursor-pointer text-muted-foreground hover:text-foreground ml-2 bg-transparent border-none"
-          aria-label={mousePreviewerTranslations.closePreview}
+          aria-label={mousePreviewerTranslations["close-preview"]}
         >
           <div className="w-5 h-5 flex items-center justify-center">
             <div className="w-4 h-0.5 bg-current rotate-45 absolute"></div>

@@ -9,13 +9,13 @@ export function BtnCreateColumn({ onClick }: BtnCreateColumnProps) {
   };
 
   // Btn create column translations
-  const btnCreateColumnTranslations = useLanguageKey("btnCreateColumn");
+  const btnCreateColumnTranslations = useLanguageKey("btn-create-column");
 
   return (
     <Button
       onClick={handleClick}
       className="cursor-pointer fixed bottom-6 right-6 rounded-full w-14 h-14 shadow-lg"
-      aria-label={btnCreateColumnTranslations.createColumn}
+      aria-label={btnCreateColumnTranslations["create-column"]}
     >
       <Plus className="w-6 h-6 text-white" />
     </Button>

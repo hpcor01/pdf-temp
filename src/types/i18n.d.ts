@@ -53,74 +53,88 @@ export interface LanguageStructure {
   };
   header: {
     processing: string;
-    generatingFile: string;
-    noColumnSelected_title: string;
-    noColumnSelected_description: string;
-    pdfsGenerated_title: string;
-    pdfsGenerated_description: string;
-    pdfGenerated_title: string;
-    pdfGenerated_description: string;
-    imagesDownloaded_title: string;
-    imagesDownloaded_description: string;
-    downloadStarted_title: string;
-    downloadStarted_description: string;
-    cancelled_title: string;
-    cancelled_description: string;
-    error_title: string;
-    error_description: string;
+    "generating-file": string;
+    "no-column-selected-title": string;
+    "no-column-selected-description": string;
+    "pdfs-generated-title": string;
+    "pdfs-generated-description": string;
+    "pdf-generated-title": string;
+    "pdf-generated-description": string;
+    "images-downloaded-title": string;
+    "images-downloaded-description": string;
+    "download-started-title": string;
+    "download-started-description": string;
+    "cancelled-title": string;
+    "cancelled-description": string;
+    "error-title": string;
+    "error-description": string;
+    "partial-error-title": string;
+    "unsupported-browser-title": string;
+    "unsupported-browser-description": string;
+    "error-accessing-folder-title": string;
   };
-  comboboxChangeLanguage: {
-    selectLanguage: string;
+  "combobox-change-language": {
+    "select-language": string;
   };
   column: {
-    dragDropArea: string;
-    columnLabel: string;
-    selectColumn: string;
-    editColumnTitle: string;
-    editColumn: string;
-    removeColumn: string;
-    imagesInColumn: string;
-    totalImages: string;
+    "drag-drop-area": string;
+    "column-label": string;
+    "select-column": string;
+    "edit-column-title": string;
+    "edit-column": string;
+    "remove-column": string;
+    "images-in-column": string;
+    "total-images": string;
   };
-  imageCard: {
-    positionNumber: string;
-    imageActions: string;
-    removeImage: string;
-    rotateImage: string;
-    zoomImage: string;
-    previewImage: string;
+  "image-card": {
+    "position-number": string;
+    "image-actions": string;
+    "remove-image": string;
+    "rotate-image": string;
+    "zoom-image": string;
+    "preview-image": string;
   };
-  mousePreviewer: {
-    closePreview: string;
+  "mouse-previewer": {
+    "close-preview": string;
     rotation: string;
     size: string;
   };
-  previewerImage: {
-    modalLabel: string;
-    previewTitle: string;
-    zoomOut: string;
-    resetZoom: string;
-    zoomIn: string;
-    closePreview: string;
-    zoomLevel: string;
-    previewContainer: string;
+  "previewer-image": {
+    "modal-label": string;
+    "preview-title": string;
+    "zoom-out": string;
+    "reset-zoom": string;
+    "zoom-in": string;
+    "close-preview": string;
+    "zoom-level": string;
+    "preview-container": string;
   };
-  btnCreateColumn: {
-    createColumn: string;
+  "btn-create-column": {
+    "create-column": string;
   };
-  updateToast: {
-    newVersion_title: string;
-    newVersion_description: string;
-    closeNotification: string;
+  "update-toast": {
+    "new-version-title": string;
+    "new-version-description": string;
+    "close-notification": string;
     updating: string;
     update: string;
     later: string;
   };
-  notFound: {
-    pageTitle: string;
-    pageDescription: string;
-    imageAlt: string;
-    backToDashboard: string;
+  "save-location-toggle": {
+    "folder-selected-title": string;
+    "folder-selected-description": string;
+    "error-selecting-folder-title": string;
+    "error-selecting-folder-description": string;
+    "single-folder": string;
+    "folder-per-column": string;
+    "default-folder": string;
+    "select-folder-prompt": string;
+  };
+  "not-found": {
+    "page-title": string;
+    "page-description": string;
+    "image-alt": string;
+    "back-to-dashboard": string;
   };
 }
 

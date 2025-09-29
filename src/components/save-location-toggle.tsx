@@ -3,6 +3,7 @@
 import { useCallback, useId } from "react";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { useLanguageKey } from "@/hooks/use-i18n";
 import { directoryHandleManager } from "@/lib/directory-handle";
 import type { SaveLocationToggleProps } from "@/types/save-location-toggle";
 
@@ -17,6 +18,7 @@ export function SaveLocationToggle({
   setToastOpen,
 }: SaveLocationToggleProps) {
   const saveLocationId = useId();
+  const saveLocationTranslations = useLanguageKey("save-location-toggle");
 
   // Local implementation of showToast since we can't import useToast without providing arguments
   const showToast = useCallback(
@@ -46,18 +48,23 @@ export function SaveLocationToggle({
               mode: "readwrite",
             });
             directoryHandleManager.setDirectoryHandle(dirHandle);
-            const path = dirHandle.name; // Get the directory name
+            // Due to browser security restrictions, we can't get the full path
+            // We'll use a descriptive representation instead
+            const path = `Selected folder: ${dirHandle.name}`;
             setSaveFolderPath(path);
             // Show toast notification when folder is selected
             showToast(
               "default",
-              "Pasta de salvamento selecionada",
-              `A pasta "${path}" será usada para salvar todos os arquivos.`,
+              saveLocationTranslations["folder-selected-title"],
+              saveLocationTranslations["folder-selected-description"].replace(
+                "{path}",
+                dirHandle.name, // Use just the name in the toast for clarity
+              ),
             );
           } else {
             // Fallback for browsers that don't support the File System Access API
             const path = prompt(
-              "Selecione a pasta onde deseja salvar (OneDrive é compatível):",
+              saveLocationTranslations["select-folder-prompt"],
               "",
             );
             if (path !== null) {
@@ -65,8 +72,11 @@ export function SaveLocationToggle({
               // Show toast notification when folder is selected
               showToast(
                 "default",
-                "Pasta de salvamento selecionada",
-                `A pasta "${path}" será usada para salvar todos os arquivos.`,
+                saveLocationTranslations["folder-selected-title"],
+                saveLocationTranslations["folder-selected-description"].replace(
+                  "{path}",
+                  path,
+                ),
               );
             } else {
               // User cancelled, revert the switch
@@ -82,8 +92,8 @@ export function SaveLocationToggle({
           // Show error message to user
           showToast(
             "destructive",
-            "Erro ao selecionar pasta",
-            "Não foi possível acessar a pasta selecionada. Verifique se a pasta está disponível e tente novamente.",
+            saveLocationTranslations["error-selecting-folder-title"],
+            saveLocationTranslations["error-selecting-folder-description"],
           );
         }
       } else {
@@ -92,7 +102,16 @@ export function SaveLocationToggle({
         setSaveFolderPath("");
       }
     },
-    [setIsSingleSaveLocation, setSaveFolderPath, showToast],
+    [
+      setIsSingleSaveLocation,
+      setSaveFolderPath,
+      showToast,
+      saveLocationTranslations["folder-selected-title"],
+      saveLocationTranslations["folder-selected-description"],
+      saveLocationTranslations["error-selecting-folder-title"],
+      saveLocationTranslations["error-selecting-folder-description"],
+      saveLocationTranslations["select-folder-prompt"],
+    ],
   );
 
   return (
@@ -107,8 +126,8 @@ export function SaveLocationToggle({
       <Label htmlFor={saveLocationId} className="cursor-pointer py-2">
         Salvar
         {isSingleSaveLocation
-          ? " (uma pasta única)"
-          : " (uma pasta por coluna)"}
+          ? saveLocationTranslations["single-folder"]
+          : saveLocationTranslations["folder-per-column"]}
       </Label>
     </div>
   );
