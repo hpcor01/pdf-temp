@@ -24,6 +24,7 @@ export interface KanbanContextType {
   renameColumn: (id: string, title: string) => void;
   addImagesToColumn: (columnId: string, images: ImageItem[]) => void;
   removeImage: (columnId: string, imageId: string) => void;
+  updateImage: (columnId: string, updatedImage: ImageItem) => void;
   rotateImage: (columnId: string, imageId: string, rotation: number) => void;
   moveImage: (
     sourceColumnId: string,

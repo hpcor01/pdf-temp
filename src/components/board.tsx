@@ -10,6 +10,7 @@ import type { ColumnProps } from "@/types/column";
 import { BtnCreateColumn } from "./btn-create-column";
 import { PreviewerImage } from "./previewer-image";
 
+// Ensure the dynamic import is properly configured
 const ColumnComponent = dynamic<ColumnProps>(
   () => import("./column").then((mod) => mod.ColumnComponent),
   {
@@ -41,13 +42,16 @@ export function Board() {
     (result: DropResult) => {
       const { source, destination, draggableId, type } = result;
 
+      // Check if destination exists
       if (!destination) return;
 
+      // Handle column reordering (if implemented)
       if (type === "COLUMN") {
         if (source.index === destination.index) return;
         return;
       }
 
+      // Handle image moving within or between columns
       if (source.droppableId === destination.droppableId) {
         if (source.index === destination.index) return;
 

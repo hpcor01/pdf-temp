@@ -4,6 +4,7 @@ import { RefreshCcw, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useAutoUpdate } from "@/hooks/use-auto-update";
+import { useLanguageKey } from "@/hooks/use-i18n";
 
 /**
  * Toast notification for app updates
@@ -14,6 +15,9 @@ export function UpdateToast() {
   const [isVisible, setIsVisible] = useState(false);
   const [autoReloadTimeout, setAutoReloadTimeout] =
     useState<NodeJS.Timeout | null>(null);
+
+  // Update toast translations
+  const updateToastTranslations = useLanguageKey("update-toast");
 
   useEffect(() => {
     if (hasUpdate) {
@@ -55,16 +59,15 @@ export function UpdateToast() {
   };
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 animate-in slide-in-from-bottom-4 duration-300">
+    <div className="fixed inset-0 z-50 flex items-center justify-center animate-in slide-in-from-bottom-4 duration-300">
       <div className="bg-background border border-border rounded-lg shadow-lg p-4 max-w-sm">
         <div className="flex items-start gap-3">
           <div className="flex-1">
             <h3 className="font-medium text-foreground">
-              Nova versão disponível
+              {updateToastTranslations["new-version-title"]}
             </h3>
             <p className="text-sm text-muted-foreground mt-1">
-              Uma nova versão do aplicativo está disponível. Clique em Atualizar
-              para carregar a nova versão.
+              {updateToastTranslations["new-version-description"]}
             </p>
           </div>
           <Button
@@ -72,7 +75,7 @@ export function UpdateToast() {
             size="sm"
             onClick={handleDismiss}
             className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground"
-            aria-label="Fechar notificação"
+            aria-label={updateToastTranslations["close-notification"]}
           >
             <X className="w-4 h-4" />
           </Button>
@@ -86,14 +89,14 @@ export function UpdateToast() {
             {isLoading ? (
               <>
                 <RefreshCcw className="mr-2 h-4 w-4 animate-spin" />
-                Atualizando...
+                {updateToastTranslations.updating}
               </>
             ) : (
-              "Atualizar"
+              updateToastTranslations.update
             )}
           </Button>
           <Button variant="outline" onClick={handleDismiss}>
-            Depois
+            {updateToastTranslations.later}
           </Button>
         </div>
       </div>

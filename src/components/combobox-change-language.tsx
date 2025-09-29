@@ -29,6 +29,9 @@ export default function ComboboxChangeLanguage() {
   const placeholder = useLanguageKey("combobox.placeholder");
   const searchPlaceholder = useLanguageKey("combobox.search-placeholder");
   const noLanguageFound = useLanguageKey("combobox.no-language-found");
+  const selectLanguageLabel = useLanguageKey(
+    "combobox-change-language.select-language",
+  );
 
   const languages = Object.entries(t["languages-selected"].locales).map(
     ([code, info]) => {
@@ -58,7 +61,7 @@ export default function ComboboxChangeLanguage() {
           role="combobox"
           aria-expanded={open}
           className="w-[200px] justify-between cursor-pointer"
-          aria-label="Selecionar idioma"
+          aria-label={selectLanguageLabel}
         >
           {languages.find((lang) => lang.value === value)?.label ?? placeholder}
           <ChevronsUpDown className="opacity-50" />
@@ -74,7 +77,7 @@ export default function ComboboxChangeLanguage() {
           <CommandInput
             placeholder={searchPlaceholder}
             className="h-9"
-            aria-label="Pesquisar idioma"
+            aria-label={useLanguageKey("combobox.search-placeholder")}
           />
           <CommandList>
             <CommandEmpty>{noLanguageFound}</CommandEmpty>

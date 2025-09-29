@@ -67,9 +67,8 @@ export default function RootLayout({
             <Analytics />
             <SpeedInsights />
           </ThemeProvider>
+          <UpdateToast />
         </I18nProvider>
-
-        <UpdateToast />
       </body>
     </html>
   );

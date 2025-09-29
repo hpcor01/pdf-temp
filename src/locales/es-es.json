@@ -50,5 +50,97 @@
     "placeholder": "Seleccionar idioma...",
     "search-placeholder": "Buscar idioma...",
     "no-language-found": "No se encontró el idioma."
+  },
+  "header": {
+    "processing": "Procesando...",
+    "generating-file": "Su archivo se está generando, por favor espere.",
+    "no-column-selected-title": "Ninguna columna seleccionada",
+    "no-column-selected-description": "Seleccione al menos una columna para guardar.",
+    "pdfs-generated-title": "PDFs generados",
+    "pdfs-generated-description": "{{count}} PDF(s) fueron guardados con el fondo eliminado.",
+    "pdf-generated-title": "PDF generado",
+    "pdf-generated-description": "{{count}} PDF(s) fueron guardados.",
+    "images-downloaded-title": "Imágenes descargadas",
+    "images-downloaded-description": "{{count}} imagen(es) fueron descargadas con el fondo eliminado.",
+    "download-started-title": "Descarga iniciada",
+    "download-started-description": "Descargando imágenes individuales...",
+    "cancelled-title": "Cancelado",
+    "cancelled-description": "Operación de guardado cancelada.",
+    "error-title": "Error",
+    "error-description": "Error al procesar las imágenes.",
+    "partial-error-title": "Error parcial",
+    "unsupported-browser-title": "Navegador no compatible",
+    "unsupported-browser-description": "Su navegador no admite el guardado automático en carpeta. Use un navegador moderno como Chrome o Edge.",
+    "error-accessing-folder-title": "Error al acceder a la carpeta"
+  },
+  "combobox-change-language": {
+    "select-language": "Seleccionar idioma"
+  },
+  "column": {
+    "drag-drop-area": "Área para arrastrar y soltar imágenes",
+    "column-label": "Columna {{title}}",
+    "select-column": "Seleccionar columna {{title}}",
+    "edit-column-title": "Editar título de columna {{title}}",
+    "edit-column": "Editar columna",
+    "remove-column": "Eliminar columna",
+    "images-in-column": "Imágenes en columna {{title}}",
+    "total-images": "Total: {{count}}"
+  },
+  "image-card": {
+    "position-number": "{{number}}",
+    "image-actions": "Acciones de imagen",
+    "remove-image": "Eliminar imagen {{fileName}}",
+    "rotate-image": "Rotar imagen {{fileName}}",
+    "zoom-image": "Zoom de imagen {{fileName}}",
+    "preview-image": "Previsualizar imagen {{fileName}}"
+  },
+  "mouse-previewer": {
+    "close-preview": "Cerrar previsualización",
+    "rotation": "Rotación: {{degrees}}°",
+    "size": "Tamaño: {{size}} KB"
+  },
+  "previewer-image": {
+    "modal-label": "Modal de previsualización de imagen",
+    "preview-title": "Previsualización de imagen",
+    "crop-image": "Recortar imagen",
+    "zoom-out": "Reducir zoom",
+    "reset-zoom": "Restablecer zoom",
+    "zoom-in": "Aumentar zoom",
+    "close-preview": "Cerrar previsualización",
+    "zoom-level": "{{percentage}}%",
+    "preview-container": "Contenedor de previsualización de imagen. Use la rueda del mouse para hacer zoom, haga clic y arrastre para mover"
+  },
+  "crop-image": {
+    "crop-title": "Recortar Imagen",
+    "close-crop": "Cerrar recorte",
+    "cancel": "Cancelar",
+    "save": "Guardar"
+  },
+  "btn-create-column": {
+    "create-column": "Crear nueva columna"
+  },
+  "update-toast": {
+    "new-version-title": "Nueva versión disponible",
+    "new-version-description": "Una nueva versión de la aplicación está disponible. Haga clic en Actualizar para cargar la nueva versión.",
+    "close-notification": "Cerrar notificación",
+    "updating": "Actualizando...",
+    "update": "Actualizar",
+    "later": "Después"
+  },
+  "save-location-toggle": {
+    "folder-selected-title": "Carpeta de guardado seleccionada",
+    "folder-selected-description": "La carpeta \"{path}\" se utilizará para guardar todos los archivos.",
+    "error-selecting-folder-title": "Error al seleccionar carpeta",
+    "error-selecting-folder-description": "No se pudo acceder a la carpeta seleccionada. Verifique si la carpeta está disponible e intente nuevamente.",
+    "single-folder": "Guardar en grupo",
+    "folder-per-column": "Guardar por separado",
+    "default-folder": "carpeta predeterminada",
+    "select-folder-prompt": "Seleccione la carpeta donde desea guardar (OneDrive es compatible):"
+  },
+  "not-found": {
+    "page-title": "Página no encontrada",
+    "page-description": "La página que solicitó ha cambiado o está en desarrollo",
+    "image-alt": "Imagen de un gato colgando del número 404 indicando que la página no fue encontrada",
+    "back-to-dashboard": "Volver al Panel"
   }
 }

@@ -1,19 +1,33 @@
 "use client";
 
-import { Minus, Plus, X } from "lucide-react";
+import { Minus, Plus, Scissors, X } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import { CropImage } from "@/components/crop-image";
 import { Button } from "@/components/ui/button";
+import { useLanguageKey } from "@/hooks/use-i18n";
+import { useKanban } from "@/providers/kanban-provider";
 import { usePreviewer } from "@/providers/previewer-provider";
 
 export function PreviewerImage() {
-  const { previewImage, isPreviewerOpen, closePreviewer } = usePreviewer();
+  const {
+    previewImage,
+    previewImageColumnId,
+    isPreviewerOpen,
+    closePreviewer,
+    updatePreviewImage,
+  } = usePreviewer();
+  const { updateImage } = useKanban();
   const [zoomLevel, setZoomLevel] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [isCropModalOpen, setIsCropModalOpen] = useState(false);
   const imageRef = useRef<HTMLDivElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
+
+  // Previewer image translations
+  const previewerImageTranslations = useLanguageKey("previewer-image");
 
   // Reset zoom and position when a new image is opened
   useEffect(() => {
@@ -93,6 +107,33 @@ export function PreviewerImage() {
     }
   };
 
+  const openCropModal = () => {
+    setIsCropModalOpen(true);
+  };
+
+  const closeCropModal = () => {
+    setIsCropModalOpen(false);
+  };
+
+  const handleSaveCroppedImage = (croppedImage: string) => {
+    // Update the preview image with the cropped version
+    if (previewImage && updatePreviewImage) {
+      const updatedImage = {
+        ...previewImage,
+        src: croppedImage,
+      };
+
+      // Update in the previewer context
+      updatePreviewImage(updatedImage);
+
+      // Update in the kanban context (this will update the image in the image card)
+      if (previewImageColumnId) {
+        updateImage(previewImageColumnId, updatedImage);
+      }
+    }
+    closeCropModal();
+  };
+
   if (!isPreviewerOpen || !previewImage) {
     return null;
   }
@@ -104,7 +145,7 @@ export function PreviewerImage() {
       onKeyDown={handleOverlayKeyDown}
       role="dialog"
       aria-modal="true"
-      aria-label="Image preview modal"
+      aria-label={previewerImageTranslations["modal-label"]}
       tabIndex={-1}
     >
       <div
@@ -113,15 +154,24 @@ export function PreviewerImage() {
       >
         <div className="p-4 border-b flex justify-between items-center">
           <h2 className="text-lg font-semibold uppercase cursor-default select-none">
-            Pré visualização da imagem
+            {previewerImageTranslations["preview-title"]}
           </h2>
           <div className="flex gap-2 items-center">
             <Button
               className="cursor-pointer"
               variant="outline"
               size="icon"
+              onClick={openCropModal}
+              aria-label={previewerImageTranslations["crop-image"]}
+            >
+              <Scissors className="h-4 w-4" />
+            </Button>
+            <Button
+              className="cursor-pointer"
+              variant="outline"
+              size="icon"
               onClick={handleZoomOut}
-              aria-label="Zoom out"
+              aria-label={previewerImageTranslations["zoom-out"]}
               disabled={zoomLevel <= 0.1}
             >
               <Minus className="h-4 w-4" />
@@ -131,16 +181,19 @@ export function PreviewerImage() {
               variant="outline"
               size="sm"
               onClick={handleResetZoom}
-              aria-label="Reset zoom"
+              aria-label={previewerImageTranslations["reset-zoom"]}
             >
-              {Math.round(zoomLevel * 100)}%
+              {previewerImageTranslations["zoom-level"].replace(
+                "{{percentage}}",
+                Math.round(zoomLevel * 100).toString(),
+              )}
             </Button>
             <Button
               className="cursor-pointer"
               variant="outline"
               size="icon"
               onClick={handleZoomIn}
-              aria-label="Zoom in"
+              aria-label={previewerImageTranslations["zoom-in"]}
               disabled={zoomLevel >= 5}
             >
               <Plus className="h-4 w-4" />
@@ -150,7 +203,7 @@ export function PreviewerImage() {
               variant="ghost"
               size="icon"
               onClick={closePreviewer}
-              aria-label="Close preview"
+              aria-label={previewerImageTranslations["close-preview"]}
             >
               <X className="h-4 w-4" />
             </Button>
@@ -169,7 +222,7 @@ export function PreviewerImage() {
             if (e.key === "Escape") closePreviewer();
           }}
           tabIndex={0}
-          aria-label="Image preview container. Use mouse wheel to zoom, click and drag to pan"
+          aria-label={previewerImageTranslations["preview-container"]}
         >
           <div
             ref={imageRef}
@@ -200,6 +253,14 @@ export function PreviewerImage() {
           </div>
         </Button>
       </div>
+      {previewImage && (
+        <CropImage
+          isOpen={isCropModalOpen}
+          imageSrc={previewImage.src}
+          onClose={closeCropModal}
+          onSave={handleSaveCroppedImage}
+        />
+      )}
     </div>
   );
 }
