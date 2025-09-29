@@ -111,11 +111,10 @@
     "preview-container": "Contêiner de pré-visualização de imagem. Use a roda do mouse para dar zoom, clique e arraste para mover"
   },
   "crop-image": {
-    "modal-label": "Modal de corte de imagem",
-    "title": "Cortar Imagem",
-    "description": "Funcionalidade de corte será implementada aqui.",
-    "close": "Fechar",
-    "close-button": "Fechar"
+    "crop-title": "Cortar Imagem",
+    "close-crop": "Fechar corte",
+    "cancel": "Cancelar",
+    "save": "Salvar"
   },
   "btn-create-column": {
     "create-column": "Criar nova coluna"

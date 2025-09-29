@@ -107,6 +107,12 @@ export function PreviewerImage() {
     setIsCropModalOpen(false);
   };
 
+  const handleSaveCroppedImage = (croppedImage: string) => {
+    // Here you would typically save the cropped image or update the preview
+    // For now, we'll just close the modal
+    closeCropModal();
+  };
+
   if (!isPreviewerOpen || !previewImage) {
     return null;
   }
@@ -226,7 +232,14 @@ export function PreviewerImage() {
           </div>
         </Button>
       </div>
-      <CropImage isOpen={isCropModalOpen} onClose={closeCropModal} />
+      {previewImage && (
+        <CropImage
+          isOpen={isCropModalOpen}
+          imageSrc={previewImage.src}
+          onClose={closeCropModal}
+          onSave={handleSaveCroppedImage}
+        />
+      )}
     </div>
   );
 }

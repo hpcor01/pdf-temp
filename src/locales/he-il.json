@@ -111,11 +111,10 @@
     "preview-container": "מיכל תצוגה מקדימה של תמונה. השתמש בגלגל העכבר לזום, לחץ וגרור להזזה"
   },
   "crop-image": {
-    "modal-label": "חלון חיתוך תמונה",
-    "title": "חתוך תמונה",
-    "description": "אפשרות החיתוך תיושם כאן.",
-    "close": "סגור",
-    "close-button": "סגור"
+    "crop-title": "חתוך תמונה",
+    "close-crop": "סגור חיתוך",
+    "cancel": "ביטול",
+    "save": "שמור"
   },
   "btn-create-column": {
     "create-column": "צור עמודה חדשה"

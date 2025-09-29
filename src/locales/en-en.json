@@ -111,11 +111,10 @@
     "preview-container": "Image preview container. Use mouse wheel to zoom, click and drag to pan"
   },
   "crop-image": {
-    "modal-label": "Crop image modal",
-    "title": "Crop Image",
-    "description": "Crop functionality will be implemented here.",
-    "close": "Close",
-    "close-button": "Close"
+    "crop-title": "Crop Image",
+    "close-crop": "Close crop",
+    "cancel": "Cancel",
+    "save": "Save"
   },
   "btn-create-column": {
     "create-column": "Create new column"

@@ -111,11 +111,10 @@ export interface LanguageStructure {
     "preview-container": string;
   };
   "crop-image": {
-    "modal-label": string;
-    title: string;
-    description: string;
-    close: string;
-    "close-button": string;
+    "crop-title": string;
+    "close-crop": string;
+    cancel: string;
+    save: string;
   };
   "btn-create-column": {
     "create-column": string;
