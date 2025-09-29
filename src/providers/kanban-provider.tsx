@@ -79,6 +79,24 @@ export function KanbanProvider({ children }: { children: ReactNode }) {
     );
   }, []);
 
+  const updateImage = useCallback(
+    (columnId: string, updatedImage: ImageItem) => {
+      setColumns((prev) =>
+        prev.map((col) =>
+          col.id === columnId
+            ? {
+                ...col,
+                items: col.items.map((img) =>
+                  img.id === updatedImage.id ? updatedImage : img,
+                ),
+              }
+            : col,
+        ),
+      );
+    },
+    [],
+  );
+
   const rotateImage = useCallback(
     (columnId: string, imageId: string, rotation: number) => {
       setColumns((prev) =>
@@ -196,6 +214,7 @@ export function KanbanProvider({ children }: { children: ReactNode }) {
         renameColumn,
         addImagesToColumn,
         removeImage,
+        updateImage,
         rotateImage,
         moveImage,
         moveColumn,

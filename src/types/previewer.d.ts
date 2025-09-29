@@ -26,3 +26,13 @@ export interface PreviewContextType {
   clearPreview: () => void;
   setIsPreviewerImageChecked: (checked: boolean) => void;
 }
+
+export interface PreviewerContextProps {
+  previewImage: ImageItem | null;
+  previewImageColumnId: string | null;
+  isPreviewerOpen: boolean;
+  setPreviewerImage: (image: ImageItem | null, columnId?: string) => void;
+  openPreviewer: (image: ImageItem, columnId?: string) => void;
+  closePreviewer: () => void;
+  updatePreviewImage: (image: ImageItem) => void;
+}

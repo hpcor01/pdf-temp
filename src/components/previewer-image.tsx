@@ -6,10 +6,18 @@ import { useEffect, useRef, useState } from "react";
 import { CropImage } from "@/components/crop-image";
 import { Button } from "@/components/ui/button";
 import { useLanguageKey } from "@/hooks/use-i18n";
+import { useKanban } from "@/providers/kanban-provider";
 import { usePreviewer } from "@/providers/previewer-provider";
 
 export function PreviewerImage() {
-  const { previewImage, isPreviewerOpen, closePreviewer } = usePreviewer();
+  const {
+    previewImage,
+    previewImageColumnId,
+    isPreviewerOpen,
+    closePreviewer,
+    updatePreviewImage,
+  } = usePreviewer();
+  const { updateImage } = useKanban();
   const [zoomLevel, setZoomLevel] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
@@ -108,8 +116,21 @@ export function PreviewerImage() {
   };
 
   const handleSaveCroppedImage = (croppedImage: string) => {
-    // Here you would typically save the cropped image or update the preview
-    // For now, we'll just close the modal
+    // Update the preview image with the cropped version
+    if (previewImage && updatePreviewImage) {
+      const updatedImage = {
+        ...previewImage,
+        src: croppedImage,
+      };
+
+      // Update in the previewer context
+      updatePreviewImage(updatedImage);
+
+      // Update in the kanban context (this will update the image in the image card)
+      if (previewImageColumnId) {
+        updateImage(previewImageColumnId, updatedImage);
+      }
+    }
     closeCropModal();
   };
 
@@ -164,7 +185,7 @@ export function PreviewerImage() {
             >
               {previewerImageTranslations["zoom-level"].replace(
                 "{{percentage}}",
-                Math.round(zoomLevel * 100).toString()
+                Math.round(zoomLevel * 100).toString(),
               )}
             </Button>
             <Button

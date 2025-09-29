@@ -5,10 +5,12 @@ import type { ImageItem } from "@/types/kanban";
 
 interface PreviewerContextProps {
   previewImage: ImageItem | null;
+  previewImageColumnId: string | null;
   isPreviewerOpen: boolean;
-  setPreviewerImage: (image: ImageItem | null) => void;
-  openPreviewer: (image: ImageItem) => void;
+  setPreviewerImage: (image: ImageItem | null, columnId?: string) => void;
+  openPreviewer: (image: ImageItem, columnId?: string) => void;
   closePreviewer: () => void;
+  updatePreviewImage: (image: ImageItem) => void;
 }
 
 const PreviewerContext = createContext<PreviewerContextProps | undefined>(
@@ -17,19 +19,29 @@ const PreviewerContext = createContext<PreviewerContextProps | undefined>(
 
 export function PreviewerProvider({ children }: { children: ReactNode }) {
   const [previewImage, setPreviewImage] = useState<ImageItem | null>(null);
+  const [previewImageColumnId, setPreviewImageColumnId] = useState<
+    string | null
+  >(null);
   const [isPreviewerOpen, setIsPreviewerOpen] = useState(false);
 
-  const openPreviewer = (image: ImageItem) => {
+  const openPreviewer = (image: ImageItem, columnId?: string) => {
     setPreviewImage(image);
+    setPreviewImageColumnId(columnId || null);
     setIsPreviewerOpen(true);
   };
 
   const closePreviewer = () => {
     setPreviewImage(null);
+    setPreviewImageColumnId(null);
     setIsPreviewerOpen(false);
   };
 
-  const setPreviewerImage = (image: ImageItem | null) => {
+  const setPreviewerImage = (image: ImageItem | null, columnId?: string) => {
+    setPreviewImage(image);
+    setPreviewImageColumnId(columnId || null);
+  };
+
+  const updatePreviewImage = (image: ImageItem) => {
     setPreviewImage(image);
   };
 
@@ -37,10 +49,12 @@ export function PreviewerProvider({ children }: { children: ReactNode }) {
     <PreviewerContext.Provider
       value={{
         previewImage,
+        previewImageColumnId,
         isPreviewerOpen,
         setPreviewerImage,
         openPreviewer,
         closePreviewer,
+        updatePreviewImage,
       }}
     >
       {children}

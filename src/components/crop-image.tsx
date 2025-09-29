@@ -1,10 +1,11 @@
 "use client";
 
 import { X } from "lucide-react";
-import Image from "next/image";
-import { useState, useRef, useEffect } from "react";
+import { useRef, useState } from "react";
+import ReactCrop, { type Crop, type PixelCrop } from "react-image-crop";
 import { Button } from "@/components/ui/button";
 import { useLanguageKey } from "@/hooks/use-i18n";
+import "react-image-crop/dist/ReactCrop.css";
 
 interface CropImageProps {
   isOpen: boolean;
@@ -13,239 +14,78 @@ interface CropImageProps {
   onSave: (croppedImage: string) => void;
 }
 
+// Function to convert crop to canvas and return data URL
+function getCroppedImg(image: HTMLImageElement, crop: PixelCrop): string {
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+
+  if (!ctx) {
+    throw new Error("Could not get canvas context");
+  }
+
+  const scaleX = image.naturalWidth / image.width;
+  const scaleY = image.naturalHeight / image.height;
+
+  canvas.width = crop.width;
+  canvas.height = crop.height;
+
+  ctx.drawImage(
+    image,
+    crop.x * scaleX,
+    crop.y * scaleY,
+    crop.width * scaleX,
+    crop.height * scaleY,
+    0,
+    0,
+    crop.width,
+    crop.height,
+  );
+
+  return canvas.toDataURL("image/jpeg");
+}
+
 export function CropImage({
   isOpen,
   imageSrc,
   onClose,
   onSave,
 }: CropImageProps) {
-  const [cropArea, setCropArea] = useState({
+  const [crop, setCrop] = useState<Crop>({
+    unit: "px",
     x: 50,
     y: 50,
     width: 200,
     height: 200,
   });
-  const [isResizing, setIsResizing] = useState(false);
-  const imageRef = useRef<HTMLImageElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const cropAreaRef = useRef<HTMLDivElement>(null);
+  const imgRef = useRef<HTMLImageElement>(null);
 
   // Crop image translations
   const cropImageTranslations = useLanguageKey("crop-image");
 
-  // Close modal when Escape key is pressed
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isOpen) {
-        onClose();
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [isOpen, onClose]);
-
-  // Handle crop area movement
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if (!cropAreaRef.current) return;
-
-    const startX = e.clientX;
-    const startY = e.clientY;
-    const startCropX = cropArea.x;
-    const startCropY = cropArea.y;
-
-    const handleMouseMove = (moveEvent: MouseEvent) => {
-      if (!containerRef.current) return;
-
-      const containerRect = containerRef.current.getBoundingClientRect();
-      const deltaX = moveEvent.clientX - startX;
-      const deltaY = moveEvent.clientY - startY;
-
-      let newX = startCropX + deltaX;
-      let newY = startCropY + deltaY;
-
-      // Boundary checks
-      newX = Math.max(0, Math.min(newX, containerRect.width - cropArea.width));
-      newY = Math.max(
-        0,
-        Math.min(newY, containerRect.height - cropArea.height)
-      );
-
-      setCropArea((prev) => ({
-        ...prev,
-        x: newX,
-        y: newY,
-      }));
-    };
-
-    const handleMouseUp = () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
-    };
-
-    document.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("mouseup", handleMouseUp);
-  };
-
-  // Handle resize handles
-  const handleResizeStart = (e: React.MouseEvent, direction: string) => {
-    e.stopPropagation();
-    setIsResizing(true);
-
-    const startX = e.clientX;
-    const startY = e.clientY;
-    const startCrop = { ...cropArea };
-
-    const handleMouseMove = (moveEvent: MouseEvent) => {
-      if (!containerRef.current) return;
-
-      const containerRect = containerRef.current.getBoundingClientRect();
-      const deltaX = moveEvent.clientX - startX;
-      const deltaY = moveEvent.clientY - startY;
-
-      let newCrop = { ...startCrop };
-
-      // Minimum crop area size
-      const minSize = 50;
-
-      switch (direction) {
-        case "nw": // Top-left
-          newCrop.x = Math.max(
-            0,
-            Math.min(
-              startCrop.x + deltaX,
-              startCrop.x + startCrop.width - minSize
-            )
-          );
-          newCrop.y = Math.max(
-            0,
-            Math.min(
-              startCrop.y + deltaY,
-              startCrop.y + startCrop.height - minSize
-            )
-          );
-          newCrop.width = Math.max(minSize, startCrop.width - deltaX);
-          newCrop.height = Math.max(minSize, startCrop.height - deltaY);
-          break;
-        case "ne": // Top-right
-          newCrop.y = Math.max(
-            0,
-            Math.min(
-              startCrop.y + deltaY,
-              startCrop.y + startCrop.height - minSize
-            )
-          );
-          newCrop.width = Math.max(minSize, startCrop.width + deltaX);
-          newCrop.height = Math.max(minSize, startCrop.height - deltaY);
-          break;
-        case "sw": // Bottom-left
-          newCrop.x = Math.max(
-            0,
-            Math.min(
-              startCrop.x + deltaX,
-              startCrop.x + startCrop.width - minSize
-            )
-          );
-          newCrop.width = Math.max(minSize, startCrop.width - deltaX);
-          newCrop.height = Math.max(minSize, startCrop.height + deltaY);
-          break;
-        case "se": // Bottom-right
-          newCrop.width = Math.max(minSize, startCrop.width + deltaX);
-          newCrop.height = Math.max(minSize, startCrop.height + deltaY);
-          break;
-        case "n": // Top
-          newCrop.y = Math.max(
-            0,
-            Math.min(
-              startCrop.y + deltaY,
-              startCrop.y + startCrop.height - minSize
-            )
-          );
-          newCrop.height = Math.max(minSize, startCrop.height - deltaY);
-          break;
-        case "s": // Bottom
-          newCrop.height = Math.max(minSize, startCrop.height + deltaY);
-          break;
-        case "w": // Left
-          newCrop.x = Math.max(
-            0,
-            Math.min(
-              startCrop.x + deltaX,
-              startCrop.x + startCrop.width - minSize
-            )
-          );
-          newCrop.width = Math.max(minSize, startCrop.width - deltaX);
-          break;
-        case "e": // Right
-          newCrop.width = Math.max(minSize, startCrop.width + deltaX);
-          break;
-      }
-
-      // Boundary checks
-      if (newCrop.x < 0) {
-        newCrop.width += newCrop.x;
-        newCrop.x = 0;
-      }
-
-      if (newCrop.y < 0) {
-        newCrop.height += newCrop.y;
-        newCrop.y = 0;
-      }
-
-      if (newCrop.x + newCrop.width > containerRect.width) {
-        newCrop.width = containerRect.width - newCrop.x;
-      }
-
-      if (newCrop.y + newCrop.height > containerRect.height) {
-        newCrop.height = containerRect.height - newCrop.y;
-      }
-
-      setCropArea(newCrop);
-    };
-
-    const handleMouseUp = () => {
-      setIsResizing(false);
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
-    };
-
-    document.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("mouseup", handleMouseUp);
+  // Handle image load
+  const onImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const { width, height } = e.currentTarget;
+    imgRef.current = e.currentTarget;
   };
 
   // Perform the actual cropping
   const handleSave = () => {
-    if (!imageRef.current) return;
-
-    const image = imageRef.current;
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
-
-    if (!ctx) return;
-
-    // Calculate crop area relative to the actual image dimensions
-    const scaleX = image.naturalWidth / image.width;
-    const scaleY = image.naturalHeight / image.height;
-
-    canvas.width = cropArea.width * scaleX;
-    canvas.height = cropArea.height * scaleY;
-
-    ctx.drawImage(
-      image,
-      cropArea.x * scaleX,
-      cropArea.y * scaleY,
-      cropArea.width * scaleX,
-      cropArea.height * scaleY,
-      0,
-      0,
-      canvas.width,
-      canvas.height
-    );
-
-    const croppedImage = canvas.toDataURL("image/jpeg");
-    onSave(croppedImage);
+    if (imgRef.current && crop.width && crop.height) {
+      try {
+        // Convert Crop to PixelCrop for the function
+        const pixelCrop: PixelCrop = {
+          x: Math.round(crop.x),
+          y: Math.round(crop.y),
+          width: Math.round(crop.width),
+          height: Math.round(crop.height),
+          unit: "px",
+        };
+        const croppedImage = getCroppedImg(imgRef.current, pixelCrop);
+        onSave(croppedImage);
+      } catch (error) {
+        console.error("Error cropping image:", error);
+      }
+    }
   };
 
   if (!isOpen) {
@@ -254,10 +94,7 @@ export function CropImage({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
-      <div
-        ref={containerRef}
-        className="relative w-full h-full max-w-4xl max-h-[80vh] bg-background rounded-lg shadow-lg flex flex-col"
-      >
+      <div className="relative w-full h-full max-w-4xl max-h-[80vh] bg-background rounded-lg shadow-lg flex flex-col">
         <div className="p-4 border-b flex justify-between items-center">
           <h2 className="text-lg font-semibold select-none">
             {cropImageTranslations["crop-title"] || "Crop Image"}
@@ -274,72 +111,20 @@ export function CropImage({
 
         <div className="flex-grow relative overflow-hidden flex items-center justify-center p-4">
           <div className="relative w-full h-full max-w-3xl max-h-[60vh]">
-            <Image
-              ref={imageRef}
-              src={imageSrc}
-              alt="Crop target"
-              fill
-              sizes="100vw"
-              style={{
-                objectFit: "contain",
-              }}
-              className="rounded-lg"
-              draggable={false}
-            />
-
-            <div
-              className="absolute inset-0 bg-black/50"
-              style={{
-                cursor: isResizing ? "grabbing" : "default",
-              }}
+            <ReactCrop
+              crop={crop}
+              onChange={(c) => setCrop(c)}
+              className="w-full h-full"
+              ruleOfThirds
             >
-              <div
-                ref={cropAreaRef}
-                className="absolute border-2 border-white cursor-move"
-                style={{
-                  left: `${cropArea.x}px`,
-                  top: `${cropArea.y}px`,
-                  width: `${cropArea.width}px`,
-                  height: `${cropArea.height}px`,
-                }}
-                onMouseDown={handleMouseDown}
-              >
-                <div className="absolute inset-0 bg-transparent"></div>
-
-                <div
-                  className="absolute w-3 h-3 bg-white border border-gray-800 cursor-nw-resize -top-1 -left-1"
-                  onMouseDown={(e) => handleResizeStart(e, "nw")}
-                ></div>
-                <div
-                  className="absolute w-3 h-3 bg-white border border-gray-800 cursor-ne-resize -top-1 -right-1"
-                  onMouseDown={(e) => handleResizeStart(e, "ne")}
-                ></div>
-                <div
-                  className="absolute w-3 h-3 bg-white border border-gray-800 cursor-sw-resize -bottom-1 -left-1"
-                  onMouseDown={(e) => handleResizeStart(e, "sw")}
-                ></div>
-                <div
-                  className="absolute w-3 h-3 bg-white border border-gray-800 cursor-se-resize -bottom-1 -right-1"
-                  onMouseDown={(e) => handleResizeStart(e, "se")}
-                ></div>
-                <div
-                  className="absolute w-3 h-3 bg-white border border-gray-800 cursor-n-resize -top-1 left-1/2 -translate-x-1/2"
-                  onMouseDown={(e) => handleResizeStart(e, "n")}
-                ></div>
-                <div
-                  className="absolute w-3 h-3 bg-white border border-gray-800 cursor-s-resize -bottom-1 left-1/2 -translate-x-1/2"
-                  onMouseDown={(e) => handleResizeStart(e, "s")}
-                ></div>
-                <div
-                  className="absolute w-3 h-3 bg-white border border-gray-800 cursor-w-resize -left-1 top-1/2 -translate-y-1/2"
-                  onMouseDown={(e) => handleResizeStart(e, "w")}
-                ></div>
-                <div
-                  className="absolute w-3 h-3 bg-white border border-gray-800 cursor-e-resize -right-1 top-1/2 -translate-y-1/2"
-                  onMouseDown={(e) => handleResizeStart(e, "e")}
-                ></div>
-              </div>
-            </div>
+              <img
+                src={imageSrc}
+                alt="Crop target"
+                onLoad={onImageLoad}
+                className="max-w-full max-h-full object-contain rounded-lg"
+                draggable={false}
+              />
+            </ReactCrop>
           </div>
         </div>
 
@@ -349,10 +134,10 @@ export function CropImage({
             onClick={onClose}
             className="cursor-pointer"
           >
-            {cropImageTranslations["cancel"] || "Cancel"}
+            {cropImageTranslations.cancel || "Cancel"}
           </Button>
           <Button onClick={handleSave} className="cursor-pointer">
-            {cropImageTranslations["save"] || "Save"}
+            {cropImageTranslations.save || "Save"}
           </Button>
         </div>
       </div>

@@ -40,7 +40,7 @@ export function ImageCard({
   };
 
   const handleZoom = () => {
-    openPreviewer(item);
+    openPreviewer(item, columnId);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -73,7 +73,7 @@ export function ImageCard({
     return (
       imageCardTranslations["preview-image"]?.replace(
         "{{fileName}}",
-        item.fileName
+        item.fileName,
       ) || `Preview image ${item.fileName}`
     );
   };
@@ -83,7 +83,7 @@ export function ImageCard({
     return (
       imageCardTranslations["position-number"]?.replace(
         "{{number}}",
-        positionNumber.toString()
+        positionNumber.toString(),
       ) || positionNumber.toString()
     );
   };
@@ -98,7 +98,7 @@ export function ImageCard({
     return (
       imageCardTranslations["remove-image"]?.replace(
         "{{fileName}}",
-        item.fileName
+        item.fileName,
       ) || `Remove image ${item.fileName}`
     );
   };
@@ -108,7 +108,7 @@ export function ImageCard({
     return (
       imageCardTranslations["rotate-image"]?.replace(
         "{{fileName}}",
-        item.fileName
+        item.fileName,
       ) || `Rotate image ${item.fileName}`
     );
   };
@@ -118,7 +118,7 @@ export function ImageCard({
     return (
       imageCardTranslations["zoom-image"]?.replace(
         "{{fileName}}",
-        item.fileName
+        item.fileName,
       ) || `Zoom image ${item.fileName}`
     );
   };
