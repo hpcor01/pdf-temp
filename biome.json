@@ -23,6 +23,9 @@
       },
       "correctness": {
         "noUnusedImports": "error"
+      },
+      "complexity": {
+        "useLiteralKeys": "error"
       }
     },
     "domains": {

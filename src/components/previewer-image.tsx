@@ -1,8 +1,9 @@
 "use client";
 
-import { Minus, Plus, X } from "lucide-react";
+import { Minus, Plus, Scissors, X } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import { CropImage } from "@/components/crop-image";
 import { Button } from "@/components/ui/button";
 import { useLanguageKey } from "@/hooks/use-i18n";
 import { usePreviewer } from "@/providers/previewer-provider";
@@ -13,6 +14,7 @@ export function PreviewerImage() {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [isCropModalOpen, setIsCropModalOpen] = useState(false);
   const imageRef = useRef<HTMLDivElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
 
@@ -97,6 +99,14 @@ export function PreviewerImage() {
     }
   };
 
+  const openCropModal = () => {
+    setIsCropModalOpen(true);
+  };
+
+  const closeCropModal = () => {
+    setIsCropModalOpen(false);
+  };
+
   if (!isPreviewerOpen || !previewImage) {
     return null;
   }
@@ -124,6 +134,15 @@ export function PreviewerImage() {
               className="cursor-pointer"
               variant="outline"
               size="icon"
+              onClick={openCropModal}
+              aria-label={previewerImageTranslations["crop-image"]}
+            >
+              <Scissors className="h-4 w-4" />
+            </Button>
+            <Button
+              className="cursor-pointer"
+              variant="outline"
+              size="icon"
               onClick={handleZoomOut}
               aria-label={previewerImageTranslations["zoom-out"]}
               disabled={zoomLevel <= 0.1}
@@ -139,7 +158,7 @@ export function PreviewerImage() {
             >
               {previewerImageTranslations["zoom-level"].replace(
                 "{{percentage}}",
-                Math.round(zoomLevel * 100).toString(),
+                Math.round(zoomLevel * 100).toString()
               )}
             </Button>
             <Button
@@ -207,6 +226,7 @@ export function PreviewerImage() {
           </div>
         </Button>
       </div>
+      <CropImage isOpen={isCropModalOpen} onClose={closeCropModal} />
     </div>
   );
 }

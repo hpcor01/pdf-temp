@@ -102,12 +102,20 @@ export interface LanguageStructure {
   "previewer-image": {
     "modal-label": string;
     "preview-title": string;
+    "crop-image": string;
     "zoom-out": string;
     "reset-zoom": string;
     "zoom-in": string;
     "close-preview": string;
     "zoom-level": string;
     "preview-container": string;
+  };
+  "crop-image": {
+    "modal-label": string;
+    title: string;
+    description: string;
+    close: string;
+    "close-button": string;
   };
   "btn-create-column": {
     "create-column": string;

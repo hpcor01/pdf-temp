@@ -38,7 +38,7 @@
     "button-convert-to-pdf": "המר ל-PDF",
     "button-remove-background": "הסר רקע",
     "button-toggle-previewer-image": {
-      "active": "הדגשת תמונה הופעלה",
+      "active": "הדגשת תמונה הופעה",
       "disabled": "הדגשת תמונה הושבתה"
     },
     "button-toggle-selected-all": {
@@ -70,7 +70,7 @@
     "error-description": "נכשל בעיבוד התמונות.",
     "partial-error-title": "שגיאה חלקית",
     "unsupported-browser-title": "דפדפן לא נתמך",
-    "unsupported-browser-description": "הדפדפן שלך אינו תומך בשמירה אוטומטית בתיקיה. השתמש בדפדפן מודרני כמו Chrome או Edge.",
+    "unsupported-browser-description": "הדפדפן שלך אינו תומך בשמירה אוטומatische בתיקיה. השתמש בדפדפן מודרני כמו Chrome או Edge.",
     "error-accessing-folder-title": "שגיאה בגישה לתיקיה"
   },
   "combobox-change-language": {
@@ -102,6 +102,7 @@
   "previewer-image": {
     "modal-label": "חלון תצוגה מקדימה של תמונה",
     "preview-title": "תצוגה מקדימה של תמונה",
+    "crop-image": "חתוך תמונה",
     "zoom-out": "הקטן זום",
     "reset-zoom": "איפוס זום",
     "zoom-in": "הגדל זום",
@@ -109,12 +110,19 @@
     "zoom-level": "{{percentage}}%",
     "preview-container": "מיכל תצוגה מקדימה של תמונה. השתמש בגלגל העכבר לזום, לחץ וגרור להזזה"
   },
+  "crop-image": {
+    "modal-label": "חלון חיתוך תמונה",
+    "title": "חתוך תמונה",
+    "description": "אפשרות החיתוך תיושם כאן.",
+    "close": "סגור",
+    "close-button": "סגור"
+  },
   "btn-create-column": {
     "create-column": "צור עמודה חדשה"
   },
   "update-toast": {
     "new-version-title": "גרסה חדשה זמינה",
-    "new-version-description": "גרסה חדשה של היישום זמינה. לחץ על עדכן כדי לטעון את הגרסה החדשה.",
+    "new-version-description": "גרסה חדשה של היישום זמינה. לחץ על עדכן כדי לטעון את הגרסה الجديدة.",
     "close-notification": "סגור הודעה",
     "updating": "מעדכן...",
     "update": "עדכן",

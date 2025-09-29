@@ -102,12 +102,20 @@
   "previewer-image": {
     "modal-label": "Image preview modal",
     "preview-title": "Image preview",
+    "crop-image": "Crop image",
     "zoom-out": "Zoom out",
     "reset-zoom": "Reset zoom",
     "zoom-in": "Zoom in",
     "close-preview": "Close preview",
     "zoom-level": "{{percentage}}%",
     "preview-container": "Image preview container. Use mouse wheel to zoom, click and drag to pan"
+  },
+  "crop-image": {
+    "modal-label": "Crop image modal",
+    "title": "Crop Image",
+    "description": "Crop functionality will be implemented here.",
+    "close": "Close",
+    "close-button": "Close"
   },
   "btn-create-column": {
     "create-column": "Create new column"

@@ -102,12 +102,20 @@
   "previewer-image": {
     "modal-label": "Modal de previsualización de imagen",
     "preview-title": "Previsualización de imagen",
+    "crop-image": "Recortar imagen",
     "zoom-out": "Reducir zoom",
     "reset-zoom": "Restablecer zoom",
     "zoom-in": "Aumentar zoom",
     "close-preview": "Cerrar previsualización",
     "zoom-level": "{{percentage}}%",
     "preview-container": "Contenedor de previsualización de imagen. Use la rueda del mouse para hacer zoom, haga clic y arrastre para mover"
+  },
+  "crop-image": {
+    "modal-label": "Modal de recorte de imagen",
+    "title": "Recortar Imagen",
+    "description": "La funcionalidad de recorte se implementará aquí.",
+    "close": "Cerrar",
+    "close-button": "Cerrar"
   },
   "btn-create-column": {
     "create-column": "Crear nueva columna"
