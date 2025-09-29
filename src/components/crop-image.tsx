@@ -64,7 +64,6 @@ export function CropImage({
 
   // Handle image load
   const onImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
-    const { width, height } = e.currentTarget;
     imgRef.current = e.currentTarget;
   };
 
@@ -117,6 +116,7 @@ export function CropImage({
               className="w-full h-full"
               ruleOfThirds
             >
+              {/* biome-ignore lint/performance/noImgElement: ReactCrop requires img element */}
               <img
                 src={imageSrc}
                 alt="Crop target"
