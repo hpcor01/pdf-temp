@@ -1,11 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-
-// Define the version response type
-interface VersionResponse {
-  version: string;
-}
+import type { VersionResponse } from "@/types/api-update";
 
 /**
  * Hook to automatically detect when a new version of the app is available

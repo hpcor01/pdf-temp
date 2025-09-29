@@ -5,7 +5,7 @@ import { Board } from "@/components/board";
 import { useLanguageKey } from "@/hooks/use-i18n";
 import { useKanban } from "@/providers/kanban-provider";
 import type { ImageItem } from "@/types/kanban";
-import Header from "@/view/header";
+import { Header } from "@/view/header/header";
 
 export default function Dashboard() {
   const [isDragging, setIsDragging] = useState(false);
