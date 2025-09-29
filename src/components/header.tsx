@@ -1,5 +1,6 @@
 "use client";
 
+import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import ComboboxChangeLanguage from "@/components/combobox-change-language";
 import { ModeToggle } from "@/components/mode-toggle";
@@ -17,13 +18,14 @@ import { removeBackgroundBatch } from "@/lib/rem-bg";
 import { useKanban } from "@/providers/kanban-provider";
 import type { HeaderProps } from "@/types/header";
 import type { Column } from "@/types/kanban";
-import { BackgroundToggle } from "../../components/background-toggle";
-import { PDFToggle } from "../../components/pdf-toggle";
-import { PreviewToggle } from "../../components/preview-toggle";
-import { SaveLocationToggle } from "../../components/save-location-toggle";
-import { SelectionToggle } from "../../components/selection-toggle";
-import { useSaveLocation } from "../../hooks/use-save-location";
-import { useToast } from "../../hooks/use-toast";
+import { useSaveLocation } from "../hooks/use-save-location";
+import { useToast } from "../hooks/use-toast";
+import { BackgroundToggle } from "./background-toggle";
+import { LoadingOverlay } from "./loading-overlay";
+import { PDFToggle } from "./pdf-toggle";
+import { PreviewToggle } from "./preview-toggle";
+import { SaveLocationToggle } from "./save-location-toggle";
+import { SelectionToggle } from "./selection-toggle";
 
 export function Header({
   onToggleAllChange,
@@ -40,7 +42,7 @@ export function Header({
   const [saveFolderPath, setSaveFolderPath] = useState("");
   const [toastOpen, setToastOpen] = useState(false);
   const [toastVariant, setToastVariant] = useState<"default" | "destructive">(
-    "default",
+    "default"
   );
   const [toastTitle, setToastTitle] = useState("");
   const [toastDescription, setToastDescription] = useState("");
@@ -77,7 +79,7 @@ export function Header({
       showToast(
         "default",
         headerTranslations.processing,
-        headerTranslations.generatingFile,
+        headerTranslations.generatingFile
       );
 
       const selectedCols = columns.filter((col) => selectedColumns[col.id]);
@@ -87,7 +89,7 @@ export function Header({
         showToast(
           "destructive",
           headerTranslations.noColumnSelected_title,
-          headerTranslations.noColumnSelected_description,
+          headerTranslations.noColumnSelected_description
         );
         return;
       }
@@ -111,7 +113,7 @@ export function Header({
               const success = await savePDFToDirectory(
                 blob,
                 directoryHandle,
-                col.title,
+                col.title
               );
 
               if (success) {
@@ -133,14 +135,14 @@ export function Header({
               headerTranslations.pdfsGenerated_title,
               headerTranslations.pdfsGenerated_description.replace(
                 "{{count}}",
-                successCount.toString(),
-              ),
+                successCount.toString()
+              )
             );
           } else {
             showToast(
               "destructive",
               "Erro parcial",
-              `Foram salvos ${successCount} de ${selectedCols.length} arquivos. ${errorCount} arquivos falharam.`,
+              `Foram salvos ${successCount} de ${selectedCols.length} arquivos. ${errorCount} arquivos falharam.`
             );
           }
 
@@ -150,7 +152,7 @@ export function Header({
           showToast(
             "destructive",
             "Navegador não suportado",
-            "Seu navegador não suporta o salvamento automático em pasta. Use um navegador moderno como Chrome ou Edge.",
+            "Seu navegador não suporta o salvamento automático em pasta. Use um navegador moderno como Chrome ou Edge."
           );
           setIsProcessing(false);
           return;
@@ -159,7 +161,7 @@ export function Header({
           showToast(
             "destructive",
             "Erro ao acessar pasta",
-            "Não foi possível acessar a pasta selecionada. Verifique se a pasta está disponível e tente novamente.",
+            "Não foi possível acessar a pasta selecionada. Verifique se a pasta está disponível e tente novamente."
           );
           setIsProcessing(false);
           return;
@@ -181,13 +183,10 @@ export function Header({
           // Generate a single PDF with all columns when single save location is enabled
           await generateSinglePDFForColumns(
             processedColumns,
-            processedColumns.reduce(
-              (acc, col) => {
-                acc[col.id] = true;
-                return acc;
-              },
-              {} as Record<string, boolean>,
-            ),
+            processedColumns.reduce((acc, col) => {
+              acc[col.id] = true;
+              return acc;
+            }, {} as Record<string, boolean>)
           );
 
           setIsProcessing(false);
@@ -196,8 +195,8 @@ export function Header({
             headerTranslations.pdfsGenerated_title,
             headerTranslations.pdfsGenerated_description.replace(
               "{{count}}",
-              "1",
-            ),
+              "1"
+            )
           );
         } else {
           // Generate separate PDFs for each column
@@ -211,8 +210,8 @@ export function Header({
             headerTranslations.pdfsGenerated_title,
             headerTranslations.pdfsGenerated_description.replace(
               "{{count}}",
-              selectedCols.length.toString(),
-            ),
+              selectedCols.length.toString()
+            )
           );
         }
       } else if (!isRemoveBgChecked && isConvertToPDFChecked) {
@@ -226,8 +225,8 @@ export function Header({
             headerTranslations.pdfGenerated_title,
             headerTranslations.pdfGenerated_description.replace(
               "{{count}}",
-              "1",
-            ),
+              "1"
+            )
           );
         } else {
           // Generate separate PDFs for each column
@@ -239,8 +238,8 @@ export function Header({
             headerTranslations.pdfGenerated_title,
             headerTranslations.pdfGenerated_description.replace(
               "{{count}}",
-              selectedColumnsCount.toString(),
-            ),
+              selectedColumnsCount.toString()
+            )
           );
         }
       } else if (isRemoveBgChecked && !isConvertToPDFChecked) {
@@ -260,15 +259,15 @@ export function Header({
           headerTranslations.imagesDownloaded_title,
           headerTranslations.imagesDownloaded_description.replace(
             "{{count}}",
-            downloadCount.toString(),
-          ),
+            downloadCount.toString()
+          )
         );
       } else {
         setIsProcessing(false);
         showToast(
           "default",
           headerTranslations.downloadStarted_title,
-          headerTranslations.downloadStarted_description,
+          headerTranslations.downloadStarted_description
         );
       }
     } catch (error: unknown) {
@@ -277,13 +276,13 @@ export function Header({
         showToast(
           "default",
           headerTranslations.cancelled_title,
-          headerTranslations.cancelled_description,
+          headerTranslations.cancelled_description
         );
       } else {
         showToast(
           "destructive",
           headerTranslations.error_title,
-          headerTranslations.error_description,
+          headerTranslations.error_description
         );
       }
     }
@@ -291,6 +290,13 @@ export function Header({
 
   return (
     <>
+      {isProcessing && (
+        <LoadingOverlay
+          message={`${headerTranslations.generatingFile} ${
+            saveFolderPath ? saveFolderPath : "pasta padrão"
+          }`}
+        />
+      )}
       <Toast
         open={toastOpen}
         onOpenChange={setToastOpen}
@@ -344,9 +350,14 @@ export function Header({
               onClick={handleSaveClick}
               aria-label={buttons["button-save"]}
             >
-              {isProcessing
-                ? headerTranslations.processing
-                : buttons["button-save"]}
+              {isProcessing ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  {headerTranslations.processing}
+                </>
+              ) : (
+                buttons["button-save"]
+              )}
               {selectedColumnsCount > 0 && !isProcessing
                 ? ` (${selectedColumnsCount})`
                 : ""}
