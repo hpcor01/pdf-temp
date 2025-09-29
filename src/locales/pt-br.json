@@ -125,8 +125,8 @@
     "folder-selected-description": "A pasta \"{path}\" será usada para salvar todos os arquivos.",
     "error-selecting-folder-title": "Erro ao selecionar pasta",
     "error-selecting-folder-description": "Não foi possível acessar a pasta selecionada. Verifique se a pasta está disponível e tente novamente.",
-    "single-folder": " (uma pasta única)",
-    "folder-per-column": " (uma pasta por coluna)",
+    "single-folder": "Salvar em grupo",
+    "folder-per-column": "Salvar separado",
     "default-folder": "pasta padrão",
     "select-folder-prompt": "Selecione a pasta onde deseja salvar (OneDrive é compatível):"
   },

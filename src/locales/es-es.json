@@ -125,8 +125,8 @@
     "folder-selected-description": "La carpeta \"{path}\" se utilizará para guardar todos los archivos.",
     "error-selecting-folder-title": "Error al seleccionar carpeta",
     "error-selecting-folder-description": "No se pudo acceder a la carpeta seleccionada. Verifique si la carpeta está disponible e intente nuevamente.",
-    "single-folder": " (una sola carpeta)",
-    "folder-per-column": " (carpeta por columna)",
+    "single-folder": "Guardar en grupo",
+    "folder-per-column": "Guardar por separado",
     "default-folder": "carpeta predeterminada",
     "select-folder-prompt": "Seleccione la carpeta donde desea guardar (OneDrive es compatible):"
   },

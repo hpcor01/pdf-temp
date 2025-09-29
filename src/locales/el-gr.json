@@ -125,8 +125,8 @@
     "folder-selected-description": "Ο φάκελος \"{path}\" θα χρησιμοποιηθεί για την αποθήκευση όλων των αρχείων.",
     "error-selecting-folder-title": "Σφάλμα επιλογής φακέλου",
     "error-selecting-folder-description": "Δεν ήταν δυνατή η πρόσβαση στον επιλεγμένο φάκελο. Ελέγξτε αν ο φάκελος είναι διαθέσιμος και δοκιμάστε ξανά.",
-    "single-folder": " (ένας φάκελος)",
-    "folder-per-column": " (φάκελος ανά στήλη)",
+    "single-folder": "Αποθήκευση σε ομάδα",
+    "folder-per-column": "Αποθήκευση ξεχωριστά",
     "default-folder": "προεπιλεγμένος φάκελος",
     "select-folder-prompt": "Επιλέξτε τον φάκελο όπου θέλετε να αποθηκεύσετε (το OneDrive είναι συμβατό):"
   },

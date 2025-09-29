@@ -125,8 +125,8 @@
     "folder-selected-description": "The folder \"{path}\" will be used to save all files.",
     "error-selecting-folder-title": "Error selecting folder",
     "error-selecting-folder-description": "Could not access the selected folder. Check if the folder is available and try again.",
-    "single-folder": " (single folder)",
-    "folder-per-column": " (folder per column)",
+    "single-folder": "Save in group",
+    "folder-per-column": "Save separately",
     "default-folder": "default folder",
     "select-folder-prompt": "Select the folder where you want to save (OneDrive is compatible):"
   },

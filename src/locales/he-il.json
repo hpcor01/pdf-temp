@@ -125,8 +125,8 @@
     "folder-selected-description": "התיקייה \"{path}\" תשמש לשמירת כל הקבצים.",
     "error-selecting-folder-title": "שגיאה בבחירת תיקייה",
     "error-selecting-folder-description": "לא ניתן לגשת לתיקייה שנבחרה. בדוק אם התיקייה זמינה ונסה שוב.",
-    "single-folder": " (תיקייה אחת)",
-    "folder-per-column": " (תיקייה לכל עמודה)",
+    "single-folder": "שמירה בקבוצה",
+    "folder-per-column": "שמירה בנפרד",
     "default-folder": "תיקיית ברירת מחדל",
     "select-folder-prompt": "בחר את התיקייה בה ברצונך לשמור (OneDrive תואם):"
   },
