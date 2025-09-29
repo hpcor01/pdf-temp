@@ -10,7 +10,7 @@ import type { ImageItem } from "@/types/kanban";
 export default function Dashboard() {
   const [isDragging, setIsDragging] = useState(false);
   const [_dragOverColumnId, setDragOverColumnId] = useState<string | null>(
-    null,
+    null
   );
   const { addImagesToColumn, columns } = useKanban();
 
@@ -35,7 +35,7 @@ export default function Dashboard() {
         if (/\.(jpe?g|png|gif|webp|avif|svg)(\?|$)/i.test(url)) {
           const fileName =
             decodeURIComponent(
-              new URL(url).pathname.split("/").pop() || "image",
+              new URL(url).pathname.split("/").pop() || "image"
             ) || "image";
           const newImage: ImageItem = {
             id: crypto.randomUUID(),
@@ -62,7 +62,7 @@ export default function Dashboard() {
         addImagesToColumn(columnId, newImages);
       }
     },
-    [addImagesToColumn, columns],
+    [addImagesToColumn, columns]
   );
 
   return (
@@ -85,7 +85,7 @@ export default function Dashboard() {
           setDragOverColumnId(null);
         }}
         onDrop={(e) => handleDrop(e)}
-        aria-label={columnTranslations.dragDropArea}
+        aria-label={columnTranslations["drag-drop-area"]}
       >
         <Board />
       </section>
