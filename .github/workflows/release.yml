@@ -15,10 +15,9 @@ jobs:
         with:
           node-version: 22
 
-      # Instala pnpm globalmente
       - run: npm install -g pnpm@9
 
-      - run: pnpm install
+      - run: pnpm install --no-frozen-lockfile
 
       - run: npx semantic-release
         env:
