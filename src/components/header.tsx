@@ -43,7 +43,7 @@ export function Header({
   const [saveFolderPath, setSaveFolderPath] = useState("");
   const [toastOpen, setToastOpen] = useState(false);
   const [toastVariant, setToastVariant] = useState<"default" | "destructive">(
-    "default",
+    "default"
   );
   const [toastTitle, setToastTitle] = useState("");
   const [toastDescription, setToastDescription] = useState("");
@@ -80,7 +80,7 @@ export function Header({
       showToast(
         "default",
         headerTranslations.processing,
-        headerTranslations["generating-file"],
+        headerTranslations["generating-file"]
       );
 
       const selectedCols = columns.filter((col) => selectedColumns[col.id]);
@@ -90,7 +90,7 @@ export function Header({
         showToast(
           "destructive",
           headerTranslations["no-column-selected-title"],
-          headerTranslations["no-column-selected-description"],
+          headerTranslations["no-column-selected-description"]
         );
         return;
       }
@@ -114,7 +114,7 @@ export function Header({
               const success = await savePDFToDirectory(
                 blob,
                 directoryHandle,
-                col.title,
+                col.title
               );
 
               if (success) {
@@ -136,14 +136,14 @@ export function Header({
               headerTranslations["pdfs-generated-title"],
               headerTranslations["pdfs-generated-description"].replace(
                 "{{count}}",
-                successCount.toString(),
-              ),
+                successCount.toString()
+              )
             );
           } else {
             showToast(
               "destructive",
               headerTranslations["partial-error-title"],
-              `Foram salvos ${successCount} de ${selectedCols.length} arquivos. ${errorCount} arquivos falharam.`,
+              `Foram salvos ${successCount} de ${selectedCols.length} arquivos. ${errorCount} arquivos falharam.`
             );
           }
 
@@ -153,7 +153,7 @@ export function Header({
           showToast(
             "destructive",
             headerTranslations["unsupported-browser-title"],
-            headerTranslations["unsupported-browser-description"],
+            headerTranslations["unsupported-browser-description"]
           );
           setIsProcessing(false);
           return;
@@ -162,7 +162,7 @@ export function Header({
           showToast(
             "destructive",
             headerTranslations["error-accessing-folder-title"],
-            saveLocationTranslations["error-selecting-folder-description"],
+            saveLocationTranslations["error-selecting-folder-description"]
           );
           setIsProcessing(false);
           return;
@@ -189,8 +189,8 @@ export function Header({
                 acc[col.id] = true;
                 return acc;
               },
-              {} as Record<string, boolean>,
-            ),
+              {} as Record<string, boolean>
+            )
           );
 
           setIsProcessing(false);
@@ -199,8 +199,8 @@ export function Header({
             headerTranslations["pdfs-generated-title"],
             headerTranslations["pdfs-generated-description"].replace(
               "{{count}}",
-              "1",
-            ),
+              "1"
+            )
           );
         } else {
           // Generate separate PDFs for each column
@@ -214,8 +214,8 @@ export function Header({
             headerTranslations["pdfs-generated-title"],
             headerTranslations["pdfs-generated-description"].replace(
               "{{count}}",
-              selectedCols.length.toString(),
-            ),
+              selectedCols.length.toString()
+            )
           );
         }
       } else if (!isRemoveBgChecked && isConvertToPDFChecked) {
@@ -229,8 +229,8 @@ export function Header({
             headerTranslations["pdf-generated-title"],
             headerTranslations["pdf-generated-description"].replace(
               "{{count}}",
-              "1",
-            ),
+              "1"
+            )
           );
         } else {
           // Generate separate PDFs for each column
@@ -242,8 +242,8 @@ export function Header({
             headerTranslations["pdf-generated-title"],
             headerTranslations["pdf-generated-description"].replace(
               "{{count}}",
-              selectedColumnsCount.toString(),
-            ),
+              selectedColumnsCount.toString()
+            )
           );
         }
       } else if (isRemoveBgChecked && !isConvertToPDFChecked) {
@@ -263,15 +263,15 @@ export function Header({
           headerTranslations["images-downloaded-title"],
           headerTranslations["images-downloaded-description"].replace(
             "{{count}}",
-            downloadCount.toString(),
-          ),
+            downloadCount.toString()
+          )
         );
       } else {
         setIsProcessing(false);
         showToast(
           "default",
           headerTranslations["download-started-title"],
-          headerTranslations["download-started-description"],
+          headerTranslations["download-started-description"]
         );
       }
     } catch (error: unknown) {
@@ -280,13 +280,13 @@ export function Header({
         showToast(
           "default",
           headerTranslations["cancelled-title"],
-          headerTranslations["cancelled-description"],
+          headerTranslations["cancelled-description"]
         );
       } else {
         showToast(
           "destructive",
           headerTranslations["error-title"],
-          headerTranslations["error-description"],
+          headerTranslations["error-description"]
         );
       }
     }
@@ -310,7 +310,7 @@ export function Header({
         <section
           className="flex flex-wrap items-center gap-4"
           aria-label={useLanguageKey(
-            "combobox-change-language.select-language",
+            "combobox-change-language.select-language"
           )}
         >
           <ModeToggle />

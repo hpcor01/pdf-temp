@@ -25,7 +25,7 @@ export function SaveLocationToggle({
     (
       variant: "default" | "destructive",
       title: string,
-      description: string,
+      description: string
     ) => {
       setToastVariant(variant);
       setToastTitle(title);
@@ -33,7 +33,7 @@ export function SaveLocationToggle({
       setToastOpen(true);
       setTimeout(() => setToastOpen(false), 5000);
     },
-    [setToastVariant, setToastTitle, setToastDescription, setToastOpen],
+    [setToastVariant, setToastTitle, setToastDescription, setToastOpen]
   );
 
   const handleSaveLocationChange = useCallback(
@@ -58,14 +58,14 @@ export function SaveLocationToggle({
               saveLocationTranslations["folder-selected-title"],
               saveLocationTranslations["folder-selected-description"].replace(
                 "{path}",
-                dirHandle.name, // Use just the name in the toast for clarity
-              ),
+                dirHandle.name // Use just the name in the toast for clarity
+              )
             );
           } else {
             // Fallback for browsers that don't support the File System Access API
             const path = prompt(
               saveLocationTranslations["select-folder-prompt"],
-              "",
+              ""
             );
             if (path !== null) {
               setSaveFolderPath(path);
@@ -75,8 +75,8 @@ export function SaveLocationToggle({
                 saveLocationTranslations["folder-selected-title"],
                 saveLocationTranslations["folder-selected-description"].replace(
                   "{path}",
-                  path,
-                ),
+                  path
+                )
               );
             } else {
               // User cancelled, revert the selection
@@ -93,7 +93,7 @@ export function SaveLocationToggle({
           showToast(
             "destructive",
             saveLocationTranslations["error-selecting-folder-title"],
-            saveLocationTranslations["error-selecting-folder-description"],
+            saveLocationTranslations["error-selecting-folder-description"]
           );
         }
       } else {
@@ -111,7 +111,7 @@ export function SaveLocationToggle({
       saveLocationTranslations["error-selecting-folder-title"],
       saveLocationTranslations["error-selecting-folder-description"],
       saveLocationTranslations["select-folder-prompt"],
-    ],
+    ]
   );
 
   return (

@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://web-editor-image.vercel.app
+
+# Sitemaps
+Sitemap: https://web-editor-image.vercel.app/sitemap.xml

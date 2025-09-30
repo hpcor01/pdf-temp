@@ -12,7 +12,7 @@ export function useSaveLocation({ showToast }: UseSaveLocationProps) {
       showToast(
         "default",
         "Pasta de salvamento limpa",
-        `A pasta "${savedPath}" foi removida da sessão atual.`,
+        `A pasta "${savedPath}" foi removida da sessão atual.`
       );
     }
   }, [showToast]);

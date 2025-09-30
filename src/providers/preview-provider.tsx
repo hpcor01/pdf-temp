@@ -19,7 +19,7 @@ export function PreviewProvider({ children }: { children: ReactNode }) {
   const setPreviewImage = (
     image: ImageItem | null,
     position: { x: number; y: number } | null = null,
-    isClickPreview: boolean = false,
+    isClickPreview: boolean = false
   ) => {
     setPreviewImageState(image);
     setPreviewPosition(position);

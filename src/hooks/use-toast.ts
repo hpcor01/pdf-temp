@@ -15,7 +15,7 @@ export function useToast({
       setToastOpen(true);
       setTimeout(() => setToastOpen(false), 5000);
     },
-    [setToastVariant, setToastTitle, setToastDescription, setToastOpen],
+    [setToastVariant, setToastTitle, setToastDescription, setToastOpen]
   );
 
   return { showToast };

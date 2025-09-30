@@ -10,13 +10,13 @@ export interface FileSystemDirectoryHandle {
   createWritable(): Promise<FileSystemWritableFileStream>;
   getFileHandle(
     name: string,
-    options?: { create: boolean },
+    options?: { create: boolean }
   ): Promise<FileSystemFileHandle>;
   name: string;
   kind: "directory";
   getDirectoryHandle(
     name: string,
-    options?: { create: boolean },
+    options?: { create: boolean }
   ): Promise<FileSystemDirectoryHandle>;
   removeEntry(name: string, options?: { recursive: boolean }): Promise<void>;
   resolve(possibleDescendant: FileSystemHandle): Promise<string[] | null>;
@@ -37,7 +37,7 @@ interface FileSystemHandle {
 declare global {
   interface Window {
     showSaveFilePicker?: (
-      options: ShowSaveFilePickerOptions,
+      options: ShowSaveFilePickerOptions
     ) => Promise<FileSystemFileHandle>;
     showSaveFilePicker?: (options: {
       suggestedName: string;

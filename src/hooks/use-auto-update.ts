@@ -79,7 +79,7 @@ export function useAutoUpdate() {
     // Get polling interval from environment variable or default to 30 seconds
     const pollInterval = parseInt(
       process.env.NEXT_PUBLIC_POLL_INTERVAL || "30000",
-      10,
+      10
     );
 
     // Start polling

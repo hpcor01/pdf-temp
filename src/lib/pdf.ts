@@ -95,7 +95,7 @@ export async function generatePDFForColumnBlob(column: Column): Promise<Blob> {
 
       const ratio = Math.min(
         pageWidth / canvas.width,
-        pageHeight / canvas.height,
+        pageHeight / canvas.height
       );
       const imgW = canvas.width * ratio;
       const imgH = canvas.height * ratio;
@@ -120,7 +120,7 @@ export async function generatePDFForColumnBlob(column: Column): Promise<Blob> {
 export async function savePDFToDirectory(
   blob: Blob,
   directoryHandle: FileSystemDirectoryHandle,
-  filename: string,
+  filename: string
 ): Promise<boolean> {
   try {
     // Sanitize filename to remove invalid characters
@@ -174,7 +174,7 @@ async function generatePDFForColumn(column: Column): Promise<void> {
 
       const ratio = Math.min(
         pageWidth / canvas.width,
-        pageHeight / canvas.height,
+        pageHeight / canvas.height
       );
       const imgW = canvas.width * ratio;
       const imgH = canvas.height * ratio;
@@ -192,7 +192,7 @@ async function generatePDFForColumn(column: Column): Promise<void> {
 
 export async function generatePDFForColumns(
   columns: Column[],
-  selected: Record<string, boolean>,
+  selected: Record<string, boolean>
 ): Promise<void> {
   const list = columns.filter((c) => selected[c.id]);
   for (const col of list) {
@@ -207,7 +207,7 @@ export async function generatePDFForColumns(
  */
 export async function generateSinglePDFForColumns(
   columns: Column[],
-  selected: Record<string, boolean>,
+  selected: Record<string, boolean>
 ): Promise<void> {
   const selectedColumns = columns.filter((c) => selected[c.id]);
 
@@ -269,7 +269,7 @@ export async function generateSinglePDFForColumns(
 
         const ratio = Math.min(
           pageWidth / canvas.width,
-          pageHeight / canvas.height,
+          pageHeight / canvas.height
         );
         const imgW = canvas.width * ratio;
         const imgH = canvas.height * ratio;

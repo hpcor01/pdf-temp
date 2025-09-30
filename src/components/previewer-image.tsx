@@ -1,17 +1,34 @@
 "use client";
 
 import { Minus, Plus, Scissors, X } from "lucide-react";
+import dynamic from "next/dynamic";
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
-import ReactCrop, { type Crop, type PixelCrop } from "react-image-crop";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { PixelCrop } from "react-image-crop";
 import { Button } from "@/components/ui/button";
 import { useLanguageKey } from "@/hooks/use-i18n";
 import { useKanban } from "@/providers/kanban-provider";
 import { usePreviewer } from "@/providers/previewer-provider";
-import "react-image-crop/dist/ReactCrop.css";
+
+// Dynamically import ReactCrop to reduce initial bundle size
+const ReactCrop = dynamic(
+  () => import("react-image-crop").then((mod) => mod.default),
+  {
+    ssr: false,
+  }
+);
 
 // Function to convert crop to canvas and return data URL
-function getCroppedImg(image: HTMLImageElement, crop: PixelCrop): string {
+function getCroppedImg(
+  image: HTMLImageElement,
+  crop: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    unit: "px" | "%";
+  }
+): string {
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d");
 
@@ -34,13 +51,14 @@ function getCroppedImg(image: HTMLImageElement, crop: PixelCrop): string {
     0,
     0,
     crop.width,
-    crop.height,
+    crop.height
   );
 
   return canvas.toDataURL("image/jpeg");
 }
 
-export function PreviewerImage() {
+// Memoize the PreviewerImage component to prevent unnecessary re-renders
+const PreviewerImage = memo(() => {
   const {
     previewImage,
     previewImageColumnId,
@@ -54,7 +72,7 @@ export function PreviewerImage() {
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [isCropping, setIsCropping] = useState(false);
-  const [crop, setCrop] = useState<Crop>({
+  const [crop, setCrop] = useState<PixelCrop>({
     unit: "px",
     x: 0,
     y: 0,
@@ -93,101 +111,119 @@ export function PreviewerImage() {
   }, [isPreviewerOpen, closePreviewer]);
 
   // Handle mouse wheel zoom
-  const handleWheel = (e: React.WheelEvent) => {
-    if (isCropping) return;
-    e.preventDefault();
-    const delta = e.deltaY > 0 ? -0.1 : 0.1;
-    setZoomLevel((prev) => Math.max(0.1, Math.min(prev + delta, 5)));
-  };
+  const handleWheel = useCallback(
+    (e: React.WheelEvent) => {
+      if (isCropping) return;
+      e.preventDefault();
+      const delta = e.deltaY > 0 ? -0.1 : 0.1;
+      setZoomLevel((prev) => Math.max(0.1, Math.min(prev + delta, 5)));
+    },
+    [isCropping]
+  );
 
-  const handleZoomIn = () => {
+  const handleZoomIn = useCallback(() => {
     if (isCropping) return;
     setZoomLevel((prev) => Math.min(prev + 0.1, 5));
-  };
+  }, [isCropping]);
 
-  const handleZoomOut = () => {
+  const handleZoomOut = useCallback(() => {
     if (isCropping) return;
     setZoomLevel((prev) => Math.max(0.1, prev - 0.1));
-  };
+  }, [isCropping]);
 
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if (isCropping) return;
-    if (zoomLevel <= 1) return;
-    setIsDragging(true);
-    setDragStart({
-      x: e.clientX - position.x,
-      y: e.clientY - position.y,
-    });
-  };
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      if (isCropping) return;
+      if (zoomLevel <= 1) return;
+      setIsDragging(true);
+      setDragStart({
+        x: e.clientX - position.x,
+        y: e.clientY - position.y,
+      });
+    },
+    [isCropping, zoomLevel, position.x, position.y]
+  );
 
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (isCropping) return;
-    if (!isDragging || zoomLevel <= 1) return;
-    setPosition({
-      x: e.clientX - dragStart.x,
-      y: e.clientY - dragStart.y,
-    });
-  };
+  const handleMouseMove = useCallback(
+    (e: React.MouseEvent) => {
+      if (isCropping) return;
+      if (!isDragging || zoomLevel <= 1) return;
+      setPosition({
+        x: e.clientX - dragStart.x,
+        y: e.clientY - dragStart.y,
+      });
+    },
+    [isCropping, isDragging, zoomLevel, dragStart.x, dragStart.y]
+  );
 
-  const handleMouseUp = () => {
+  const handleMouseUp = useCallback(() => {
     if (isCropping) return;
     setIsDragging(false);
-  };
+  }, [isCropping]);
 
   // Reset zoom
-  const handleResetZoom = () => {
+  const handleResetZoom = useCallback(() => {
     if (isCropping) return;
     setZoomLevel(1);
     setPosition({ x: 0, y: 0 });
-  };
+  }, [isCropping]);
 
   // Handle click outside to close preview
-  const handleOverlayClick = (e: React.MouseEvent) => {
-    // Se estiver no modo crop, ignora clique fora
-    if (isCropping) return;
+  const handleOverlayClick = useCallback(
+    (e: React.MouseEvent) => {
+      // Se estiver no modo crop, ignora clique fora
+      if (isCropping) return;
 
-    if (e.target === e.currentTarget) {
-      closePreviewer();
-    }
-  };
+      if (e.target === e.currentTarget) {
+        closePreviewer();
+      }
+    },
+    [isCropping, closePreviewer]
+  );
 
   // Handle keyboard events for accessibility
-  const handleOverlayKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Escape") {
-      closePreviewer();
-    }
-  };
+  const handleOverlayKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === "Escape") {
+        closePreviewer();
+      }
+    },
+    [closePreviewer]
+  );
 
-  const toggleCropMode = () => {
+  const toggleCropMode = useCallback(() => {
     setIsCropping(!isCropping);
     // Reset crop when entering crop mode to cover most of the image
     if (!isCropping) {
       setCrop({
-        unit: "%",
+        unit: "px",
         x: 10,
         y: 10,
         width: 80,
         height: 80,
-      });
+      } as PixelCrop);
     }
-  };
+  }, [isCropping]);
 
   // Handle image load for cropping
-  const onImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
-    const { naturalWidth, naturalHeight } = e.currentTarget;
-    imgRef.current = e.currentTarget;
+  const onImageLoad = useCallback(
+    (e: React.SyntheticEvent<HTMLImageElement>) => {
+      const { naturalWidth, naturalHeight } = e.currentTarget;
+      imgRef.current = e.currentTarget;
 
-    setCrop({
-      unit: "px",
-      x: 0,
-      y: 0,
-      width: naturalWidth,
-      height: naturalHeight,
-    });
-  };
+      setCrop({
+        unit: "px",
+        x: 0,
+        y: 0,
+        width: naturalWidth,
+        height: naturalHeight,
+      } as PixelCrop);
+    },
+    []
+  );
 
   // Perform the actual cropping
-  const handleSaveCrop = () => {
+  const handleSaveCrop = useCallback(() => {
     if (imgRef.current && crop.width && crop.height && previewImage) {
       try {
         // Convert Crop to PixelCrop for the function
@@ -220,77 +256,97 @@ export function PreviewerImage() {
         console.error("Error cropping image:", error);
       }
     }
-  };
+  }, [
+    crop,
+    previewImage,
+    previewImageColumnId,
+    updatePreviewImage,
+    updateImage,
+  ]);
 
-  const handleCancelCrop = () => {
+  const handleCancelCrop = useCallback(() => {
     setIsCropping(false);
-  };
+  }, []);
 
-  // Define button configurations to reduce duplication
-  const previewButtons = [
-    {
-      id: "crop",
-      icon: Scissors,
-      onClick: toggleCropMode,
-      ariaLabel: previewerImageTranslations["crop-image"],
-      variant: "outline" as const,
-      size: "icon" as const,
-    },
-    {
-      id: "zoom-out",
-      icon: Minus,
-      onClick: handleZoomOut,
-      ariaLabel: previewerImageTranslations["zoom-out"],
-      disabled: zoomLevel <= 0.1,
-      variant: "outline" as const,
-      size: "icon" as const,
-    },
-    {
-      id: "reset-zoom",
-      label: previewerImageTranslations["zoom-level"].replace(
-        "{{percentage}}",
-        Math.round(zoomLevel * 100).toString(),
-      ),
-      onClick: handleResetZoom,
-      ariaLabel: previewerImageTranslations["reset-zoom"],
-      variant: "outline" as const,
-      size: "sm" as const,
-    },
-    {
-      id: "zoom-in",
-      icon: Plus,
-      onClick: handleZoomIn,
-      ariaLabel: previewerImageTranslations["zoom-in"],
-      disabled: zoomLevel >= 5,
-      variant: "outline" as const,
-      size: "icon" as const,
-    },
-    {
-      id: "close",
-      icon: X,
-      onClick: closePreviewer,
-      ariaLabel: previewerImageTranslations["close-preview"],
-      variant: "ghost" as const,
-      size: "icon" as const,
-    },
-  ];
+  // Memoize button configurations to reduce duplication
+  const previewButtons = useMemo(
+    () => [
+      {
+        id: "crop",
+        icon: Scissors,
+        onClick: toggleCropMode,
+        ariaLabel: previewerImageTranslations["crop-image"],
+        variant: "outline" as const,
+        size: "icon" as const,
+      },
+      {
+        id: "zoom-out",
+        icon: Minus,
+        onClick: handleZoomOut,
+        ariaLabel: previewerImageTranslations["zoom-out"],
+        disabled: zoomLevel <= 0.1,
+        variant: "outline" as const,
+        size: "icon" as const,
+      },
+      {
+        id: "reset-zoom",
+        label: previewerImageTranslations["zoom-level"].replace(
+          "{{percentage}}",
+          Math.round(zoomLevel * 100).toString()
+        ),
+        onClick: handleResetZoom,
+        ariaLabel: previewerImageTranslations["reset-zoom"],
+        variant: "outline" as const,
+        size: "sm" as const,
+      },
+      {
+        id: "zoom-in",
+        icon: Plus,
+        onClick: handleZoomIn,
+        ariaLabel: previewerImageTranslations["zoom-in"],
+        disabled: zoomLevel >= 5,
+        variant: "outline" as const,
+        size: "icon" as const,
+      },
+      {
+        id: "close",
+        icon: X,
+        onClick: closePreviewer,
+        ariaLabel: previewerImageTranslations["close-preview"],
+        variant: "ghost" as const,
+        size: "icon" as const,
+      },
+    ],
+    [
+      previewerImageTranslations,
+      zoomLevel,
+      toggleCropMode,
+      handleZoomOut,
+      handleResetZoom,
+      handleZoomIn,
+      closePreviewer,
+    ]
+  );
 
-  const cropButtons = [
-    {
-      id: "cancel",
-      label: cropImageTranslations.cancel || "Cancel",
-      onClick: handleCancelCrop,
-      ariaLabel: cropImageTranslations.cancel || "Cancel",
-      variant: "outline" as const,
-    },
-    {
-      id: "save",
-      label: cropImageTranslations.save || "Save",
-      onClick: handleSaveCrop,
-      ariaLabel: cropImageTranslations.save || "Save",
-      variant: "default" as const,
-    },
-  ];
+  const cropButtons = useMemo(
+    () => [
+      {
+        id: "cancel",
+        label: cropImageTranslations.cancel || "Cancel",
+        onClick: handleCancelCrop,
+        ariaLabel: cropImageTranslations.cancel || "Cancel",
+        variant: "outline" as const,
+      },
+      {
+        id: "save",
+        label: cropImageTranslations.save || "Save",
+        onClick: handleSaveCrop,
+        ariaLabel: cropImageTranslations.save || "Save",
+        variant: "default" as const,
+      },
+    ],
+    [cropImageTranslations, handleCancelCrop, handleSaveCrop]
+  );
 
   if (!isPreviewerOpen || !previewImage) {
     return null;
@@ -386,7 +442,7 @@ export function PreviewerImage() {
               <div className="w-full h-full flex items-center justify-center relative">
                 <ReactCrop
                   crop={crop}
-                  onChange={(c) => setCrop(c)}
+                  onChange={(c) => setCrop(c as PixelCrop)}
                   className="w-full h-full"
                   ruleOfThirds
                   minWidth={20}
@@ -416,7 +472,7 @@ export function PreviewerImage() {
                 alt={previewImage.fileName}
                 width={0}
                 height={0}
-                sizes="100vw"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 style={{
                   transform: `rotate(${previewImage.rotation}deg)`,
                   width: "auto",
@@ -427,6 +483,8 @@ export function PreviewerImage() {
                 }}
                 className="rounded-lg shadow-lg"
                 draggable={false}
+                placeholder="blur"
+                blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg=="
               />
             )}
           </div>
@@ -434,4 +492,9 @@ export function PreviewerImage() {
       </div>
     </div>
   );
-}
+});
+
+// Add display name for debugging
+PreviewerImage.displayName = "PreviewerImage";
+
+export { PreviewerImage };

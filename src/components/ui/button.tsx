@@ -31,7 +31,7 @@ const buttonVariants = cva(
       variant: "default",
       size: "default",
     },
-  },
+  }
 );
 
 function Button({
@@ -52,7 +52,7 @@ function Button({
     (typeof children === "string" && children.trim() !== "") ||
     (Array.isArray(children) &&
       children.some(
-        (child) => typeof child === "string" && child.trim() !== "",
+        (child) => typeof child === "string" && child.trim() !== ""
       ));
 
   // Warn if no accessible name is provided (in development only)
@@ -63,7 +63,7 @@ function Button({
     !props["aria-labelledby"]
   ) {
     console.warn(
-      "Button is missing accessible name. Add visible text content or an aria-label/aria-labelledby attribute.",
+      "Button is missing accessible name. Add visible text content or an aria-label/aria-labelledby attribute."
     );
   }
 

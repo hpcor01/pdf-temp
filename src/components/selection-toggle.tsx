@@ -15,7 +15,7 @@ export function SelectionToggle({
 
   const toggleAllColumns = useId();
   const toggleButtonLabels = useLanguageKey(
-    "buttons.button-toggle-selected-all",
+    "buttons.button-toggle-selected-all"
   );
 
   const handleToggleAllChange = (checked: boolean) => {

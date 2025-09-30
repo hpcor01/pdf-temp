@@ -113,14 +113,14 @@ export function MousePreviewerImage({
         <p>
           {mousePreviewerTranslations.rotation.replace(
             "{{degrees}}",
-            (image.rotation || 0).toString(),
+            (image.rotation || 0).toString()
           )}
         </p>
         {image.size && image.size > 0 && (
           <p>
             {mousePreviewerTranslations.size.replace(
               "{{size}}",
-              (image.size / 1024).toFixed(2),
+              (image.size / 1024).toFixed(2)
             )}
           </p>
         )}
