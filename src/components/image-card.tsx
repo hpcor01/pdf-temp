@@ -123,6 +123,43 @@ export function ImageCard({
     );
   };
 
+  // Define button configurations to reduce duplication
+  const actionButtons = [
+    {
+      id: "remove",
+      icon: X,
+      onClick: (e: React.MouseEvent) => {
+        e.stopPropagation();
+        onRemove(columnId, item.id);
+      },
+      ariaLabel: getRemoveImageLabel(),
+      className:
+        "p-2 rounded-full cursor-pointer bg-white/90 dark:bg-gray-800/90 text-gray-900 dark:text-gray-100 hover:bg-red-500 hover:text-white transition-all duration-200 shadow-md",
+    },
+    {
+      id: "rotate",
+      icon: RotateCw,
+      onClick: (e: React.MouseEvent) => {
+        e.stopPropagation();
+        handleRotate();
+      },
+      ariaLabel: getRotateImageLabel(),
+      className:
+        "p-2 rounded-full cursor-pointer bg-white/90 dark:bg-gray-800/90 text-gray-900 dark:text-gray-100 hover:bg-blue-500 hover:text-white transition-all duration-200 shadow-md",
+    },
+    {
+      id: "zoom",
+      icon: ZoomIn,
+      onClick: (e: React.MouseEvent) => {
+        e.stopPropagation();
+        handleZoom();
+      },
+      ariaLabel: getZoomImageLabel(),
+      className:
+        "p-2 rounded-full cursor-pointer bg-white/90 dark:bg-gray-800/90 text-gray-900 dark:text-gray-100 hover:bg-green-500 hover:text-white transition-all duration-200 shadow-md",
+    },
+  ];
+
   return (
     <>
       <Draggable draggableId={item.id} index={index}>
@@ -147,9 +184,9 @@ export function ImageCard({
                 onKeyDown={handleKeyDown}
                 aria-label={getPreviewImageLabel()}
               />
-              <div className="absolute top-2 left-2 z-20 bg-black/70 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center select-none cursor-default">
+              <span className="absolute top-2 left-2 z-20 bg-black/70 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center select-none cursor-default">
                 {getPositionNumberLabel()}
-              </div>
+              </span>
 
               <div
                 className="
@@ -160,53 +197,20 @@ export function ImageCard({
                 role="toolbar"
                 aria-label={getImageActionsLabel()}
               >
-                <Button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onRemove(columnId, item.id);
-                  }}
-                  className="
-                    p-2 rounded-full cursor-pointer bg-white/90 dark:bg-gray-800/90
-                    text-gray-900 dark:text-gray-100 hover:bg-red-500 hover:text-white
-                    transition-all duration-200 shadow-md
-                  "
-                  aria-label={getRemoveImageLabel()}
-                >
-                  <X className="w-4 h-4" />
-                </Button>
-
-                <Button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleRotate();
-                  }}
-                  className="
-                    p-2 rounded-full cursor-pointer bg-white/90 dark:bg-gray-800/90
-                    text-gray-900 dark:text-gray-100 hover:bg-blue-500 hover:text-white
-                    transition-all duration-200 shadow-md
-                  "
-                  aria-label={getRotateImageLabel()}
-                >
-                  <RotateCw className="w-4 h-4" />
-                </Button>
-
-                <Button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleZoom();
-                  }}
-                  className="
-                    p-2 rounded-full cursor-pointer bg-white/90 dark:bg-gray-800/90
-                    text-gray-900 dark:text-gray-100 hover:bg-green-500 hover:text-white
-                    transition-all duration-200 shadow-md
-                  "
-                  aria-label={getZoomImageLabel()}
-                >
-                  <ZoomIn className="w-4 h-4" />
-                </Button>
+                {actionButtons.map((button) => {
+                  const Icon = button.icon;
+                  return (
+                    <Button
+                      key={button.id}
+                      type="button"
+                      onClick={button.onClick}
+                      className={button.className}
+                      aria-label={button.ariaLabel}
+                    >
+                      <Icon className="w-4 h-4" />
+                    </Button>
+                  );
+                })}
               </div>
 
               <CardContent className="p-0">
