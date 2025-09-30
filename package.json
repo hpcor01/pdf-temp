@@ -2,6 +2,28 @@
   "name": "kanban-edit-img",
   "version": "5.0.0",
   "private": true,
+  "license": "Apache-2.0",
+  "type": "module",
+  "description": "Editor de imagens para Kanban",
+  "homepage": "https://editor-image-archi.vercel.app/",
+  "keywords": [
+    "kanban",
+    "editor",
+    "image",
+    "editor-image"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LStivan/web-editor-image.git"
+  },
+  "bugs": {
+    "url": "https://github.com/LStivan/web-editor-image/issues"
+  },
+  "author": {
+    "url": "https://editor-image-archi.vercel.app/",
+    "email": "l.stivan@advocaciabichara.com.br",
+    "name": "Stivan Lucas Camargo"
+  },
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
