@@ -89,6 +89,8 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const isProduction = process.env.NODE_ENV === "production";
+
   return (
     <html lang="pt-BR" suppressHydrationWarning>
       <head>
@@ -119,8 +121,12 @@ export default function RootLayout({
                 <KanbanProvider>{children}</KanbanProvider>
               </PreviewerProvider>
             </PreviewProvider>
-            <Analytics />
-            <SpeedInsights />
+            {isProduction && (
+              <>
+                <Analytics />
+                <SpeedInsights />
+              </>
+            )}
           </ThemeProvider>
           <UpdateToast />
         </I18nProvider>
