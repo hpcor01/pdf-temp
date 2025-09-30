@@ -1,0 +1,16 @@
+{
+  "name": "Editor de Imagem | Archí",
+  "short_name": "Archí Image Editor",
+  "description": "Editor de Imagem | Archí é um poderoso editor de imagens estilo KanBan onde você pode organizar suas imagens de forma simples e intuitiva, remover fundo e converter para PDF.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3b82f6",
+  "icons": [
+    {
+      "src": "/assets/icon-editor-de-imagem-archi.png",
+      "sizes": "1430x1430",
+      "type": "image/png"
+    }
+  ]
+}

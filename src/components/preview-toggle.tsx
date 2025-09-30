@@ -11,7 +11,7 @@ export function PreviewToggle({ isProcessing }: PreviewToggleProps) {
   const { isPreviewerImageChecked, setIsPreviewerImageChecked } = usePreview();
   const togglePreviewerImage = useId();
   const toggleButtonPreviewerImages = useLanguageKey(
-    "buttons.button-toggle-previewer-image",
+    "buttons.button-toggle-previewer-image"
   );
 
   const handlePreviewerImageChange = (checked: boolean) => {

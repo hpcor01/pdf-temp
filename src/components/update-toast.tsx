@@ -25,7 +25,7 @@ export function UpdateToast() {
 
       const autoReloadDelay = parseInt(
         process.env.NEXT_PUBLIC_AUTO_RELOAD_DELAY || "0",
-        10,
+        10
       );
 
       if (autoReloadDelay > 0) {

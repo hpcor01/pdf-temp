@@ -4,7 +4,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_KEY_BACK_END || "";
 
 export async function login(
   email: string,
-  password: string,
+  password: string
 ): Promise<LoginResponse> {
   if (!API_BASE_URL) {
     throw new Error("API base URL is not configured");
@@ -30,7 +30,7 @@ export async function login(
   } catch (error) {
     console.error("Login error:", error);
     throw new Error(
-      "Failed to login. Please check your credentials and try again.",
+      "Failed to login. Please check your credentials and try again."
     );
   }
 }

@@ -5,6 +5,7 @@ import {
   type ReactNode,
   useCallback,
   useContext,
+  useMemo,
   useState,
 } from "react";
 import type { Column, ImageItem, KanbanContextType } from "@/types/kanban";
@@ -24,8 +25,13 @@ export function KanbanProvider({ children }: { children: ReactNode }) {
     Record<string, boolean>
   >({});
 
-  const areAllColumnsSelected =
-    columns.length > 0 && columns.every((column) => selectedColumns[column.id]);
+  // Memoize areAllColumnsSelected to prevent unnecessary recalculations
+  const areAllColumnsSelected = useMemo(
+    () =>
+      columns.length > 0 &&
+      columns.every((column) => selectedColumns[column.id]),
+    [columns, selectedColumns]
+  );
 
   const addColumn = useCallback(
     (title: string) => {
@@ -37,7 +43,7 @@ export function KanbanProvider({ children }: { children: ReactNode }) {
       };
       setColumns((prev) => [...prev, newColumn]);
     },
-    [columns.length],
+    [columns.length]
   );
 
   const removeColumn = useCallback((id: string) => {
@@ -52,7 +58,7 @@ export function KanbanProvider({ children }: { children: ReactNode }) {
 
   const renameColumn = useCallback((id: string, title: string) => {
     setColumns((prev) =>
-      prev.map((col) => (col.id === id ? { ...col, title } : col)),
+      prev.map((col) => (col.id === id ? { ...col, title } : col))
     );
   }, []);
 
@@ -62,11 +68,11 @@ export function KanbanProvider({ children }: { children: ReactNode }) {
         prev.map((col) =>
           col.id === columnId
             ? { ...col, items: [...col.items, ...images] }
-            : col,
-        ),
+            : col
+        )
       );
     },
-    [],
+    []
   );
 
   const removeImage = useCallback((columnId: string, imageId: string) => {
@@ -74,8 +80,8 @@ export function KanbanProvider({ children }: { children: ReactNode }) {
       prev.map((col) =>
         col.id === columnId
           ? { ...col, items: col.items.filter((img) => img.id !== imageId) }
-          : col,
-      ),
+          : col
+      )
     );
   }, []);
 
@@ -87,14 +93,14 @@ export function KanbanProvider({ children }: { children: ReactNode }) {
             ? {
                 ...col,
                 items: col.items.map((img) =>
-                  img.id === updatedImage.id ? updatedImage : img,
+                  img.id === updatedImage.id ? updatedImage : img
                 ),
               }
-            : col,
-        ),
+            : col
+        )
       );
     },
-    [],
+    []
   );
 
   const rotateImage = useCallback(
@@ -105,14 +111,14 @@ export function KanbanProvider({ children }: { children: ReactNode }) {
             ? {
                 ...col,
                 items: col.items.map((img) =>
-                  img.id === imageId ? { ...img, rotation } : img,
+                  img.id === imageId ? { ...img, rotation } : img
                 ),
               }
-            : col,
-        ),
+            : col
+        )
       );
     },
-    [],
+    []
   );
 
   const moveImage = useCallback(
@@ -120,15 +126,15 @@ export function KanbanProvider({ children }: { children: ReactNode }) {
       sourceColumnId: string,
       destColumnId: string,
       imageId: string,
-      destIndex: number,
+      destIndex: number
     ) => {
       setColumns((prev) => {
         const newColumns = [...prev];
         const sourceColumnIndex = newColumns.findIndex(
-          (col) => col.id === sourceColumnId,
+          (col) => col.id === sourceColumnId
         );
         const destColumnIndex = newColumns.findIndex(
-          (col) => col.id === destColumnId,
+          (col) => col.id === destColumnId
         );
 
         if (sourceColumnIndex === -1 || destColumnIndex === -1) return prev;
@@ -137,7 +143,7 @@ export function KanbanProvider({ children }: { children: ReactNode }) {
         const destColumn = newColumns[destColumnIndex];
 
         const imageIndex = sourceColumn.items.findIndex(
-          (img) => img.id === imageId,
+          (img) => img.id === imageId
         );
 
         if (imageIndex === -1) return prev;
@@ -151,7 +157,7 @@ export function KanbanProvider({ children }: { children: ReactNode }) {
         return newColumns;
       });
     },
-    [],
+    []
   );
 
   const moveColumn = useCallback((sourceIndex: number, destIndex: number) => {
@@ -170,7 +176,7 @@ export function KanbanProvider({ children }: { children: ReactNode }) {
         [columnId]: selected,
       }));
     },
-    [],
+    []
   );
 
   const toggleAllColumnsSelection = useCallback(
@@ -181,13 +187,13 @@ export function KanbanProvider({ children }: { children: ReactNode }) {
       });
       setSelectedColumns(newSelected);
     },
-    [columns],
+    [columns]
   );
 
   const saveSelectedColumns = useCallback(
     async (convertToPDF: boolean, savePath: string) => {
       const selectedColumnsList = columns.filter(
-        (column) => selectedColumns[column.id],
+        (column) => selectedColumns[column.id]
       );
 
       if (selectedColumnsList.length === 0) {
@@ -198,32 +204,52 @@ export function KanbanProvider({ children }: { children: ReactNode }) {
       alert(
         `Would save ${selectedColumnsList.length} columns to ${savePath} as ${
           convertToPDF ? "PDF" : "images"
-        }`,
+        }`
       );
     },
-    [columns, selectedColumns],
+    [columns, selectedColumns]
+  );
+
+  // Memoize context value to prevent unnecessary re-renders
+  const contextValue = useMemo(
+    () => ({
+      columns,
+      selectedColumns,
+      addColumn,
+      removeColumn,
+      renameColumn,
+      addImagesToColumn,
+      removeImage,
+      updateImage,
+      rotateImage,
+      moveImage,
+      moveColumn,
+      toggleColumnSelection,
+      toggleAllColumnsSelection,
+      areAllColumnsSelected,
+      saveSelectedColumns,
+    }),
+    [
+      columns,
+      selectedColumns,
+      addColumn,
+      removeColumn,
+      renameColumn,
+      addImagesToColumn,
+      removeImage,
+      updateImage,
+      rotateImage,
+      moveImage,
+      moveColumn,
+      toggleColumnSelection,
+      toggleAllColumnsSelection,
+      areAllColumnsSelected,
+      saveSelectedColumns,
+    ]
   );
 
   return (
-    <KanbanContext.Provider
-      value={{
-        columns,
-        selectedColumns,
-        addColumn,
-        removeColumn,
-        renameColumn,
-        addImagesToColumn,
-        removeImage,
-        updateImage,
-        rotateImage,
-        moveImage,
-        moveColumn,
-        toggleColumnSelection,
-        toggleAllColumnsSelection,
-        areAllColumnsSelected,
-        saveSelectedColumns,
-      }}
-    >
+    <KanbanContext.Provider value={contextValue}>
       {children}
     </KanbanContext.Provider>
   );

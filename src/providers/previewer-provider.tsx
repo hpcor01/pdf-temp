@@ -14,7 +14,7 @@ interface PreviewerContextProps {
 }
 
 const PreviewerContext = createContext<PreviewerContextProps | undefined>(
-  undefined,
+  undefined
 );
 
 export function PreviewerProvider({ children }: { children: ReactNode }) {

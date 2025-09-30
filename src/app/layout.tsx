@@ -13,20 +13,75 @@ import { ThemeProvider } from "@/providers/theme-provider";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  display: "swap", // Add font display swap for better performance
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: "swap", // Add font display swap for better performance
 });
 
 export const metadata: Metadata = {
-  title: "Editor de Imagem | Archí",
+  title: {
+    default: "Editor de Imagem | Archí",
+    template: "%s | Archí Image Editor",
+  },
   description:
     "Editor de Imagem | Archí é um poderoso editor de imagens estilo KanBan onde você pode organizar suas imagens de forma simples e intuitiva, remover fundo e converter para PDF.",
+  keywords: [
+    "editor de imagem",
+    "kanban",
+    "organizar imagens",
+    "remover fundo",
+    "converter para PDF",
+    "image editor",
+    "kanban board",
+    "background removal",
+    "PDF converter",
+  ],
+  authors: [{ name: "Archí" }],
+  creator: "Archí",
+  publisher: "Archí",
+  robots: {
+    index: true,
+    follow: true,
+  },
+  alternates: {
+    canonical: "https://web-editor-image.vercel.app",
+  },
+  openGraph: {
+    type: "website",
+    locale: "pt_BR",
+    url: "https://web-editor-image.vercel.app",
+    title: "Editor de Imagem | Archí",
+    description:
+      "Editor de Imagem | Archí é um poderoso editor de imagens estilo KanBan onde você pode organizar suas imagens de forma simples e intuitiva, remover fundo e converter para PDF.",
+    siteName: "Archí Image Editor",
+    images: [
+      {
+        url: "/assets/icon-editor-de-imagem-archi.png",
+        width: 1430,
+        height: 1430,
+        alt: "Archí Image Editor Logo",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Editor de Imagem | Archí",
+    description:
+      "Editor de Imagem | Archí é um poderoso editor de imagens estilo KanBan onde você pode organizar suas imagens de forma simples e intuitiva, remover fundo e converter para PDF.",
+    images: ["/assets/icon-editor-de-imagem-archi.png"],
+    creator: "@archi",
+  },
   icons: {
     icon: "/assets/icon-editor-de-imagem-archi.png",
+    shortcut: "/assets/icon-editor-de-imagem-archi.png",
+    apple: "/assets/icon-editor-de-imagem-archi.png",
   },
+  manifest: "/manifest.json",
+  metadataBase: new URL("https://web-editor-image.vercel.app"),
 };
 
 export default function RootLayout({
@@ -34,6 +89,8 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const isProduction = process.env.NODE_ENV === "production";
+
   return (
     <html lang="pt-BR" suppressHydrationWarning>
       <head>
@@ -64,8 +121,12 @@ export default function RootLayout({
                 <KanbanProvider>{children}</KanbanProvider>
               </PreviewerProvider>
             </PreviewProvider>
-            <Analytics />
-            <SpeedInsights />
+            {isProduction && (
+              <>
+                <Analytics />
+                <SpeedInsights />
+              </>
+            )}
           </ThemeProvider>
           <UpdateToast />
         </I18nProvider>

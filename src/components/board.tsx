@@ -2,7 +2,7 @@
 
 import { DragDropContext, type DropResult } from "@hello-pangea/dnd";
 import dynamic from "next/dynamic";
-import { useCallback, useEffect } from "react";
+import { memo, useCallback, useEffect } from "react";
 import { useKanban } from "@/providers/kanban-provider";
 import { usePreview } from "@/providers/preview-provider";
 import { usePreviewer } from "@/providers/previewer-provider";
@@ -10,7 +10,7 @@ import type { ColumnProps } from "@/types/column";
 import { BtnCreateColumn } from "./btn-create-column";
 import { PreviewerImage } from "./previewer-image";
 
-// Ensure the dynamic import is properly configured
+// Dynamically import ColumnComponent with optimized loading
 const ColumnComponent = dynamic<ColumnProps>(
   () => import("./column").then((mod) => mod.ColumnComponent),
   {
@@ -30,10 +30,11 @@ const ColumnComponent = dynamic<ColumnProps>(
         </div>
       </div>
     ),
-  },
+  }
 );
 
-export function Board() {
+// Memoize the Board component to prevent unnecessary re-renders
+const Board = memo(() => {
   const { columns, moveImage, addColumn } = useKanban();
   const { previewImage, isClickPreview, clearPreview } = usePreview();
   const { isPreviewerOpen } = usePreviewer();
@@ -59,23 +60,26 @@ export function Board() {
           source.droppableId,
           destination.droppableId,
           draggableId,
-          destination.index,
+          destination.index
         );
       } else {
         moveImage(
           source.droppableId,
           destination.droppableId,
           draggableId,
-          destination.index,
+          destination.index
         );
       }
     },
-    [moveImage],
+    [moveImage]
   );
 
-  const handleAddColumn = (title?: string) => {
-    addColumn(title || "");
-  };
+  const handleAddColumn = useCallback(
+    (title?: string) => {
+      addColumn(title || "");
+    },
+    [addColumn]
+  );
 
   // Handle escape key to close preview
   useEffect(() => {
@@ -116,4 +120,9 @@ export function Board() {
       <PreviewerImage />
     </div>
   );
-}
+});
+
+// Add display name for debugging
+Board.displayName = "Board";
+
+export { Board };

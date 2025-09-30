@@ -1,13 +1,14 @@
 {
   "name": "kanban-edit-img",
-  "version": "4.0.1",
+  "version": "5.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "biome check",
-    "format": "biome format --write"
+    "format": "biome format --write",
+    "analyze": "ANALYZE=true next build"
   },
   "dependencies": {
     "@hello-pangea/dnd": "^18.0.1",
@@ -38,6 +39,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.2.0",
+    "@next/bundle-analyzer": "^15.5.4",
     "@tailwindcss/postcss": "^4",
     "@types/js-cookie": "^3.0.6",
     "@types/lodash-es": "^4.17.12",

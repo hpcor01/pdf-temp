@@ -22,7 +22,7 @@ export async function GET(): Promise<NextResponse<VersionResponse>> {
         Pragma: "no-cache",
         Expires: "0",
       },
-    },
+    }
   );
 }
 

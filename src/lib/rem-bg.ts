@@ -5,7 +5,7 @@ export async function removeBackground(src: string): Promise<string> {
 
   if (!apiKey) {
     console.warn(
-      "NEXT_PUBLIC_REMOVE_BG_API_KEY not set, returning original image",
+      "NEXT_PUBLIC_REMOVE_BG_API_KEY not set, returning original image"
     );
     return src;
   }
@@ -20,7 +20,7 @@ export async function removeBackground(src: string): Promise<string> {
       const response = await fetch(src);
       if (!response.ok) {
         throw new Error(
-          `Failed to fetch image: ${response.status} ${response.statusText}`,
+          `Failed to fetch image: ${response.status} ${response.statusText}`
         );
       }
       imageBlob = await response.blob();
@@ -40,7 +40,7 @@ export async function removeBackground(src: string): Promise<string> {
 
     if (!apiResponse.ok) {
       throw new Error(
-        `Remove.bg API error: ${apiResponse.status} ${apiResponse.statusText}`,
+        `Remove.bg API error: ${apiResponse.status} ${apiResponse.statusText}`
       );
     }
 
@@ -59,7 +59,7 @@ export async function removeBackground(src: string): Promise<string> {
 }
 
 export async function removeBackgroundBatch(
-  items: ImageItem[],
+  items: ImageItem[]
 ): Promise<ImageItem[]> {
   return Promise.all(
     items.map(async (item) => {
@@ -75,6 +75,6 @@ export async function removeBackgroundBatch(
         console.error(`Error processing image ${item.fileName}:`, error);
         return item;
       }
-    }),
+    })
   );
 }
