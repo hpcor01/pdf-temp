@@ -114,7 +114,9 @@
     "crop-title": "Περικοπή Εικόνας",
     "close-crop": "Κλείσιμο περικοπής",
     "cancel": "Ακύρωση",
-    "save": "Αποθήκευση"
+    "save": "Αποθήκευση",
+    "success-title": "Η εικόνα περικόπησε",
+    "success-description": "Η εικόνα περικόπησε με επιτυχία."
   },
   "btn-create-column": {
     "create-column": "Δημιουργία νέας στήλης"
