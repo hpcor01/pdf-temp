@@ -66,6 +66,9 @@ export async function generatePDFForColumnBlob(column: Column): Promise<Blob> {
 
   for (let i = 0; i < column.items.length; i++) {
     const item = column.items[i];
+    // Add a check to ensure item is defined
+    if (!item) continue;
+
     try {
       if (i > 0) doc.addPage();
 
@@ -145,6 +148,9 @@ async function generatePDFForColumn(column: Column): Promise<void> {
 
   for (let i = 0; i < column.items.length; i++) {
     const item = column.items[i];
+    // Add a check to ensure item is defined
+    if (!item) continue;
+
     try {
       if (i > 0) doc.addPage();
 
@@ -223,6 +229,8 @@ export async function generateSinglePDFForColumns(
   // Process each selected column
   for (let colIndex = 0; colIndex < selectedColumns.length; colIndex++) {
     const column = selectedColumns[colIndex];
+    // Add a check to ensure column is defined
+    if (!column) continue;
 
     // Add a title page for the column
     if (colIndex > 0) {
@@ -236,6 +244,8 @@ export async function generateSinglePDFForColumns(
     // Process each image in the column
     for (let imgIndex = 0; imgIndex < column.items.length; imgIndex++) {
       const item = column.items[imgIndex];
+      // Add a check to ensure item is defined
+      if (!item) continue;
 
       try {
         // Add a new page for each image (except the first one on the title page)
@@ -278,7 +288,12 @@ export async function generateSinglePDFForColumns(
 
         doc.addImage(canvas.toDataURL("image/png"), "PNG", x, y, imgW, imgH);
       } catch (err: unknown) {
-        console.error(`Erro ao processar imagem ${item.fileName}:`, err);
+        // Add a check to ensure item is defined before accessing fileName
+        if (item) {
+          console.error(`Erro ao processar imagem ${item.fileName}:`, err);
+        } else {
+          console.error(`Erro ao processar imagem:`, err);
+        }
       }
     }
   }
