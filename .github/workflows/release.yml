@@ -15,9 +15,9 @@ jobs:
         with:
           node-version: 22
 
-      - run: npm install -g pnpm@9
+      - run: npm install -g pnpm -y
 
-      - run: pnpm install --no-frozen-lockfile
+      - run: pnpm install
 
       - run: npx semantic-release
         env:
