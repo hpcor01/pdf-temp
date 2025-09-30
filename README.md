@@ -1,6 +1,7 @@
 # Archí - Image Editor & Kanban Board
 
-[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://github.com/your-username/kanban-edit-img/blob/main/LICENSE)
+[![Release](https://img.shields.io/github/v/release/LStivan/web-editor-image?sort=semver)](https://github.com/LStivan/web-editor-image/releases)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![Next.js](https://img.shields.io/badge/Next.js-15-black)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-19-blue)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)](https://www.typescriptlang.org/)
@@ -30,7 +31,7 @@ Archí is a modern, intuitive image editor with an integrated Kanban board for o
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/kanban-edit-img.git
+git clone https://github.com/LStivan/web-editor-image.git
 
 # Navigate to the project directory
 cd kanban-edit-img
@@ -86,14 +87,14 @@ pnpm start
 Contributions are welcome! Please follow these steps:
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+2. Create a feature branch (`git checkout -b feat/AmazingFeature`)
 3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
+4. Push to the branch (`git push origin feat/AmazingFeature`)
 5. Open a Pull Request
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
 
 ## 🙏 Acknowledgements
 
@@ -102,3 +103,27 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [Tailwind CSS](https://tailwindcss.com/)
 - [Lucide Icons](https://lucide.dev/)
 - [Vercel](https://vercel.com/)
+
+## 📝 Changelog
+
+For a detailed history of changes, see [CHANGELOG.md](CHANGELOG.md).
+
+## 📋 Commit Convention
+
+All commits in this project follow the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) specification. This standard provides:
+
+- Human and machine-readable commit messages
+- Automated CHANGELOG generation
+- Automatic semantic versioning
+- Structured commit history
+
+We use commit types like `feat:`, `fix:`, `chore:`, `docs:`, `style:`, `refactor:`, `perf:`, and `test:`. Breaking changes are indicated with either a `!` or a `BREAKING CHANGE:` footer.
+
+Please ensure all contributions follow this convention for consistency and automation purposes.
+
+Show mode information [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)
+
+## 🖼️ Screenshots
+
+![Kanban Board](./screenshots/dashboard.png)
+![Image Editor](./screenshots/dash-kanban.png)
