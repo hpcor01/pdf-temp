@@ -19,8 +19,10 @@
     "enabled": true,
     "rules": {
       "recommended": true,
+
       "suspicious": {
-        "noUnknownAtRules": "off"
+        "noUnknownAtRules": "off",
+        "noTemplateCurlyInString": "error"
       },
       "correctness": {
         "noUnusedImports": "error",
