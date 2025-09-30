@@ -1,7 +1,7 @@
 {
   "name": "kanban-edit-img",
   "version": "0.0.0-development",
-  "private": true,
+  "private": false,
   "license": "Apache-2.0",
   "type": "module",
   "description": "Editor de imagens para Kanban",
