@@ -114,7 +114,9 @@
     "crop-title": "Recortar Imagen",
     "close-crop": "Cerrar recorte",
     "cancel": "Cancelar",
-    "save": "Guardar"
+    "save": "Guardar",
+    "success-title": "Imagen recortada",
+    "success-description": "La imagen se recortó con éxito."
   },
   "btn-create-column": {
     "create-column": "Crear nueva columna"

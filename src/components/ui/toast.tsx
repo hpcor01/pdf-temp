@@ -64,7 +64,7 @@ function Toast({
       className={cn(toastVariants({ variant }), className)}
       {...props}
     >
-      <div className="flex items-start gap-4">
+      <div className="flex items-start gap-4 z-[9999]">
         <div className="flex-shrink-0">{icon}</div>
 
         <div className="flex-1 space-y-1">

@@ -142,6 +142,9 @@ export function KanbanProvider({ children }: { children: ReactNode }) {
         const sourceColumn = newColumns[sourceColumnIndex];
         const destColumn = newColumns[destColumnIndex];
 
+        // Add checks to ensure sourceColumn and destColumn are defined
+        if (!sourceColumn || !destColumn) return prev;
+
         const imageIndex = sourceColumn.items.findIndex(
           (img) => img.id === imageId
         );
@@ -149,6 +152,9 @@ export function KanbanProvider({ children }: { children: ReactNode }) {
         if (imageIndex === -1) return prev;
 
         const [movedImage] = sourceColumn.items.splice(imageIndex, 1);
+
+        // Add a check to ensure movedImage is defined
+        if (!movedImage) return prev;
 
         if (sourceColumnId === destColumnId) {
           sourceColumn.items.splice(destIndex, 0, movedImage);
@@ -164,6 +170,10 @@ export function KanbanProvider({ children }: { children: ReactNode }) {
     setColumns((prev) => {
       const newColumns = [...prev];
       const [movedColumn] = newColumns.splice(sourceIndex, 1);
+
+      // Add a check to ensure movedColumn is defined
+      if (!movedColumn) return prev;
+
       newColumns.splice(destIndex, 0, movedColumn);
       return newColumns;
     });

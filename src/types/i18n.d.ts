@@ -115,6 +115,8 @@ export interface LanguageStructure {
     "close-crop": string;
     cancel: string;
     save: string;
+    "success-title": string;
+    "success-description": string;
   };
   "btn-create-column": {
     "create-column": string;

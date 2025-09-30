@@ -1,14 +1,43 @@
 {
   "name": "kanban-edit-img",
-  "version": "5.0.0",
+  "version": "5.0.2",
   "private": true,
+  "license": "Apache-2.0",
+  "type": "module",
+  "description": "Editor de imagens para Kanban",
+  "homepage": "https://editor-image-archi.vercel.app/",
+  "keywords": [
+    "kanban",
+    "editor",
+    "image",
+    "editor-image"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LStivan/web-editor-image.git"
+  },
+  "bugs": {
+    "url": "https://github.com/LStivan/web-editor-image/issues"
+  },
+  "author": {
+    "url": "https://editor-image-archi.vercel.app/",
+    "email": "l.stivan@advocaciabichara.com.br",
+    "name": "Stivan Lucas Camargo"
+  },
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "biome check",
     "format": "biome format --write",
-    "analyze": "ANALYZE=true next build"
+    "analyze": "ANALYZE=true next build",
+    "release": "standard-version",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{js,ts,jsx,tsx,json,jsonc}": [
+      "biome check --write --files-ignore-unknown=true --no-errors-on-unmatched"
+    ]
   },
   "dependencies": {
     "@hello-pangea/dnd": "^18.0.1",
@@ -40,6 +69,10 @@
   "devDependencies": {
     "@biomejs/biome": "2.2.0",
     "@next/bundle-analyzer": "^15.5.4",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/commit-analyzer": "^13.0.1",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/release-notes-generator": "^14.1.0",
     "@tailwindcss/postcss": "^4",
     "@types/js-cookie": "^3.0.6",
     "@types/lodash-es": "^4.17.12",
@@ -48,6 +81,10 @@
     "@types/react-dom": "^19",
     "@types/react-image-crop": "^9.0.2",
     "critters": "^0.0.25",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.3",
+    "semantic-release": "^24.2.9",
+    "standard-version": "^9.5.0",
     "tailwindcss": "^4",
     "tw-animate-css": "^1.4.0",
     "typescript": "^5",
