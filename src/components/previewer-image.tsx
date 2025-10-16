@@ -11,17 +11,15 @@ import { useLanguageKey } from "@/hooks/use-i18n";
 import { useToast } from "@/hooks/use-toast";
 import { useKanban } from "@/providers/kanban-provider";
 import { usePreviewer } from "@/providers/previewer-provider";
-import type { ToastVariant } from "@/types/toast"; // Import the ToastVariant type
+import type { ToastVariant } from "@/types/toast";
 
-// Dynamically import ReactCrop to reduce initial bundle size
+// Import dinâmico seguro
 const ReactCrop = dynamic(
-  () => import("react-image-crop").then((mod) => mod.default),
-  {
-    ssr: false,
-  }
+  () => import("react-image-crop").then((mod) => mod.ReactCrop || mod.default),
+  { ssr: false }
 );
 
-// Function to convert crop to canvas and return data URL
+// Função para gerar o cropped (com validações e tratamento de erros CORS)
 function getCroppedImg(
   image: HTMLImageElement,
   crop: {
@@ -32,6 +30,11 @@ function getCroppedImg(
     unit: "px" | "%";
   }
 ): string {
+  // validação inicial
+  if (!crop.width || !crop.height) {
+    throw new Error("Crop dimensions are invalid");
+  }
+
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d");
 
@@ -42,8 +45,9 @@ function getCroppedImg(
   const scaleX = image.naturalWidth / image.width;
   const scaleY = image.naturalHeight / image.height;
 
-  canvas.width = crop.width;
-  canvas.height = crop.height;
+  // garantir inteiros (evita problemas com valores fracionários)
+  canvas.width = Math.round(crop.width);
+  canvas.height = Math.round(crop.height);
 
   ctx.drawImage(
     image,
@@ -53,14 +57,26 @@ function getCroppedImg(
     crop.height * scaleY,
     0,
     0,
-    crop.width,
-    crop.height
+    canvas.width,
+    canvas.height
   );
 
-  return canvas.toDataURL("image/jpeg");
+  // toDataURL pode lançar SecurityError se o canvas estiver "tainted" (CORS)
+  try {
+    return canvas.toDataURL("image/jpeg");
+  } catch (err: any) {
+    // relançar com mensagem mais clara
+    const message =
+      err && (err.name === "SecurityError" || /taint/i.test(err.message || ""))
+        ? "CORS_ERROR: The canvas is tainted. Check image CORS or use a proxy."
+        : err?.message || String(err);
+    const e = new Error(message);
+    // Anexa original para debug
+    (e as any).original = err;
+    throw e;
+  }
 }
 
-// Memoize the PreviewerImage component to prevent unnecessary re-renders
 const PreviewerImage = memo(() => {
   const {
     previewImage,
@@ -70,6 +86,7 @@ const PreviewerImage = memo(() => {
     updatePreviewImage,
   } = usePreviewer();
   const { updateImage } = useKanban();
+
   const [zoomLevel, setZoomLevel] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
@@ -82,22 +99,19 @@ const PreviewerImage = memo(() => {
     width: 0,
     height: 0,
   });
-  // Add toast state
+
   const [toastOpen, setToastOpen] = useState(false);
-  const [toastVariant, setToastVariant] = useState<ToastVariant>("default"); // Use the correct type
+  const [toastVariant, setToastVariant] = useState<ToastVariant>("default");
   const [toastTitle, setToastTitle] = useState("");
   const [toastDescription, setToastDescription] = useState("");
 
   const imageRef = useRef<HTMLDivElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
-  const imgRef = useRef<HTMLImageElement>(null);
+  const imgRef = useRef<HTMLImageElement | null>(null);
 
-  // Previewer image translations
   const previewerImageTranslations = useLanguageKey("previewer-image");
-  // Crop image translations
   const cropImageTranslations = useLanguageKey("crop-image");
 
-  // Add toast hook
   const { showToast } = useToast({
     setToastVariant,
     setToastTitle,
@@ -105,7 +119,6 @@ const PreviewerImage = memo(() => {
     setToastOpen,
   });
 
-  // Reset zoom and position when a new image is opened
   useEffect(() => {
     if (isPreviewerOpen && previewImage) {
       setZoomLevel(1);
@@ -113,21 +126,16 @@ const PreviewerImage = memo(() => {
     }
   }, [previewImage, isPreviewerOpen]);
 
-  // Close previewer when Escape key is pressed
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape" && isPreviewerOpen) {
         closePreviewer();
       }
     };
-
     window.addEventListener("keydown", handleKeyDown);
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isPreviewerOpen, closePreviewer]);
 
-  // Handle mouse wheel zoom
   const handleWheel = useCallback(
     (e: React.WheelEvent) => {
       if (isCropping) return;
@@ -150,25 +158,17 @@ const PreviewerImage = memo(() => {
 
   const handleMouseDown = useCallback(
     (e: React.MouseEvent) => {
-      if (isCropping) return;
-      if (zoomLevel <= 1) return;
+      if (isCropping || zoomLevel <= 1) return;
       setIsDragging(true);
-      setDragStart({
-        x: e.clientX - position.x,
-        y: e.clientY - position.y,
-      });
+      setDragStart({ x: e.clientX - position.x, y: e.clientY - position.y });
     },
     [isCropping, zoomLevel, position.x, position.y]
   );
 
   const handleMouseMove = useCallback(
     (e: React.MouseEvent) => {
-      if (isCropping) return;
-      if (!isDragging || zoomLevel <= 1) return;
-      setPosition({
-        x: e.clientX - dragStart.x,
-        y: e.clientY - dragStart.y,
-      });
+      if (isCropping || !isDragging || zoomLevel <= 1) return;
+      setPosition({ x: e.clientX - dragStart.x, y: e.clientY - dragStart.y });
     },
     [isCropping, isDragging, zoomLevel, dragStart.x, dragStart.y]
   );
@@ -178,72 +178,49 @@ const PreviewerImage = memo(() => {
     setIsDragging(false);
   }, [isCropping]);
 
-  // Reset zoom
   const handleResetZoom = useCallback(() => {
     if (isCropping) return;
     setZoomLevel(1);
     setPosition({ x: 0, y: 0 });
   }, [isCropping]);
 
-  // Handle click outside to close preview
   const handleOverlayClick = useCallback(
     (e: React.MouseEvent) => {
-      // Se estiver no modo crop, ignora clique fora
       if (isCropping) return;
-
-      if (e.target === e.currentTarget) {
-        closePreviewer();
-      }
+      if (e.target === e.currentTarget) closePreviewer();
     },
     [isCropping, closePreviewer]
   );
 
-  // Handle keyboard events for accessibility
   const handleOverlayKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
-      if (e.key === "Escape") {
-        closePreviewer();
-      }
+      if (e.key === "Escape") closePreviewer();
     },
     [closePreviewer]
   );
 
   const toggleCropMode = useCallback(() => {
     setIsCropping(!isCropping);
-    // Reset crop when entering crop mode to cover most of the image
     if (!isCropping) {
-      setCrop({
-        unit: "px",
-        x: 10,
-        y: 10,
-        width: 80,
-        height: 80,
-      } as PixelCrop);
+      setCrop({ unit: "px", x: 10, y: 10, width: 80, height: 80 } as PixelCrop);
     }
   }, [isCropping]);
 
-  // Handle image load for cropping
-  const onImageLoad = useCallback(
-    (e: React.SyntheticEvent<HTMLImageElement>) => {
-      const { naturalWidth, naturalHeight } = e.currentTarget;
-      imgRef.current = e.currentTarget;
+  const onImageLoad = useCallback((e: React.SyntheticEvent<HTMLImageElement>) => {
+    const { naturalWidth, naturalHeight } = e.currentTarget;
+    imgRef.current = e.currentTarget;
+    setCrop({
+      unit: "px",
+      x: 0,
+      y: 0,
+      width: naturalWidth,
+      height: naturalHeight,
+    } as PixelCrop);
+  }, []);
 
-      setCrop({
-        unit: "px",
-        x: 0,
-        y: 0,
-        width: naturalWidth,
-        height: naturalHeight,
-      } as PixelCrop);
-    },
-    []
-  );
-
-  // Perform the actual cropping
   const handleSaveCrop = useCallback(() => {
     if (imgRef.current && crop.width && crop.height && previewImage) {
       try {
-        // Convert Crop to PixelCrop for the function
         const pixelCrop: PixelCrop = {
           x: Math.round(crop.x),
           y: Math.round(crop.y),
@@ -251,34 +228,40 @@ const PreviewerImage = memo(() => {
           height: Math.round(crop.height),
           unit: "px",
         };
+
         const croppedImage = getCroppedImg(imgRef.current, pixelCrop);
 
-        // Update the preview image with the cropped version
-        const updatedImage = {
-          ...previewImage,
-          src: croppedImage,
-        };
-
-        // Update in the previewer context
+        const updatedImage = { ...previewImage, src: croppedImage };
         updatePreviewImage(updatedImage);
 
-        // Update in the kanban context (this will update the image in the image card)
-        if (previewImageColumnId) {
-          updateImage(previewImageColumnId, updatedImage);
-        }
+        if (previewImageColumnId) updateImage(previewImageColumnId, updatedImage);
 
-        // Exit crop mode
         setIsCropping(false);
-
-        // Show success toast
         showToast(
-          "default", // Use "default" instead of "success" to match the type
+          "default",
           cropImageTranslations["success-title"] || "Image cropped",
           cropImageTranslations["success-description"] ||
             "The image was successfully cropped."
         );
-      } catch (error) {
-        console.error("Error cropping image:", error);
+      } catch (error: any) {
+        // Tratamento específico para erro de CORS / tainted canvas
+        const msg = error?.message || String(error);
+        console.error("Crop error:", error);
+
+        if (msg.includes("CORS_ERROR") || /taint/i.test(msg) || error?.name === "SecurityError") {
+          showToast(
+            "default",
+            cropImageTranslations["cors-error-title"] || "Cannot export image",
+            cropImageTranslations["cors-error-description"] ||
+              "The image origin blocks canvas export (CORS). Serve the image with Access-Control-Allow-Origin or use a proxy."
+          );
+        } else {
+          showToast(
+            "default",
+            cropImageTranslations["error-title"] || "Error cropping image",
+            msg
+          );
+        }
       }
     }
   }, [
@@ -291,93 +274,28 @@ const PreviewerImage = memo(() => {
     cropImageTranslations,
   ]);
 
-  const handleCancelCrop = useCallback(() => {
-    setIsCropping(false);
-  }, []);
+  const handleCancelCrop = useCallback(() => setIsCropping(false), []);
 
-  // Memoize button configurations to reduce duplication
   const previewButtons = useMemo(
     () => [
-      {
-        id: "crop",
-        icon: Scissors,
-        onClick: toggleCropMode,
-        ariaLabel: previewerImageTranslations["crop-image"],
-        variant: "outline" as const,
-        size: "icon" as const,
-      },
-      {
-        id: "zoom-out",
-        icon: Minus,
-        onClick: handleZoomOut,
-        ariaLabel: previewerImageTranslations["zoom-out"],
-        disabled: zoomLevel <= 0.1,
-        variant: "outline" as const,
-        size: "icon" as const,
-      },
-      {
-        id: "reset-zoom",
-        label: previewerImageTranslations["zoom-level"].replace(
-          "{{percentage}}",
-          Math.round(zoomLevel * 100).toString()
-        ),
-        onClick: handleResetZoom,
-        ariaLabel: previewerImageTranslations["reset-zoom"],
-        variant: "outline" as const,
-        size: "sm" as const,
-      },
-      {
-        id: "zoom-in",
-        icon: Plus,
-        onClick: handleZoomIn,
-        ariaLabel: previewerImageTranslations["zoom-in"],
-        disabled: zoomLevel >= 5,
-        variant: "outline" as const,
-        size: "icon" as const,
-      },
-      {
-        id: "close",
-        icon: X,
-        onClick: closePreviewer,
-        ariaLabel: previewerImageTranslations["close-preview"],
-        variant: "ghost" as const,
-        size: "icon" as const,
-      },
+      { id: "crop", icon: Scissors, onClick: toggleCropMode, ariaLabel: previewerImageTranslations["crop-image"], variant: "outline" as const, size: "icon" as const },
+      { id: "zoom-out", icon: Minus, onClick: handleZoomOut, ariaLabel: previewerImageTranslations["zoom-out"], disabled: zoomLevel <= 0.1, variant: "outline" as const, size: "icon" as const },
+      { id: "reset-zoom", label: previewerImageTranslations["zoom-level"].replace("{{percentage}}", Math.round(zoomLevel * 100).toString()), onClick: handleResetZoom, ariaLabel: previewerImageTranslations["reset-zoom"], variant: "outline" as const, size: "sm" as const },
+      { id: "zoom-in", icon: Plus, onClick: handleZoomIn, ariaLabel: previewerImageTranslations["zoom-in"], disabled: zoomLevel >= 5, variant: "outline" as const, size: "icon" as const },
+      { id: "close", icon: X, onClick: closePreviewer, ariaLabel: previewerImageTranslations["close-preview"], variant: "ghost" as const, size: "icon" as const },
     ],
-    [
-      previewerImageTranslations,
-      zoomLevel,
-      toggleCropMode,
-      handleZoomOut,
-      handleResetZoom,
-      handleZoomIn,
-      closePreviewer,
-    ]
+    [previewerImageTranslations, zoomLevel, toggleCropMode, handleZoomOut, handleResetZoom, handleZoomIn, closePreviewer]
   );
 
   const cropButtons = useMemo(
     () => [
-      {
-        id: "cancel",
-        label: cropImageTranslations.cancel || "Cancel",
-        onClick: handleCancelCrop,
-        ariaLabel: cropImageTranslations.cancel || "Cancel",
-        variant: "outline" as const,
-      },
-      {
-        id: "save",
-        label: cropImageTranslations.save || "Save",
-        onClick: handleSaveCrop,
-        ariaLabel: cropImageTranslations.save || "Save",
-        variant: "default" as const,
-      },
+      { id: "cancel", label: cropImageTranslations.cancel || "Cancel", onClick: handleCancelCrop, ariaLabel: cropImageTranslations.cancel || "Cancel", variant: "outline" as const },
+      { id: "save", label: cropImageTranslations.save || "Save", onClick: handleSaveCrop, ariaLabel: cropImageTranslations.save || "Save", variant: "default" as const },
     ],
     [cropImageTranslations, handleCancelCrop, handleSaveCrop]
   );
 
-  if (!isPreviewerOpen || !previewImage) {
-    return null;
-  }
+  if (!isPreviewerOpen || !previewImage) return null;
 
   return (
     <>
@@ -390,10 +308,7 @@ const PreviewerImage = memo(() => {
         aria-label={previewerImageTranslations["modal-label"]}
         tabIndex={-1}
       >
-        <div
-          ref={previewRef}
-          className="w-[30%] h-full bg-background border-l shadow-lg flex flex-col"
-        >
+        <div ref={previewRef} className="w-[30%] h-full bg-background border-l shadow-lg flex flex-col">
           <div className="p-4 border-b flex justify-between items-center">
             {isCropping ? (
               <>
@@ -402,13 +317,7 @@ const PreviewerImage = memo(() => {
                 </h2>
                 <div className="flex gap-2 items-center">
                   {cropButtons.map((button) => (
-                    <Button
-                      key={button.id}
-                      className="cursor-pointer"
-                      variant={button.variant}
-                      onClick={button.onClick}
-                      aria-label={button.ariaLabel}
-                    >
+                    <Button key={button.id} className="cursor-pointer" variant={button.variant} onClick={button.onClick} aria-label={button.ariaLabel}>
                       {button.label}
                     </Button>
                   ))}
@@ -423,15 +332,7 @@ const PreviewerImage = memo(() => {
                   {previewButtons.map((button) => {
                     const Icon = button.icon;
                     return (
-                      <Button
-                        key={button.id}
-                        className="cursor-pointer"
-                        variant={button.variant}
-                        size={button.size}
-                        onClick={button.onClick}
-                        aria-label={button.ariaLabel}
-                        disabled={button.disabled}
-                      >
+                      <Button key={button.id} className="cursor-pointer" variant={button.variant} size={button.size} onClick={button.onClick} aria-label={button.ariaLabel} disabled={button.disabled}>
                         {Icon ? <Icon className="h-4 w-4" /> : button.label}
                       </Button>
                     );
@@ -449,9 +350,7 @@ const PreviewerImage = memo(() => {
             onMouseUp={handleMouseUp}
             onMouseLeave={handleMouseUp}
             onWheel={handleWheel}
-            onKeyDown={(e) => {
-              if (e.key === "Escape") closePreviewer();
-            }}
+            onKeyDown={(e) => e.key === "Escape" && closePreviewer()}
             tabIndex={0}
             aria-label={previewerImageTranslations["preview-container"]}
           >
@@ -476,11 +375,13 @@ const PreviewerImage = memo(() => {
                     minWidth={20}
                     minHeight={20}
                   >
+                    {/* Adicionado crossOrigin para evitar taint quando possível */}
                     {/* biome-ignore lint/performance/noImgElement: ReactCrop requires img element */}
                     <img
                       src={previewImage.src}
                       alt={previewImage.fileName}
                       onLoad={onImageLoad}
+                      crossOrigin="anonymous"
                       className="rounded-lg"
                       draggable={false}
                       style={{
@@ -519,7 +420,7 @@ const PreviewerImage = memo(() => {
           </Button>
         </div>
       </div>
-      {/* Add Toast component */}
+
       <Toast
         title={toastTitle}
         description={toastDescription}
@@ -531,7 +432,6 @@ const PreviewerImage = memo(() => {
   );
 });
 
-// Add display name for debugging
 PreviewerImage.displayName = "PreviewerImage";
 
 export { PreviewerImage };
