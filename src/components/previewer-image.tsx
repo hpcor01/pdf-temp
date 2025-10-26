@@ -342,7 +342,7 @@ const PreviewerImage = memo(() => {
       } catch (error) {
         console.error("Error cropping image:", error);
         
-        // Fallback: mantém a imagem original se o crop falhar
+        /* Fallback: mantém a imagem original se o crop falhar
         
        const title =
           Object.prototype.hasOwnProperty.call(cropImageTranslations, "error-title") &&
@@ -356,10 +356,10 @@ const PreviewerImage = memo(() => {
             ? (cropImageTranslations as Record<string, string>)["error-description"]
             : "Failed to crop the image. Using original image instead.";
 
-        showToast("destructive", title, description);
+        showToast("destructive", title, description); */
 
         
-        setIsCropping(false);
+        setIsCropping(false); 
       }
     }
   }, [crop, previewImage, previewImageColumnId, updatePreviewImage, updateImage, showToast, cropImageTranslations]);
