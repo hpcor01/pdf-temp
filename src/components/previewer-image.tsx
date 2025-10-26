@@ -342,22 +342,12 @@ const PreviewerImage = memo(() => {
       } catch (error) {
         console.error("Error cropping image:", error);
         
-        /* Fallback: mantém a imagem original se o crop falhar
-        
-       const title =
-          Object.prototype.hasOwnProperty.call(cropImageTranslations, "error-title") &&
-          typeof (cropImageTranslations as Record<string, string>)["error-title"] === "string"
-            ? (cropImageTranslations as Record<string, string>)["error-title"]
-            : "Crop Error";
-
-        const description =
-          Object.prototype.hasOwnProperty.call(cropImageTranslations, "error-description") &&
-          typeof (cropImageTranslations as Record<string, string>)["error-description"] === "string"
-            ? (cropImageTranslations as Record<string, string>)["error-description"]
-            : "Failed to crop the image. Using original image instead.";
-
-        showToast("destructive", title, description); */
-
+        showToast(
+          "destructive",
+          cropImageTranslations["error-title"] || "Cropping failed",
+          cropImageTranslations["error-description"] ||
+            "Unable to crop the image due to CORS restrictions."
+        );
         
         setIsCropping(false); 
       }
