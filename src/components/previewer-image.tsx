@@ -108,7 +108,7 @@ async function getCroppedImg(
       const ctx = canvas.getContext("2d");
       if (!ctx) return reject(new Error("Could not get canvas context"));
 
-      const img = new Image();
+      const img = new (window.Image as { new (): HTMLImageElement })();
       if (imageSrc.startsWith("http") && !imageUrl.startsWith("blob:")) {
         img.crossOrigin = "anonymous";
       }
@@ -343,12 +343,27 @@ const PreviewerImage = memo(() => {
         console.error("Error cropping image:", error);
         
         // Fallback: mantém a imagem original se o crop falhar
-        showToast(
-          "destructive",
-          cropImageTranslations["error-title"] || "Crop Error",
-          cropImageTranslations["error-description"] ||
-            "Failed to crop the image. Using original image instead."
-        );
+        const title =
+          "error-title" in cropImageTranslations
+            ? cropImageTranslations["error-title"]
+            : "Crop Error";
+        
+        const description =
+          "error-description" in cropImageTranslations
+            ? cropImageTranslations["error-description"]
+            : "Failed to crop the image. Using original image instead.";
+        
+        const title =
+          "error-title" in cropImageTranslations
+            ? cropImageTranslations["error-title"]
+            : "Crop Error";
+        
+        const description =
+          "error-description" in cropImageTranslations
+            ? cropImageTranslations["error-description"]
+            : "Failed to crop the image. Using original image instead.";
+        
+        showToast("destructive", title, description);
         
         setIsCropping(false);
       }
