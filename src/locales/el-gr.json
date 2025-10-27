@@ -116,7 +116,9 @@
     "cancel": "Ακύρωση",
     "save": "Αποθήκευση",
     "success-title": "Η εικόνα περικόπησε",
-    "success-description": "Η εικόνα περικόπησε με επιτυχία."
+    "success-description": "Η εικόνα περικόπησε με επιτυχία.",
+    "error-title": "Αποτυχία περικοπής",
+    "error-description": "Δεν ήταν δυνατή η περικοπή της εικόνας λόγω περιορισμών CORS."
   },
   "btn-create-column": {
     "create-column": "Δημιουργία νέας στήλης"
