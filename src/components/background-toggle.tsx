@@ -22,10 +22,10 @@ export function BackgroundToggle({
     <div className="flex items-center gap-2">
       <Checkbox
         id={removeBgId}
-        checked={isRemoveBgChecked}
+        checked={false}
         onCheckedChange={handleRemoveBgChange}
         className="cursor-pointer"
-        disabled={isProcessing}
+        disabled={true}
       >
         <Label htmlFor={removeBgId} className="cursor-pointer py-2">
           {buttons["button-remove-background"]}

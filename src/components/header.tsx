@@ -38,7 +38,7 @@ export function Header({
   const saveLocationTranslations = useLanguageKey("save-location-toggle");
 
   const [isConvertToPDFChecked, setIsConvertToPDFChecked] = useState(true);
-  const [isRemoveBgChecked, setIsRemoveBgChecked] = useState(true);
+  const [isRemoveBgChecked, setIsRemoveBgChecked] = useState(false);
   const [isSingleSaveLocation, setIsSingleSaveLocation] = useState(false);
   const [saveFolderPath, setSaveFolderPath] = useState("");
   const [toastOpen, setToastOpen] = useState(false);
