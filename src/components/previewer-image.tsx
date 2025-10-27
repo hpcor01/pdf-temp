@@ -114,8 +114,18 @@ async function getCroppedImg(
       }
 
       img.onload = () => {
-        const scaleX = img.naturalWidth / img.width;
-        const scaleY = img.naturalHeight / img.height;
+        const containerWidth = img.clientWidth;
+        const containerHeight = img.clientHeight;
+        const scale = Math.min(containerWidth / img.naturalWidth, containerHeight / img.naturalHeight);
+        const displayedWidth = img.naturalWidth * scale;
+        const displayedHeight = img.naturalHeight * scale;
+        const offsetX = (containerWidth - displayedWidth) / 2;
+        const offsetY = (containerHeight - displayedHeight) / 2;
+
+        const sourceX = (crop.x - offsetX) * (img.naturalWidth / displayedWidth);
+        const sourceY = (crop.y - offsetY) * (img.naturalHeight / displayedHeight);
+        const sourceWidth = crop.width * (img.naturalWidth / displayedWidth);
+        const sourceHeight = crop.height * (img.naturalHeight / displayedHeight);
 
         canvas.width = crop.width;
         canvas.height = crop.height;
@@ -126,10 +136,10 @@ async function getCroppedImg(
 
         ctx.drawImage(
           img,
-          crop.x * scaleX,
-          crop.y * scaleY,
-          crop.width * scaleX,
-          crop.height * scaleY,
+          sourceX,
+          sourceY,
+          sourceWidth,
+          sourceHeight,
           0,
           0,
           crop.width,
