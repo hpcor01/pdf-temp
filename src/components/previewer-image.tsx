@@ -322,25 +322,25 @@ const PreviewerImage = memo(() => {
   const toggleCropMode = useCallback(() => {
     setIsCropping(!isCropping);
     if (!isCropping) {
-      // Set initial crop area to center quarter of the image
+      // Set initial crop area to cover most of the image (80%)
       const img = imgRef.current;
       if (img) {
         const { width, height } = img;
         setCrop({
           unit: "px",
-          x: width * 0.25,
-          y: height * 0.25,
-          width: width * 0.5,
-          height: height * 0.5,
+          x: width * 0.1,
+          y: height * 0.1,
+          width: width * 0.8,
+          height: height * 0.8,
         } as PixelCrop);
       } else {
         // Fallback if image not loaded yet
         setCrop({
           unit: "px",
-          x: 50,
-          y: 50,
-          width: 100,
-          height: 100,
+          x: 20,
+          y: 20,
+          width: 200,
+          height: 200,
         } as PixelCrop);
       }
     }
