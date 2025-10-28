@@ -470,7 +470,7 @@ const PreviewerImage = memo(() => {
   return (
     <>
       <div
-        className="fixed inset-0 z-50 flex justify-end"
+        className="fixed inset-0 z-80 flex justify-end"
         onClick={handleOverlayClick}
         role="dialog"
         aria-modal="true"
