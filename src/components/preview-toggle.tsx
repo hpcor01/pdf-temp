@@ -22,10 +22,10 @@ export function PreviewToggle({ isProcessing }: PreviewToggleProps) {
     <div className="flex items-center gap-2">
       <Switch
         id={togglePreviewerImage}
-        checked={isPreviewerImageChecked}
+        checked={false}
         onCheckedChange={handlePreviewerImageChange}
         className="cursor-pointer"
-        disabled={isProcessing}
+        disabled={true}
       />
       <Label htmlFor={togglePreviewerImage} className="cursor-pointer py-2">
         {isPreviewerImageChecked
