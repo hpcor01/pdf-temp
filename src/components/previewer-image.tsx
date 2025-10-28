@@ -557,8 +557,6 @@ const PreviewerImage = memo(() => {
                     onChange={(c) => setCrop(c as PixelCrop)}
                     className="w-full h-full"
                     ruleOfThirds
-                    minWidth={20}
-                    minHeight={20}
                   >
                     <img
                       src={previewImage.src}
