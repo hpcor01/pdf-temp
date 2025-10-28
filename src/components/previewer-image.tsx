@@ -336,14 +336,16 @@ const PreviewerImage = memo(() => {
     const { naturalWidth, naturalHeight, width, height } = e.currentTarget;
     imgRef.current = e.currentTarget;
     setImageScale({ x: naturalWidth / width, y: naturalHeight / height });
-    setCrop({
-      unit: "px",
-      x: 0,
-      y: 0,
-      width: width,
-      height: height,
-    } as PixelCrop);
-  }, []);
+    if (!isCropping) {
+      setCrop({
+        unit: "px",
+        x: 0,
+        y: 0,
+        width: width,
+        height: height,
+      } as PixelCrop);
+    }
+  }, [isCropping]);
 
   const handleSaveCrop = useCallback(async () => {
     if (crop.width && crop.height && previewImage) {
