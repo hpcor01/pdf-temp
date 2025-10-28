@@ -48,7 +48,8 @@ const handleOracleStorageImage = async (imageSrc: string): Promise<string> => {
 async function getCroppedImg(
   imageSrc: string,
   crop: { x: number; y: number; width: number; height: number; unit: "px" | "%" },
-  imageScale: { x: number; y: number }
+  imageScale: { x: number; y: number },
+  rotation: number = 0
 ): Promise<string> {
   return new Promise(async (resolve, reject) => {
     try {
@@ -132,17 +133,36 @@ async function getCroppedImg(
         ctx.imageSmoothingEnabled = true;
         ctx.imageSmoothingQuality = 'high';
 
-        ctx.drawImage(
-          img,
-          sourceX,
-          sourceY,
-          sourceWidth,
-          sourceHeight,
-          0,
-          0,
-          crop.width,
-          crop.height
-        );
+        // Apply rotation if needed
+        if (rotation !== 0) {
+          ctx.save();
+          ctx.translate(canvas.width / 2, canvas.height / 2);
+          ctx.rotate((rotation * Math.PI) / 180);
+          ctx.drawImage(
+            img,
+            sourceX,
+            sourceY,
+            sourceWidth,
+            sourceHeight,
+            -crop.width / 2,
+            -crop.height / 2,
+            crop.width,
+            crop.height
+          );
+          ctx.restore();
+        } else {
+          ctx.drawImage(
+            img,
+            sourceX,
+            sourceY,
+            sourceWidth,
+            sourceHeight,
+            0,
+            0,
+            crop.width,
+            crop.height
+          );
+        }
 
         try {
           // Tenta diferentes formatos
@@ -336,7 +356,7 @@ const PreviewerImage = memo(() => {
           unit: "px",
         };
 
-        const croppedImage = await getCroppedImg(previewImage.src, pixelCrop, imageScale);
+        const croppedImage = await getCroppedImg(previewImage.src, pixelCrop, imageScale, previewImage.rotation);
         const updatedImage = { ...previewImage, src: croppedImage };
 
         updatePreviewImage(updatedImage);
@@ -547,7 +567,6 @@ const PreviewerImage = memo(() => {
                       className="rounded-lg"
                       draggable={false}
                       style={{
-                        transform: `rotate(${previewImage.rotation}deg)`,
                         width: "auto",
                         height: "auto",
                         maxWidth: "100%",
