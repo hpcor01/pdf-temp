@@ -250,7 +250,7 @@ const PreviewerImage = memo(() => {
   // Reset ao abrir uma nova imagem
   useEffect(() => {
     if (isPreviewerOpen && previewImage) {
-      setZoomLevel(0.25);
+      setZoomLevel(0.7);
       setPosition({ x: 0, y: 0 });
     }
   }, [previewImage, isPreviewerOpen]);
@@ -324,10 +324,10 @@ const PreviewerImage = memo(() => {
     if (!isCropping) {
       setCrop({
         unit: "px",
-        x: 10,
-        y: 10,
-        width: 80,
-        height: 80,
+        x: 0,
+        y: 0,
+        width: 0,
+        height: 0,
       } as PixelCrop);
     }
   }, [isCropping]);
