@@ -569,11 +569,13 @@ const PreviewerImage = memo(() => {
               {isCropping ? (
                 <div className="w-full h-full flex items-center justify-center relative">
                   <ReactCrop
-                    crop={crop}
+                    rop={crop}
                     onChange={(c) => setCrop(c as PixelCrop)}
-                    className="w-full h-full"{isCropping ? (
+                    className="w-full h-full"
                     ruleOfThirds
-                    restrictPosition={false}
+                    restrictPosition={false} 
+                    minWidth={20}
+                    minHeight={20}
                   >
                     <img
                       src={previewImage.src}
