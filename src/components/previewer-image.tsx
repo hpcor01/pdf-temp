@@ -250,7 +250,7 @@ const PreviewerImage = memo(() => {
   // Reset ao abrir uma nova imagem
   useEffect(() => {
     if (isPreviewerOpen && previewImage) {
-      setZoomLevel(1);
+      setZoomLevel(0.25);
       setPosition({ x: 0, y: 0 });
     }
   }, [previewImage, isPreviewerOpen]);
