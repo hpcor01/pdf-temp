@@ -47,7 +47,8 @@ const handleOracleStorageImage = async (imageSrc: string): Promise<string> => {
 // Função que tenta buscar a imagem de forma segura (CORS + proxy fallback)
 async function getCroppedImg(
   imageSrc: string,
-  crop: { x: number; y: number; width: number; height: number; unit: "px" | "%" }
+  crop: { x: number; y: number; width: number; height: number; unit: "px" | "%" },
+  imageScale: { x: number; y: number }
 ): Promise<string> {
   return new Promise(async (resolve, reject) => {
     try {
@@ -114,11 +115,9 @@ async function getCroppedImg(
       }
 
       img.onload = () => {
-        // Calculate scale factor between displayed image and natural image
-        const displayedWidth = img.width;
-        const displayedHeight = img.height;
-        const scaleX = img.naturalWidth / displayedWidth;
-        const scaleY = img.naturalHeight / displayedHeight;
+        // Use the stored scale from the displayed image
+        const scaleX = imageScale.x;
+        const scaleY = imageScale.y;
 
         // Convert crop coordinates from displayed image to natural image
         const sourceX = crop.x * scaleX;
@@ -206,6 +205,7 @@ const PreviewerImage = memo(() => {
     width: 0,
     height: 0,
   });
+  const [imageScale, setImageScale] = useState({ x: 1, y: 1 });
 
   // Estado para Toast
   const [toastOpen, setToastOpen] = useState(false);
@@ -313,14 +313,15 @@ const PreviewerImage = memo(() => {
   }, [isCropping]);
 
   const onImageLoad = useCallback((e: React.SyntheticEvent<HTMLImageElement>) => {
-    const { naturalWidth, naturalHeight } = e.currentTarget;
+    const { naturalWidth, naturalHeight, width, height } = e.currentTarget;
     imgRef.current = e.currentTarget;
+    setImageScale({ x: naturalWidth / width, y: naturalHeight / height });
     setCrop({
       unit: "px",
       x: 0,
       y: 0,
-      width: naturalWidth,
-      height: naturalHeight,
+      width: width,
+      height: height,
     } as PixelCrop);
   }, []);
 
@@ -335,7 +336,7 @@ const PreviewerImage = memo(() => {
           unit: "px",
         };
 
-        const croppedImage = await getCroppedImg(previewImage.src, pixelCrop);
+        const croppedImage = await getCroppedImg(previewImage.src, pixelCrop, imageScale);
         const updatedImage = { ...previewImage, src: croppedImage };
 
         updatePreviewImage(updatedImage);
