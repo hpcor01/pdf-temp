@@ -573,7 +573,7 @@ const PreviewerImage = memo(() => {
                     onChange={(c) => setCrop(c as PixelCrop)}
                     className="w-full h-full"
                     ruleOfThirds
-                    restrictPosition={false} // ESTA LINHA É A SOLUÇÃO
+                    restrictPosition={false} 
                     minWidth={20}
                     minHeight={20}
                   >
@@ -582,7 +582,7 @@ const PreviewerImage = memo(() => {
                       alt={previewImage.fileName}
                       onLoad={onImageLoad}
                       className="rounded-lg"
-                      draggable={false}
+                      draggable={true}
                       style={{
                         width: "auto",
                         height: "auto",
