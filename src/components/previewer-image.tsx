@@ -476,7 +476,7 @@ const PreviewerImage = memo(() => {
       >
         <div
           ref={previewRef}
-          className="w-[50%] h-full bg-background border-l shadow-lg flex flex-col"
+          className="fixed inset-0 z-90 bg-background flex flex-col items-center justify-center"
         >
           <div className="p-4 border-b flex justify-between items-center">
             {isCropping ? (
