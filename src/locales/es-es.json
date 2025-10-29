@@ -116,7 +116,9 @@
     "cancel": "Cancelar",
     "save": "Guardar",
     "success-title": "Imagen recortada",
-    "success-description": "La imagen se recortó con éxito."
+    "success-description": "La imagen se recortó con éxito.",
+    "error-title": "Recorte fallido",
+    "error-description": "No se pudo recortar la imagen debido a restricciones de CORS."
   },
   "btn-create-column": {
     "create-column": "Crear nueva columna"

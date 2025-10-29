@@ -116,7 +116,9 @@
     "cancel": "Cancel",
     "save": "Save",
     "success-title": "Image cropped",
-    "success-description": "The image was successfully cropped."
+    "success-description": "The image was successfully cropped.",
+    "error-title": "Cropping failed",
+    "error-description": "Unable to crop the image due to CORS restrictions."
   },
   "btn-create-column": {
     "create-column": "Create new column"

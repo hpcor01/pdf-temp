@@ -117,6 +117,8 @@ export interface LanguageStructure {
     save: string;
     "success-title": string;
     "success-description": string;
+    "error-title": string;
+    "error-description": string;
   };
   "btn-create-column": {
     "create-column": string;

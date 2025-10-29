@@ -116,7 +116,9 @@
     "cancel": "ביטול",
     "save": "שמור",
     "success-title": "התמונה נחתכה",
-    "success-description": "התמונה נחתכה בהצלחה."
+    "success-description": "התמונה נחתכה בהצלחה.",
+    "error-title": "חיתוך נכשל",
+    "error-description": "לא ניתן לחתוך את התמונה בגלל מגבלות CORS."
   },
   "btn-create-column": {
     "create-column": "צור עמודה חדשה"
