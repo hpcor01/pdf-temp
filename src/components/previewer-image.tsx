@@ -17,7 +17,7 @@ const ReactCrop = dynamic(() => import("react-image-crop").then((mod) => mod.def
   ssr: false,
 });
 
-// ======== TRATAMENTO DE IMAGEM PARA RECORTE ========
+// ============= FUNÇÃO DE CORTE ============
 async function getCroppedImg(
   imageSrc: string,
   crop: { x: number; y: number; width: number; height: number; unit: "px" | "%" },
@@ -26,16 +26,12 @@ async function getCroppedImg(
 ): Promise<string> {
   return new Promise(async (resolve, reject) => {
     try {
-      let imageUrl = imageSrc;
-
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
       if (!ctx) return reject(new Error("Could not get canvas context"));
 
       const img = typeof window !== "undefined" ? new window.Image() : ({} as HTMLImageElement);
-      if (imageSrc.startsWith("http") && !imageUrl.startsWith("blob:")) {
-        img.crossOrigin = "anonymous";
-      }
+      img.crossOrigin = "anonymous";
 
       img.onload = () => {
         const scaleX = imageScale.x;
@@ -69,14 +65,14 @@ async function getCroppedImg(
       };
 
       img.onerror = () => reject(new Error("Failed to load image for cropping."));
-      img.src = imageUrl;
-    } catch (error) {
+      img.src = imageSrc;
+    } catch {
       reject(new Error("Failed to process image for cropping."));
     }
   });
 }
 
-// ======== COMPONENTE PRINCIPAL ========
+// ============= COMPONENTE PRINCIPAL ============
 const PreviewerImage = memo(() => {
   const {
     previewImage,
@@ -102,6 +98,7 @@ const PreviewerImage = memo(() => {
   const [toastDescription, setToastDescription] = useState("");
 
   const imgRef = useRef<HTMLImageElement>(null);
+  const cropContainerRef = useRef<HTMLDivElement>(null);
 
   const { showToast } = useToast({
     setToastVariant,
@@ -113,7 +110,7 @@ const PreviewerImage = memo(() => {
   const previewerImageTranslations = useLanguageKey("previewer-image");
   const cropImageTranslations = useLanguageKey("crop-image");
 
-  // Resetar zoom quando abrir
+  // Reset zoom quando abrir preview
   useEffect(() => {
     if (isPreviewerOpen && previewImage) {
       setZoomLevel(0.7);
@@ -121,7 +118,7 @@ const PreviewerImage = memo(() => {
     }
   }, [previewImage, isPreviewerOpen]);
 
-  // Resetar zoom e posição ao entrar no modo crop
+  // Entrar/sair do modo crop
   const toggleCropMode = useCallback(() => {
     if (!isCropping) {
       setZoomLevel(1);
@@ -143,7 +140,7 @@ const PreviewerImage = memo(() => {
     }
   }, [isCropping]);
 
-  // Corrigir cálculo de escala real
+  // Cálculo da escala real
   const onImageLoad = useCallback(
     (e: React.SyntheticEvent<HTMLImageElement>) => {
       const img = e.currentTarget;
@@ -167,6 +164,14 @@ const PreviewerImage = memo(() => {
     [isCropping]
   );
 
+  // Zoom dentro do modo crop
+  const handleCropZoom = (e: React.WheelEvent) => {
+    e.preventDefault();
+    const delta = e.deltaY > 0 ? -0.1 : 0.1;
+    setZoomLevel((prev) => Math.max(0.2, Math.min(prev + delta, 5)));
+  };
+
+  // Salvar recorte
   const handleSaveCrop = useCallback(async () => {
     if (crop.width && crop.height && previewImage) {
       try {
@@ -189,8 +194,7 @@ const PreviewerImage = memo(() => {
   return (
     <>
       <div className="fixed inset-0 z-80 flex justify-end">
-        {/* Painel lateral */}
-        <div className="w-[40%] h-full bg-background border-l shadow-lg flex flex-col">
+        <div className="w-[45%] h-full bg-background border-l shadow-lg flex flex-col">
           <div className="p-4 border-b flex justify-between items-center">
             <h2 className="text-lg font-semibold uppercase">
               {isCropping ? "CORTAR IMAGEM" : "VISUALIZAR IMAGEM"}
@@ -220,29 +224,41 @@ const PreviewerImage = memo(() => {
 
           {/* Conteúdo principal */}
           {isCropping ? (
-            <div className="flex-grow flex items-center justify-center overflow-auto p-4 bg-black/10">
-              <ReactCrop
-                crop={crop}
-                onChange={(c) => setCrop(c as PixelCrop)}
-                ruleOfThirds
-                className="max-w-full max-h-full"
+            <div
+              ref={cropContainerRef}
+              className="flex-grow flex items-center justify-center overflow-auto p-4 bg-black/10 cursor-grab"
+              onWheel={handleCropZoom}
+            >
+              <div
+                style={{
+                  transform: `scale(${zoomLevel})`,
+                  transformOrigin: "center center",
+                  transition: "transform 0.1s ease-out",
+                }}
               >
-                <img
-                  src={previewImage.src}
-                  alt={previewImage.fileName}
-                  onLoad={onImageLoad}
-                  className="rounded-lg"
-                  draggable={true}
-                  style={{
-                    maxWidth: "100%",
-                    maxHeight: "100%",
-                    width: "auto",
-                    height: "auto",
-                    objectFit: "contain",
-                    display: "block",
-                  }}
-                />
-              </ReactCrop>
+                <ReactCrop
+                  crop={crop}
+                  onChange={(c) => setCrop(c as PixelCrop)}
+                  ruleOfThirds
+                  className="max-w-full max-h-full"
+                >
+                  <img
+                    src={previewImage.src}
+                    alt={previewImage.fileName}
+                    onLoad={onImageLoad}
+                    className="rounded-lg select-none"
+                    draggable={true}
+                    style={{
+                      maxWidth: "100%",
+                      maxHeight: "100%",
+                      width: "auto",
+                      height: "auto",
+                      objectFit: "contain",
+                      display: "block",
+                    }}
+                  />
+                </ReactCrop>
+              </div>
             </div>
           ) : (
             <div
