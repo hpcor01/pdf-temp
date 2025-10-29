@@ -1,19 +1,15 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback, memo } from "react";
-import { X, Scissors, RotateCcw, Crop } from "lucide-react";
+import React, { useState, useRef, useEffect, useCallback, memo } from "react";
+import { X, Scissors, Crop, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { usePreviewer } from "@/providers/previewer-provider";
 import { useKanban } from "@/providers/kanban-provider";
 import { Toast } from "@/components/ui/toast";
 
-/**
- * PreviewerImage integrado com ImageCropperWrapper (slider nativo)
- * - Substitui dependência de Slider por <input type="range">
- * - Mantém painel lateral e integração com updatePreviewImage/updateImage
- */
-
+// ==========================================
+// ======== COMPONENTE PRINCIPAL ============
+// ==========================================
 export const PreviewerImage = memo(() => {
   const {
     previewImage,
@@ -25,7 +21,6 @@ export const PreviewerImage = memo(() => {
   const { updateImage } = useKanban();
 
   const [isCropping, setIsCropping] = useState(false);
-  const [croppedImage, setCroppedImage] = useState<string | null>(null);
   const [toastOpen, setToastOpen] = useState(false);
   const [toastVariant, setToastVariant] = useState<"default" | "destructive">("default");
   const [toastTitle, setToastTitle] = useState("");
@@ -38,69 +33,58 @@ export const PreviewerImage = memo(() => {
     setToastOpen(true);
   };
 
-  const handleSaveCrop = useCallback(() => {
-    if (croppedImage && previewImage) {
-      const updatedImage = { ...previewImage, src: croppedImage };
-      updatePreviewImage(updatedImage);
-      if (previewImageColumnId) updateImage(previewImageColumnId, updatedImage);
-      setIsCropping(false);
-      showToast("default", "Imagem cortada", "O recorte foi salvo com sucesso.");
-    }
-  }, [croppedImage, previewImage, previewImageColumnId, updateImage, updatePreviewImage]);
+  const handleSaveCrop = useCallback(
+    (cropped: string) => {
+      if (previewImage) {
+        const updatedImage = { ...previewImage, src: cropped };
+        updatePreviewImage(updatedImage);
+        if (previewImageColumnId) updateImage(previewImageColumnId, updatedImage);
+        showToast("default", "Imagem cortada", "O recorte foi salvo com sucesso.");
+      }
+    },
+    [previewImage, previewImageColumnId, updateImage, updatePreviewImage]
+  );
 
   if (!isPreviewerOpen || !previewImage) return null;
 
   return (
     <>
+      {/* Painel lateral */}
       <div className="fixed inset-0 z-80 flex justify-end">
         <div className="w-[45%] h-full bg-background border-l shadow-lg flex flex-col">
-          {/* Header */}
           <div className="p-4 border-b flex justify-between items-center">
-            <h2 className="text-lg font-semibold uppercase">
-              {isCropping ? "CORTAR IMAGEM" : "VISUALIZAR IMAGEM"}
-            </h2>
+            <h2 className="text-lg font-semibold uppercase">Visualizar Imagem</h2>
             <div className="flex gap-2">
-              {isCropping ? (
-                <>
-                  <Button variant="outline" onClick={() => setIsCropping(false)}>
-                    Cancelar
-                  </Button>
-                  <Button variant="default" onClick={handleSaveCrop}>
-                    Salvar
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <Button variant="outline" size="icon" onClick={() => setIsCropping(true)}>
-                    <Scissors className="w-4 h-4" />
-                  </Button>
-                  <Button variant="ghost" size="icon" onClick={closePreviewer}>
-                    <X className="w-4 h-4" />
-                  </Button>
-                </>
-              )}
+              <Button variant="outline" size="icon" onClick={() => setIsCropping(true)}>
+                <Scissors className="w-4 h-4" />
+              </Button>
+              <Button variant="ghost" size="icon" onClick={closePreviewer}>
+                <X className="w-4 h-4" />
+              </Button>
             </div>
           </div>
 
-          {/* Conteúdo principal */}
-          <div className="flex-grow overflow-hidden bg-[#18181B]">
-            {!isCropping ? (
-              <div className="flex items-center justify-center h-full p-4">
-                <img
-                  src={previewImage.src}
-                  alt="Preview"
-                  className="max-w-full max-h-full object-contain rounded-lg"
-                />
-              </div>
-            ) : (
-              <ImageCropperWrapper
-                imageSrc={previewImage.src}
-                onCropFinish={(img) => setCroppedImage(img)}
-              />
-            )}
+          <div className="flex-grow flex items-center justify-center bg-[#18181B] p-4">
+            <img
+              src={previewImage.src}
+              alt="Preview"
+              className="max-w-full max-h-full object-contain rounded-lg"
+            />
           </div>
         </div>
       </div>
+
+      {/* Modal de recorte */}
+      {isCropping && (
+        <ImageCropModal
+          imageSrc={previewImage.src}
+          onClose={() => setIsCropping(false)}
+          onSave={(cropped) => {
+            handleSaveCrop(cropped);
+            setIsCropping(false);
+          }}
+        />
+      )}
 
       <Toast
         title={toastTitle}
@@ -115,11 +99,59 @@ export const PreviewerImage = memo(() => {
 
 PreviewerImage.displayName = "PreviewerImage";
 
-// ===========================================================
-// =============== COMPONENTE DE CROP ADAPTADO ===============
-// ===========================================================
+// ==========================================
+// ======== MODAL DE RECORTE ================
+// ==========================================
+function ImageCropModal({
+  imageSrc,
+  onClose,
+  onSave,
+}: {
+  imageSrc: string;
+  onClose: () => void;
+  onSave: (cropped: string) => void;
+}) {
+  const [croppedImage, setCroppedImage] = useState<string | null>(null);
 
-function ImageCropperWrapper({
+  return (
+    <div className="fixed inset-0 z-[9999] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+      <div className="bg-[#18181B] rounded-2xl shadow-2xl w-[90%] max-w-5xl max-h-[90%] flex flex-col overflow-hidden border border-gray-700">
+        {/* Cabeçalho */}
+        <div className="p-4 border-b border-gray-700 flex justify-between items-center">
+          <h2 className="text-lg text-white font-semibold">Recortar Imagem</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-white">
+            ✕
+          </button>
+        </div>
+
+        {/* Corpo */}
+        <div className="flex-1 overflow-auto p-4">
+          <ImageCropper imageSrc={imageSrc} onCropFinish={setCroppedImage} />
+        </div>
+
+        {/* Rodapé */}
+        <div className="p-4 border-t border-gray-700 flex justify-end gap-3">
+          <Button variant="outline" onClick={onClose}>
+            Cancelar
+          </Button>
+          <Button
+            disabled={!croppedImage}
+            onClick={() => {
+              if (croppedImage) onSave(croppedImage);
+            }}
+          >
+            Salvar recorte
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ==========================================
+// ======== IMAGE CROPPER ===================
+// ==========================================
+function ImageCropper({
   imageSrc,
   onCropFinish,
 }: {
@@ -127,10 +159,10 @@ function ImageCropperWrapper({
   onCropFinish: (img: string | null) => void;
 }) {
   const [image, setImage] = useState<HTMLImageElement | null>(null);
-  const [cropArea, setCropArea] = useState({ x: 60, y: 40, width: 300, height: 200 });
+  const [cropArea, setCropArea] = useState({ x: 150, y: 100, width: 400, height: 250 });
   const [zoom, setZoom] = useState(100);
-  const [croppedImage, setCroppedImage] = useState<string | null>(null);
-
+  const [dragging, setDragging] = useState(false);
+  const [startPos, setStartPos] = useState({ x: 0, y: 0 });
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -138,181 +170,123 @@ function ImageCropperWrapper({
   useEffect(() => {
     const img = new Image();
     img.crossOrigin = "anonymous";
-    img.onload = () => {
-      // ajusta crop inicial baseado nas dimensões naturais (manter dentro do container depois)
-      setImage(img);
-
-      // opcional: ajustar cropArea inicial dinamicamente com base no tamanho natural
-      const defaultW = Math.min(400, img.width * 0.6);
-      const defaultH = Math.min(300, img.height * 0.6);
-      setCropArea({
-        x: Math.max(20, (img.width - defaultW) / 2),
-        y: Math.max(20, (img.height - defaultH) / 2),
-        width: defaultW,
-        height: defaultH,
-      });
-    };
+    img.onload = () => setImage(img);
     img.src = imageSrc;
   }, [imageSrc]);
 
-  // Função principal de crop (usa zoom como escala)
+  // mover área
+  const handleMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setDragging(true);
+    setStartPos({ x: e.clientX, y: e.clientY });
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!dragging) return;
+    const dx = e.clientX - startPos.x;
+    const dy = e.clientY - startPos.y;
+    setCropArea((prev) => ({
+      ...prev,
+      x: prev.x + dx,
+      y: prev.y + dy,
+    }));
+    setStartPos({ x: e.clientX, y: e.clientY });
+  };
+
+  const handleMouseUp = () => setDragging(false);
+
+  // função de recorte
   const handleCrop = useCallback(() => {
     if (!image) return;
-
     const canvas = canvasRef.current!;
     const ctx = canvas.getContext("2d")!;
     const scale = zoom / 100;
 
-    // Consideramos que exibimos a imagem dentro do container com scale applied.
-    // Para traduzir cropArea (em pixels do container visual), dividimos pela escala.
-    const cropX = Math.round(cropArea.x / scale);
-    const cropY = Math.round(cropArea.y / scale);
-    const cropW = Math.round(cropArea.width / scale);
-    const cropH = Math.round(cropArea.height / scale);
+    const cropX = cropArea.x / scale;
+    const cropY = cropArea.y / scale;
+    const cropW = cropArea.width / scale;
+    const cropH = cropArea.height / scale;
 
-    // Limpa e define tamanho do canvas
     canvas.width = cropW;
     canvas.height = cropH;
 
-    // Desenha a parte correta da imagem original no canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(image, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
 
     const result = canvas.toDataURL("image/png");
-    setCroppedImage(result);
     onCropFinish(result);
   }, [image, cropArea, zoom, onCropFinish]);
 
-  // Handler simples de drag do retângulo (click+drag para mover)
-  const draggingRef = useRef<{ active: boolean; startX: number; startY: number; startArea?: typeof cropArea }>({
-    active: false,
-    startX: 0,
-    startY: 0,
-  });
-
-  const handleMouseDownArea = (e: React.MouseEvent) => {
-    e.preventDefault();
-    const startX = e.nativeEvent.offsetX;
-    const startY = e.nativeEvent.offsetY;
-    draggingRef.current = { active: true, startX, startY, startArea: { ...cropArea } };
-    document.addEventListener("mousemove", onDocMouseMove);
-    document.addEventListener("mouseup", onDocMouseUp);
-  };
-
-  const onDocMouseMove = (ev: MouseEvent) => {
-    if (!draggingRef.current.active || !containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    const clientX = ev.clientX - rect.left;
-    const clientY = ev.clientY - rect.top;
-    const dx = clientX - (draggingRef.current.startX || 0);
-    const dy = clientY - (draggingRef.current.startY || 0);
-    const startArea = draggingRef.current.startArea!;
-    setCropArea({
-      ...startArea,
-      x: Math.max(0, startArea.x + dx),
-      y: Math.max(0, startArea.y + dy),
-      width: startArea.width,
-      height: startArea.height,
-    });
-  };
-
-  const onDocMouseUp = () => {
-    draggingRef.current.active = false;
-    document.removeEventListener("mousemove", onDocMouseMove);
-    document.removeEventListener("mouseup", onDocMouseUp);
-  };
-
-  // Pequeno helper para adaptar cropArea quando zoom muda (conserva centro)
-  useEffect(() => {
-    // opcional: você pode ajustar aqui se quiser que o crop "escale" com a imagem
-    // Neste exemplo mantemos o cropArea em pixels da "visão" (portanto não alteramos automaticamente).
-  }, [zoom]);
-
   return (
-    <div className="flex flex-col h-full">
-      <div
-        ref={containerRef}
-        className="flex-grow relative flex items-center justify-center bg-[#18181B] overflow-hidden"
-        style={{ minHeight: 300 }}
-      >
-        {/* Imagem escalada */}
-        {image && (
-          <img
-            src={image.src}
-            alt="Crop"
-            className="object-contain"
-            style={{
-              transform: `scale(${zoom / 100})`,
-              transformOrigin: "top left",
-              // para que a imagem seja posicionada no canto superior-esquerdo do container visual,
-              // se preferir centralizar troque por posicionamento diferente.
-              display: "block",
-              maxWidth: "none",
-            }}
-          />
-        )}
-
-        {/* Overlay da área de crop */}
-        <div
-          className="absolute border-2 border-emerald-500 shadow-lg bg-transparent cursor-move"
+    <div
+      ref={containerRef}
+      className="relative w-full h-[70vh] bg-[#0f0f0f] flex items-center justify-center overflow-hidden select-none"
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={handleMouseUp}
+    >
+      {/* Imagem */}
+      {image && (
+        <img
+          src={image.src}
+          alt="Crop"
+          className="object-contain max-w-none"
           style={{
-            left: cropArea.x,
-            top: cropArea.y,
-            width: cropArea.width,
-            height: cropArea.height,
+            transform: `scale(${zoom / 100})`,
+            transformOrigin: "top left",
+            pointerEvents: "none",
           }}
-          onMouseDown={handleMouseDownArea}
         />
+      )}
 
-        {/* Máscara escura ao redor (opcional): */}
-        <div className="absolute inset-0 pointer-events-none">
-          <svg width="100%" height="100%">
-            <defs>
-              <mask id="maskCrop">
-                <rect x="0" y="0" width="100%" height="100%" fill="white" />
-                <rect
-                  x={cropArea.x}
-                  y={cropArea.y}
-                  width={cropArea.width}
-                  height={cropArea.height}
-                  fill="black"
-                />
-              </mask>
-            </defs>
-            <rect width="100%" height="100%" fill="black" opacity="0.5" mask="url(#maskCrop)" />
-          </svg>
-        </div>
+      {/* Overlay de recorte */}
+      <div
+        className="absolute border-2 border-emerald-500 shadow-lg bg-transparent cursor-move"
+        style={{
+          left: cropArea.x,
+          top: cropArea.y,
+          width: cropArea.width,
+          height: cropArea.height,
+        }}
+        onMouseDown={handleMouseDown}
+      />
+
+      {/* Máscara escura */}
+      <div className="absolute inset-0 pointer-events-none">
+        <svg width="100%" height="100%">
+          <defs>
+            <mask id="maskCrop">
+              <rect x="0" y="0" width="100%" height="100%" fill="white" />
+              <rect
+                x={cropArea.x}
+                y={cropArea.y}
+                width={cropArea.width}
+                height={cropArea.height}
+                fill="black"
+              />
+            </mask>
+          </defs>
+          <rect width="100%" height="100%" fill="black" opacity="0.6" mask="url(#maskCrop)" />
+        </svg>
       </div>
 
-      {/* Controles */}
-      <div className="p-4 border-t bg-[#27272A]">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-gray-300">Zoom</span>
-          <span className="text-white">{zoom}%</span>
-        </div>
-
-        {/* Slider nativo substituindo componente ausente */}
-        <div className="mb-4">
-          <input
-            type="range"
-            min={50}
-            max={200}
-            step={5}
-            value={zoom}
-            onChange={(e) => setZoom(Number(e.target.value))}
-            className="w-full"
-            aria-label="Zoom"
-          />
-        </div>
-
-        <div className="flex gap-2">
-          <Button onClick={handleCrop} className="flex-1 bg-emerald-600 text-white hover:bg-emerald-700">
-            <Crop className="w-4 h-4 mr-2" /> Recortar
-          </Button>
-          <Button onClick={() => setZoom(100)} variant="outline" className="flex-1">
-            <RotateCcw className="w-4 h-4 mr-2" /> Reset
-          </Button>
-        </div>
+      {/* Controles de zoom */}
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/70 rounded-full px-4 py-2 flex items-center gap-3">
+        <label className="text-white text-sm">Zoom: {zoom}%</label>
+        <input
+          type="range"
+          min={50}
+          max={200}
+          step={5}
+          value={zoom}
+          onChange={(e) => setZoom(Number(e.target.value))}
+          className="w-40"
+        />
+        <Button variant="outline" size="sm" onClick={() => setZoom(100)}>
+          <RotateCcw className="w-4 h-4 mr-1" /> Reset
+        </Button>
+        <Button size="sm" onClick={handleCrop}>
+          <Crop className="w-4 h-4 mr-1" /> Aplicar
+        </Button>
       </div>
 
       <canvas ref={canvasRef} className="hidden" />
