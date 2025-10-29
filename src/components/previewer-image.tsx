@@ -83,7 +83,7 @@ async function getCroppedImg(
       const ctx = canvas.getContext("2d");
       if (!ctx) return reject(new Error("Could not get canvas context"));
 
-      const img = new Image();
+      const img = typeof window !== "undefined" ? new window.Image() : ({} as HTMLImageElement);
       if (imageSrc.startsWith("http") && !imageUrl.startsWith("blob:")) img.crossOrigin = "anonymous";
 
       img.onload = () => {
