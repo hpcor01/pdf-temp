@@ -95,7 +95,7 @@ function CropModal({
     img.src = imageSrc;
   }, [imageSrc]);
 
-  // Eventos globais
+  // Reset handlers
   useEffect(() => {
     const handleUp = () => {
       setDraggingImage(false);
@@ -106,7 +106,6 @@ function CropModal({
     return () => window.removeEventListener("mouseup", handleUp);
   }, []);
 
-  // Mover ou redimensionar
   const handleMouseMove = (e: React.MouseEvent) => {
     const dx = e.clientX - startPos.x;
     const dy = e.clientY - startPos.y;
@@ -128,7 +127,6 @@ function CropModal({
 
     if (resizing) {
       let newSel = { ...startSelection };
-
       if (resizing.includes("e")) newSel.width = Math.max(50, startSelection.width + dx);
       if (resizing.includes("s")) newSel.height = Math.max(50, startSelection.height + dy);
       if (resizing.includes("w")) {
@@ -139,19 +137,17 @@ function CropModal({
         newSel.height = Math.max(50, startSelection.height - dy);
         newSel.y = startSelection.y + dy;
       }
-
       setSelection(newSel);
     }
   };
 
-  // Iniciar drag imagem
+  // Drag imagem
   const handleImageMouseDown = (e: React.MouseEvent) => {
     setDraggingImage(true);
     setStartPos({ x: e.clientX, y: e.clientY });
     setStartPosition(position);
   };
 
-  // Iniciar drag seleção
   const handleSelectionMouseDown = (e: React.MouseEvent) => {
     e.stopPropagation();
     setDraggingSelection(true);
@@ -159,7 +155,6 @@ function CropModal({
     setStartSelection(selection);
   };
 
-  // Iniciar resize
   const handleResizeMouseDown = (e: React.MouseEvent, dir: string) => {
     e.stopPropagation();
     setResizing(dir);
@@ -167,22 +162,32 @@ function CropModal({
     setStartSelection(selection);
   };
 
-  // Aplicar recorte
+  // Aplicar recorte (corrigido)
   const handleCrop = () => {
-    if (!image || !canvasRef.current) return;
+    if (!image || !canvasRef.current || !containerRef.current) return;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d")!;
-    const scale = zoom;
+
+    const container = containerRef.current.getBoundingClientRect();
+    const imgDisplayWidth = image.width * zoom;
+    const imgDisplayHeight = image.height * zoom;
+
+    const imgCenterX = container.width / 2 + position.x;
+    const imgCenterY = container.height / 2 + position.y;
+
+    const imgX = imgCenterX - imgDisplayWidth / 2;
+    const imgY = imgCenterY - imgDisplayHeight / 2;
+
+    const sx = (selection.x - imgX) / zoom;
+    const sy = (selection.y - imgY) / zoom;
+    const sw = selection.width / zoom;
+    const sh = selection.height / zoom;
 
     canvas.width = selection.width;
     canvas.height = selection.height;
 
-    const cropX = (selection.x - position.x) / scale;
-    const cropY = (selection.y - position.y) / scale;
-    const cropW = selection.width / scale;
-    const cropH = selection.height / scale;
+    ctx.drawImage(image, sx, sy, sw, sh, 0, 0, selection.width, selection.height);
 
-    ctx.drawImage(image, cropX, cropY, cropW, cropH, 0, 0, selection.width, selection.height);
     const result = canvas.toDataURL("image/png");
     onSave(result);
     onClose();
@@ -194,13 +199,8 @@ function CropModal({
         ref={containerRef}
         className="relative w-[95%] h-[90%] bg-[#18181B] overflow-hidden rounded-2xl border border-gray-700"
         onMouseMove={handleMouseMove}
-        onMouseUp={() => {
-          setDraggingImage(false);
-          setDraggingSelection(false);
-          setResizing(null);
-        }}
       >
-        {/* IMAGEM */}
+        {/* Imagem */}
         {image && (
           <img
             src={image.src}
@@ -214,7 +214,7 @@ function CropModal({
           />
         )}
 
-        {/* SELEÇÃO */}
+        {/* Seleção */}
         <div
           className="absolute border-2 border-emerald-500 bg-transparent cursor-move"
           style={{
@@ -225,7 +225,7 @@ function CropModal({
           }}
           onMouseDown={handleSelectionMouseDown}
         >
-          {/* Linhas de grade */}
+          {/* Grade */}
           <div className="absolute inset-0 grid grid-cols-3 grid-rows-3 pointer-events-none">
             {[...Array(9)].map((_, i) => (
               <div key={i} className="border border-emerald-500/30" />
@@ -255,7 +255,7 @@ function CropModal({
           ))}
         </div>
 
-        {/* MÁSCARA */}
+        {/* Máscara */}
         <div className="absolute inset-0 pointer-events-none">
           <svg width="100%" height="100%">
             <defs>
@@ -274,12 +274,12 @@ function CropModal({
           </svg>
         </div>
 
-        {/* CONTROLES */}
+        {/* Controles */}
         <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-4 bg-black/70 rounded-full px-6 py-3 items-center">
           <Button
             variant="outline"
             size="icon"
-            onClick={() => setZoom((z) => Math.max(0.5, z - 0.1))}
+            onClick={() => setZoom((z) => Math.max(0.2, z - 0.1))}
           >
             <ZoomOut className="w-4 h-4" />
           </Button>
