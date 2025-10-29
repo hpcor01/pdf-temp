@@ -1,79 +1,15 @@
 "use client";
 
-import { Minus, Plus, Scissors, X } from "lucide-react";
-import dynamic from "next/dynamic";
-import Image from "next/image";
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { PixelCrop } from "react-image-crop";
+import { useState, useRef, useEffect, useCallback, memo } from "react";
+import { X, Scissors, Download, RotateCcw, ZoomIn, Crop } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Toast } from "@/components/ui/toast";
-import { useLanguageKey } from "@/hooks/use-i18n";
-import { useToast } from "@/hooks/use-toast";
-import { useKanban } from "@/providers/kanban-provider";
+import { Card } from "@/components/ui/card";
+import { Slider } from "@/components/ui/slider";
 import { usePreviewer } from "@/providers/previewer-provider";
-import type { ToastVariant } from "@/types/toast";
+import { useKanban } from "@/providers/kanban-provider";
+import { Toast } from "@/components/ui/toast";
 
-const ReactCrop = dynamic(() => import("react-image-crop").then((mod) => mod.default), {
-  ssr: false,
-});
-
-// ============= FUNÇÃO DE CORTE ============
-async function getCroppedImg(
-  imageSrc: string,
-  crop: { x: number; y: number; width: number; height: number; unit: "px" | "%" },
-  imageScale: { x: number; y: number },
-  rotation: number = 0
-): Promise<string> {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("2d");
-      if (!ctx) return reject(new Error("Could not get canvas context"));
-
-      const img = typeof window !== "undefined" ? new window.Image() : ({} as HTMLImageElement);
-      img.crossOrigin = "anonymous";
-
-      img.onload = () => {
-        const scaleX = imageScale.x;
-        const scaleY = imageScale.y;
-
-        const sourceX = crop.x * scaleX;
-        const sourceY = crop.y * scaleY;
-        const sourceWidth = crop.width * scaleX;
-        const sourceHeight = crop.height * scaleY;
-
-        canvas.width = crop.width;
-        canvas.height = crop.height;
-
-        ctx.imageSmoothingEnabled = true;
-        ctx.imageSmoothingQuality = "high";
-
-        ctx.drawImage(
-          img,
-          sourceX,
-          sourceY,
-          sourceWidth,
-          sourceHeight,
-          0,
-          0,
-          crop.width,
-          crop.height
-        );
-
-        const result = canvas.toDataURL("image/jpeg", 0.95);
-        resolve(result);
-      };
-
-      img.onerror = () => reject(new Error("Failed to load image for cropping."));
-      img.src = imageSrc;
-    } catch {
-      reject(new Error("Failed to process image for cropping."));
-    }
-  });
-}
-
-// ============= COMPONENTE PRINCIPAL ============
-const PreviewerImage = memo(() => {
+export const PreviewerImage = memo(() => {
   const {
     previewImage,
     previewImageColumnId,
@@ -81,113 +17,31 @@ const PreviewerImage = memo(() => {
     closePreviewer,
     updatePreviewImage,
   } = usePreviewer();
-
   const { updateImage } = useKanban();
 
-  const [zoomLevel, setZoomLevel] = useState(1);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [isCropping, setIsCropping] = useState(false);
-  const [crop, setCrop] = useState<PixelCrop>({ unit: "px", x: 0, y: 0, width: 0, height: 0 });
-  const [imageScale, setImageScale] = useState({ x: 1, y: 1 });
-
+  const [croppedImage, setCroppedImage] = useState<string | null>(null);
   const [toastOpen, setToastOpen] = useState(false);
-  const [toastVariant, setToastVariant] = useState<ToastVariant>("default");
+  const [toastVariant, setToastVariant] = useState<"default" | "destructive">("default");
   const [toastTitle, setToastTitle] = useState("");
   const [toastDescription, setToastDescription] = useState("");
 
-  const imgRef = useRef<HTMLImageElement>(null);
-  const cropContainerRef = useRef<HTMLDivElement>(null);
-
-  const { showToast } = useToast({
-    setToastVariant,
-    setToastTitle,
-    setToastDescription,
-    setToastOpen,
-  });
-
-  const previewerImageTranslations = useLanguageKey("previewer-image");
-  const cropImageTranslations = useLanguageKey("crop-image");
-
-  // Reset zoom quando abrir preview
-  useEffect(() => {
-    if (isPreviewerOpen && previewImage) {
-      setZoomLevel(0.7);
-      setPosition({ x: 0, y: 0 });
-    }
-  }, [previewImage, isPreviewerOpen]);
-
-  // Entrar/sair do modo crop
-  const toggleCropMode = useCallback(() => {
-    if (!isCropping) {
-      setZoomLevel(1);
-      setPosition({ x: 0, y: 0 });
-    }
-    setIsCropping(!isCropping);
-
-    if (!isCropping) {
-      const img = imgRef.current;
-      if (img) {
-        setCrop({
-          unit: "px",
-          x: img.width * 0.1,
-          y: img.height * 0.1,
-          width: img.width * 0.8,
-          height: img.height * 0.8,
-        });
-      }
-    }
-  }, [isCropping]);
-
-  // Cálculo da escala real
-  const onImageLoad = useCallback(
-    (e: React.SyntheticEvent<HTMLImageElement>) => {
-      const img = e.currentTarget;
-      imgRef.current = img;
-
-      setImageScale({
-        x: img.naturalWidth / img.width,
-        y: img.naturalHeight / img.height,
-      });
-
-      if (!isCropping) {
-        setCrop({
-          unit: "px",
-          x: img.width * 0.1,
-          y: img.height * 0.1,
-          width: img.width * 0.8,
-          height: img.height * 0.8,
-        });
-      }
-    },
-    [isCropping]
-  );
-
-  // Zoom dentro do modo crop
-  const handleCropZoom = (e: React.WheelEvent) => {
-    e.preventDefault();
-    const delta = e.deltaY > 0 ? -0.1 : 0.1;
-    setZoomLevel((prev) => Math.max(0.2, Math.min(prev + delta, 5)));
+  const showToast = (variant: "default" | "destructive", title: string, desc: string) => {
+    setToastVariant(variant);
+    setToastTitle(title);
+    setToastDescription(desc);
+    setToastOpen(true);
   };
 
-  // Salvar recorte
-  const handleSaveCrop = useCallback(async () => {
-    if (crop.width && crop.height && previewImage) {
-      try {
-        const croppedImage = await getCroppedImg(previewImage.src, crop, imageScale, previewImage.rotation);
-        const updatedImage = { ...previewImage, src: croppedImage };
-        updatePreviewImage(updatedImage);
-        if (previewImageColumnId) updateImage(previewImageColumnId, updatedImage);
-        setIsCropping(false);
-
-        showToast("default", "Imagem cortada", "O recorte foi salvo com sucesso.");
-      } catch {
-        showToast("destructive", "Erro no recorte", "Não foi possível recortar a imagem.");
-        setIsCropping(false);
-      }
+  const handleSaveCrop = useCallback(() => {
+    if (croppedImage && previewImage) {
+      const updatedImage = { ...previewImage, src: croppedImage };
+      updatePreviewImage(updatedImage);
+      if (previewImageColumnId) updateImage(previewImageColumnId, updatedImage);
+      setIsCropping(false);
+      showToast("default", "Imagem cortada", "O recorte foi salvo com sucesso.");
     }
-  }, [crop, previewImage, previewImageColumnId, imageScale, updateImage, updatePreviewImage, showToast]);
+  }, [croppedImage, previewImage, previewImageColumnId, updateImage, updatePreviewImage]);
 
   if (!isPreviewerOpen || !previewImage) return null;
 
@@ -195,6 +49,7 @@ const PreviewerImage = memo(() => {
     <>
       <div className="fixed inset-0 z-80 flex justify-end">
         <div className="w-[45%] h-full bg-background border-l shadow-lg flex flex-col">
+          {/* Header */}
           <div className="p-4 border-b flex justify-between items-center">
             <h2 className="text-lg font-semibold uppercase">
               {isCropping ? "CORTAR IMAGEM" : "VISUALIZAR IMAGEM"}
@@ -211,7 +66,7 @@ const PreviewerImage = memo(() => {
                 </>
               ) : (
                 <>
-                  <Button variant="outline" size="icon" onClick={toggleCropMode}>
+                  <Button variant="outline" size="icon" onClick={() => setIsCropping(true)}>
                     <Scissors className="w-4 h-4" />
                   </Button>
                   <Button variant="ghost" size="icon" onClick={closePreviewer}>
@@ -221,69 +76,23 @@ const PreviewerImage = memo(() => {
               )}
             </div>
           </div>
-
           {/* Conteúdo principal */}
-          {isCropping ? (
-            <div
-              ref={cropContainerRef}
-              className="flex-grow flex items-center justify-center overflow-auto p-4 bg-black/10 cursor-grab"
-              onWheel={handleCropZoom}
-            >
-              <div
-                style={{
-                  transform: `scale(${zoomLevel})`,
-                  transformOrigin: "center center",
-                  transition: "transform 0.1s ease-out",
-                }}
-              >
-                <ReactCrop
-                  crop={crop}
-                  onChange={(c) => setCrop(c as PixelCrop)}
-                  ruleOfThirds
-                  className="max-w-full max-h-full"
-                >
-                  <img
-                    src={previewImage.src}
-                    alt={previewImage.fileName}
-                    onLoad={onImageLoad}
-                    className="rounded-lg select-none"
-                    draggable={true}
-                    style={{
-                      maxWidth: "100%",
-                      maxHeight: "100%",
-                      width: "auto",
-                      height: "auto",
-                      objectFit: "contain",
-                      display: "block",
-                    }}
-                  />
-                </ReactCrop>
+          <div className="flex-grow overflow-hidden bg-[#18181B]">
+            {!isCropping ? (
+              <div className="flex items-center justify-center h-full">
+                <img
+                  src={previewImage.src}
+                  alt="Preview"
+                  className="max-w-full max-h-full object-contain rounded-lg"
+                />
               </div>
-            </div>
-          ) : (
-            <div
-              className="flex-grow flex items-center justify-center overflow-hidden bg-transparent"
-              style={{
-                transform: `translate(${position.x}px, ${position.y}px) scale(${zoomLevel})`,
-                transformOrigin: "center center",
-                transition: "transform 0.2s",
-              }}
-            >
-              <Image
-                src={previewImage.src}
-                alt={previewImage.fileName}
-                width={0}
-                height={0}
-                style={{
-                  width: "auto",
-                  height: "auto",
-                  maxHeight: "100vh",
-                  objectFit: "contain",
-                }}
-                className="rounded-lg"
+            ) : (
+              <ImageCropperWrapper
+                imageSrc={previewImage.src}
+                onCropFinish={setCroppedImage}
               />
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
 
@@ -299,4 +108,89 @@ const PreviewerImage = memo(() => {
 });
 
 PreviewerImage.displayName = "PreviewerImage";
-export { PreviewerImage };
+
+// ===========================================================
+// =============== COMPONENTE DE CROP ADAPTADO ===============
+// ===========================================================
+
+function ImageCropperWrapper({ imageSrc, onCropFinish }: { imageSrc: string; onCropFinish: (img: string | null) => void }) {
+  const [image, setImage] = useState<HTMLImageElement | null>(null);
+  const [cropArea, setCropArea] = useState({ x: 50, y: 50, width: 200, height: 200 });
+  const [zoom, setZoom] = useState(100);
+  const [croppedImage, setCroppedImage] = useState<string | null>(null);
+
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => setImage(img);
+    img.src = imageSrc;
+  }, [imageSrc]);
+
+  const handleCrop = () => {
+    if (!image) return;
+
+    const canvas = canvasRef.current!;
+    const ctx = canvas.getContext("2d")!;
+    const scale = zoom / 100;
+
+    const displayWidth = image.width * scale;
+    const displayHeight = image.height * scale;
+    const cropX = cropArea.x / scale;
+    const cropY = cropArea.y / scale;
+    const cropW = cropArea.width / scale;
+    const cropH = cropArea.height / scale;
+
+    canvas.width = cropW;
+    canvas.height = cropH;
+    ctx.drawImage(image, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
+
+    const result = canvas.toDataURL("image/png");
+    setCroppedImage(result);
+    onCropFinish(result);
+  };
+
+  return (
+    <div className="flex flex-col h-full">
+      <div ref={containerRef} className="flex-grow relative flex items-center justify-center bg-[#18181B]">
+        {image && (
+          <img
+            src={image.src}
+            alt="Crop"
+            className="max-w-[80%] max-h-[80%] object-contain"
+            style={{ transform: `scale(${zoom / 100})` }}
+          />
+        )}
+        <div
+          className="absolute border-2 border-emerald-500 shadow-lg"
+          style={{
+            left: cropArea.x,
+            top: cropArea.y,
+            width: cropArea.width,
+            height: cropArea.height,
+          }}
+        />
+      </div>
+
+      <div className="p-4 border-t bg-[#27272A]">
+        <div className="flex items-center justify-between mb-4">
+          <span className="text-gray-300">Zoom</span>
+          <span className="text-white">{zoom}%</span>
+        </div>
+        <Slider value={[zoom]} onValueChange={(v) => setZoom(v[0])} min={50} max={200} step={5} />
+        <div className="mt-4 flex gap-2">
+          <Button onClick={handleCrop} className="flex-1 bg-emerald-600 text-white hover:bg-emerald-700">
+            <Crop className="w-4 h-4 mr-2" /> Recortar
+          </Button>
+          <Button onClick={() => setZoom(100)} variant="outline" className="flex-1">
+            <RotateCcw className="w-4 h-4 mr-2" /> Reset
+          </Button>
+        </div>
+      </div>
+
+      <canvas ref={canvasRef} className="hidden" />
+    </div>
+  );
+}
