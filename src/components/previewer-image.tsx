@@ -548,29 +548,28 @@ const PreviewerImage = memo(() => {
               }}
             >
               {isCropping ? (
-                <div className="w-full h-full flex items-center justify-center relative">
-                  <ReactCrop
-                    crop={crop}
-                    onChange={(c) => setCrop(c as PixelCrop)}
-                    className="flex items-center justify-center"
-                    ruleOfThirds
-                  >
-                    <img
-                      src={previewImage.src}
-                      alt={previewImage.fileName}
-                      onLoad={onImageLoad}
-                      className="rounded-lg"
-                      draggable={true}
-                      style={{
-                        maxWidth: "none",
-                        maxHeight: "none",
-                        width: "100%",
-                        height: "auto",
-                        objectFit: "contain",
-                      }}
-                    />
-                  </ReactCrop>
-                </div>
+                <div className="max-w-[90vw] max-h-[90vh] flex items-center justify-center overflow-auto">
+                    <ReactCrop
+                      crop={crop}
+                      onChange={(c) => setCrop(c as PixelCrop)}
+                      ruleOfThirds
+                      className="max-w-full max-h-full"
+                    >
+                      <img
+                        src={previewImage.src}
+                        alt={previewImage.fileName}
+                        onLoad={onImageLoad}
+                        className="rounded-lg"
+                        style={{
+                          width: "auto",
+                          height: "auto",
+                          maxWidth: "90vw",
+                          maxHeight: "90vh",
+                          objectFit: "contain",
+                        }}
+                      />
+                    </ReactCrop>
+                  </div>
               ) : (
                 <Image
                   src={previewImage.src}
