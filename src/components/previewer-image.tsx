@@ -17,27 +17,7 @@ const ReactCrop = dynamic(() => import("react-image-crop").then((mod) => mod.def
   ssr: false,
 });
 
-// Função específica para lidar com Oracle Cloud Storage
-const handleOracleStorageImage = async (imageSrc: string): Promise<string> => {
-  try {
-    const testResponse = await fetch(imageSrc, { mode: "cors", credentials: "omit" }).catch(() => null);
-    if (testResponse?.ok) {
-      const blob = await testResponse.blob();
-      return URL.createObjectURL(blob);
-    }
-
-    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(imageSrc)}`;
-    const proxyResponse = await fetch(proxyUrl);
-    if (!proxyResponse.ok) throw new Error("Proxy failed");
-
-    const blob = await proxyResponse.blob();
-    return URL.createObjectURL(blob);
-  } catch (error) {
-    throw new Error(`Oracle Storage image failed: ${error}`);
-  }
-};
-
-// Função para gerar imagem cortada
+// ======== TRATAMENTO DE IMAGEM PARA RECORTE ========
 async function getCroppedImg(
   imageSrc: string,
   crop: { x: number; y: number; width: number; height: number; unit: "px" | "%" },
@@ -48,43 +28,14 @@ async function getCroppedImg(
     try {
       let imageUrl = imageSrc;
 
-      const tryFetchImage = async (url: string, useProxy = false) => {
-        try {
-          const finalUrl = useProxy
-            ? `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`
-            : url;
-
-          const res = await fetch(finalUrl, {
-            mode: "cors",
-            credentials: "omit",
-            headers: useProxy ? {} : { Accept: "image/*", Origin: window.location.origin },
-          });
-
-          if (!res.ok) throw new Error(`HTTP ${res.status}`);
-          const blob = await res.blob();
-
-          if (!blob.type.startsWith("image/")) throw new Error("Invalid image type");
-
-          return URL.createObjectURL(blob);
-        } catch {
-          return null;
-        }
-      };
-
-      if (imageSrc.includes("oraclecloud.com")) {
-        imageUrl = await handleOracleStorageImage(imageSrc);
-      } else if (imageSrc.startsWith("http")) {
-        let blobUrl = await tryFetchImage(imageSrc, false);
-        if (!blobUrl) blobUrl = await tryFetchImage(imageSrc, true);
-        if (blobUrl) imageUrl = blobUrl;
-      }
-
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
       if (!ctx) return reject(new Error("Could not get canvas context"));
 
       const img = typeof window !== "undefined" ? new window.Image() : ({} as HTMLImageElement);
-      if (imageSrc.startsWith("http") && !imageUrl.startsWith("blob:")) img.crossOrigin = "anonymous";
+      if (imageSrc.startsWith("http") && !imageUrl.startsWith("blob:")) {
+        img.crossOrigin = "anonymous";
+      }
 
       img.onload = () => {
         const scaleX = imageScale.x;
@@ -101,52 +52,31 @@ async function getCroppedImg(
         ctx.imageSmoothingEnabled = true;
         ctx.imageSmoothingQuality = "high";
 
-        if (rotation !== 0) {
-          ctx.save();
-          ctx.translate(canvas.width / 2, canvas.height / 2);
-          ctx.rotate((rotation * Math.PI) / 180);
-          ctx.drawImage(
-            img,
-            sourceX,
-            sourceY,
-            sourceWidth,
-            sourceHeight,
-            -crop.width / 2,
-            -crop.height / 2,
-            crop.width,
-            crop.height
-          );
-          ctx.restore();
-        } else {
-          ctx.drawImage(
-            img,
-            sourceX,
-            sourceY,
-            sourceWidth,
-            sourceHeight,
-            0,
-            0,
-            crop.width,
-            crop.height
-          );
-        }
+        ctx.drawImage(
+          img,
+          sourceX,
+          sourceY,
+          sourceWidth,
+          sourceHeight,
+          0,
+          0,
+          crop.width,
+          crop.height
+        );
 
         const result = canvas.toDataURL("image/jpeg", 0.95);
-        if (imageUrl.startsWith("blob:")) URL.revokeObjectURL(imageUrl);
         resolve(result);
       };
 
-      img.onerror = () => {
-        if (imageUrl.startsWith("blob:")) URL.revokeObjectURL(imageUrl);
-        reject(new Error("Failed to load image for cropping."));
-      };
-
+      img.onerror = () => reject(new Error("Failed to load image for cropping."));
       img.src = imageUrl;
-    } catch {
+    } catch (error) {
       reject(new Error("Failed to process image for cropping."));
     }
   });
 }
+
+// ======== COMPONENTE PRINCIPAL ========
 const PreviewerImage = memo(() => {
   const {
     previewImage,
@@ -155,6 +85,7 @@ const PreviewerImage = memo(() => {
     closePreviewer,
     updatePreviewImage,
   } = usePreviewer();
+
   const { updateImage } = useKanban();
 
   const [zoomLevel, setZoomLevel] = useState(1);
@@ -172,9 +103,6 @@ const PreviewerImage = memo(() => {
 
   const imgRef = useRef<HTMLImageElement>(null);
 
-  const previewerImageTranslations = useLanguageKey("previewer-image");
-  const cropImageTranslations = useLanguageKey("crop-image");
-
   const { showToast } = useToast({
     setToastVariant,
     setToastTitle,
@@ -182,6 +110,10 @@ const PreviewerImage = memo(() => {
     setToastOpen,
   });
 
+  const previewerImageTranslations = useLanguageKey("previewer-image");
+  const cropImageTranslations = useLanguageKey("crop-image");
+
+  // Resetar zoom quando abrir
   useEffect(() => {
     if (isPreviewerOpen && previewImage) {
       setZoomLevel(0.7);
@@ -189,9 +121,9 @@ const PreviewerImage = memo(() => {
     }
   }, [previewImage, isPreviewerOpen]);
 
+  // Resetar zoom e posição ao entrar no modo crop
   const toggleCropMode = useCallback(() => {
     if (!isCropping) {
-      // Reseta zoom e posição ao entrar no modo de recorte
       setZoomLevel(1);
       setPosition({ x: 0, y: 0 });
     }
@@ -200,23 +132,40 @@ const PreviewerImage = memo(() => {
     if (!isCropping) {
       const img = imgRef.current;
       if (img) {
-        const { width, height } = img;
         setCrop({
           unit: "px",
-          x: width * 0.1,
-          y: height * 0.1,
-          width: width * 0.8,
-          height: height * 0.8,
+          x: img.width * 0.1,
+          y: img.height * 0.1,
+          width: img.width * 0.8,
+          height: img.height * 0.8,
         });
       }
     }
   }, [isCropping]);
 
-  const onImageLoad = useCallback((e: React.SyntheticEvent<HTMLImageElement>) => {
-    const { naturalWidth, naturalHeight, width, height } = e.currentTarget;
-    imgRef.current = e.currentTarget;
-    setImageScale({ x: naturalWidth / width, y: naturalHeight / height });
-  }, []);
+  // Corrigir cálculo de escala real
+  const onImageLoad = useCallback(
+    (e: React.SyntheticEvent<HTMLImageElement>) => {
+      const img = e.currentTarget;
+      imgRef.current = img;
+
+      setImageScale({
+        x: img.naturalWidth / img.width,
+        y: img.naturalHeight / img.height,
+      });
+
+      if (!isCropping) {
+        setCrop({
+          unit: "px",
+          x: img.width * 0.1,
+          y: img.height * 0.1,
+          width: img.width * 0.8,
+          height: img.height * 0.8,
+        });
+      }
+    },
+    [isCropping]
+  );
 
   const handleSaveCrop = useCallback(async () => {
     if (crop.width && crop.height && previewImage) {
@@ -240,16 +189,21 @@ const PreviewerImage = memo(() => {
   return (
     <>
       <div className="fixed inset-0 z-80 flex justify-end">
+        {/* Painel lateral */}
         <div className="w-[40%] h-full bg-background border-l shadow-lg flex flex-col">
           <div className="p-4 border-b flex justify-between items-center">
             <h2 className="text-lg font-semibold uppercase">
-              {isCropping ? "Cortar imagem" : "Visualizar imagem"}
+              {isCropping ? "CORTAR IMAGEM" : "VISUALIZAR IMAGEM"}
             </h2>
             <div className="flex gap-2">
               {isCropping ? (
                 <>
-                  <Button variant="outline" onClick={() => setIsCropping(false)}>Cancelar</Button>
-                  <Button variant="default" onClick={handleSaveCrop}>Salvar</Button>
+                  <Button variant="outline" onClick={() => setIsCropping(false)}>
+                    Cancelar
+                  </Button>
+                  <Button variant="default" onClick={handleSaveCrop}>
+                    Salvar
+                  </Button>
                 </>
               ) : (
                 <>
@@ -263,8 +217,10 @@ const PreviewerImage = memo(() => {
               )}
             </div>
           </div>
+
+          {/* Conteúdo principal */}
           {isCropping ? (
-            <div className="flex-grow flex items-center justify-center overflow-auto p-4">
+            <div className="flex-grow flex items-center justify-center overflow-auto p-4 bg-black/10">
               <ReactCrop
                 crop={crop}
                 onChange={(c) => setCrop(c as PixelCrop)}
@@ -275,12 +231,15 @@ const PreviewerImage = memo(() => {
                   src={previewImage.src}
                   alt={previewImage.fileName}
                   onLoad={onImageLoad}
+                  className="rounded-lg"
+                  draggable={true}
                   style={{
-                    width: "100%",
+                    maxWidth: "100%",
+                    maxHeight: "100%",
+                    width: "auto",
                     height: "auto",
-                    maxWidth: "none",
-                    maxHeight: "none",
                     objectFit: "contain",
+                    display: "block",
                   }}
                 />
               </ReactCrop>
