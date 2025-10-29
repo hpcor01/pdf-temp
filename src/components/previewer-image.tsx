@@ -7,7 +7,7 @@ import { usePreviewer } from "@/providers/previewer-provider";
 import { useKanban } from "@/providers/kanban-provider";
 import { Toast } from "@/components/ui/toast";
 
-export default function PreviewerImage() {
+export function PreviewerImage() {
   const {
     previewImage,
     previewImageColumnId,
