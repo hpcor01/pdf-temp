@@ -20,7 +20,6 @@ const ReactCrop = dynamic(() => import("react-image-crop").then((mod) => mod.def
 // Função específica para lidar com Oracle Cloud Storage
 const handleOracleStorageImage = async (imageSrc: string): Promise<string> => {
   try {
-    // Tenta diretamente primeiro (pode funcionar em alguns casos)
     const testResponse = await fetch(imageSrc, {
       mode: 'cors',
       credentials: 'omit'
@@ -31,7 +30,6 @@ const handleOracleStorageImage = async (imageSrc: string): Promise<string> => {
       return URL.createObjectURL(blob);
     }
 
-    // Se direto falhar, usa proxy
     const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(imageSrc)}`;
     const proxyResponse = await fetch(proxyUrl);
     
@@ -44,7 +42,6 @@ const handleOracleStorageImage = async (imageSrc: string): Promise<string> => {
   }
 };
 
-// Função que tenta buscar a imagem de forma segura (CORS + proxy fallback)
 async function getCroppedImg(
   imageSrc: string,
   crop: { x: number; y: number; width: number; height: number; unit: "px" | "%" },
@@ -55,7 +52,6 @@ async function getCroppedImg(
     try {
       let imageUrl = imageSrc;
 
-      // Função auxiliar para tentar carregar a imagem
       const tryFetchImage = async (url: string, useProxy = false) => {
         try {
           const finalUrl = useProxy 
@@ -74,7 +70,6 @@ async function getCroppedImg(
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
           const blob = await res.blob();
           
-          // Verifica se o blob é uma imagem válida
           if (!blob.type.startsWith('image/')) {
             throw new Error('Invalid image type');
           }
@@ -86,7 +81,6 @@ async function getCroppedImg(
         }
       };
 
-      // Para URLs do Oracle Cloud Storage (tratamento específico)
       if (imageSrc.includes('oraclecloud.com')) {
         try {
           const blobUrl = await handleOracleStorageImage(imageSrc);
@@ -96,7 +90,6 @@ async function getCroppedImg(
           throw new Error('Unable to load image from Oracle Cloud Storage');
         }
       } 
-      // Para outras URLs HTTP
       else if (imageSrc.startsWith("http")) {
         let blobUrl = await tryFetchImage(imageSrc, false);
         if (!blobUrl) {
@@ -105,7 +98,6 @@ async function getCroppedImg(
         if (blobUrl) imageUrl = blobUrl;
       }
 
-      // Criação do canvas
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
       if (!ctx) return reject(new Error("Could not get canvas context"));
@@ -116,11 +108,9 @@ async function getCroppedImg(
       }
 
       img.onload = () => {
-        // Use the stored scale from the displayed image
         const scaleX = imageScale.x;
         const scaleY = imageScale.y;
 
-        // Convert crop coordinates from displayed image to natural image
         const sourceX = crop.x * scaleX;
         const sourceY = crop.y * scaleY;
         const sourceWidth = crop.width * scaleX;
@@ -129,11 +119,9 @@ async function getCroppedImg(
         canvas.width = crop.width;
         canvas.height = crop.height;
 
-        // Configura qualidade do canvas
         ctx.imageSmoothingEnabled = true;
         ctx.imageSmoothingQuality = 'high';
 
-        // Apply rotation if needed
         if (rotation !== 0) {
           ctx.save();
           ctx.translate(canvas.width / 2, canvas.height / 2);
@@ -165,7 +153,6 @@ async function getCroppedImg(
         }
 
         try {
-          // Tenta diferentes formatos
           let result: string | null = null;
           try {
             result = canvas.toDataURL("image/jpeg", 0.95);
@@ -227,7 +214,6 @@ const PreviewerImage = memo(() => {
   });
   const [imageScale, setImageScale] = useState({ x: 1, y: 1 });
 
-  // Estado para Toast
   const [toastOpen, setToastOpen] = useState(false);
   const [toastVariant, setToastVariant] = useState<ToastVariant>("default");
   const [toastTitle, setToastTitle] = useState("");
@@ -247,7 +233,6 @@ const PreviewerImage = memo(() => {
     setToastOpen,
   });
 
-  // Reset ao abrir uma nova imagem
   useEffect(() => {
     if (isPreviewerOpen && previewImage) {
       setZoomLevel(0.7);
@@ -255,7 +240,6 @@ const PreviewerImage = memo(() => {
     }
   }, [previewImage, isPreviewerOpen]);
 
-  // Fecha com ESC
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape" && isPreviewerOpen) closePreviewer();
@@ -264,7 +248,6 @@ const PreviewerImage = memo(() => {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isPreviewerOpen, closePreviewer]);
 
-  // Zoom
   const handleWheel = useCallback(
     (e: React.WheelEvent) => {
       if (isCropping) return;
@@ -322,7 +305,6 @@ const PreviewerImage = memo(() => {
   const toggleCropMode = useCallback(() => {
     setIsCropping(!isCropping);
     if (!isCropping) {
-      // Set initial crop area to cover most of the image (80%)
       const img = imgRef.current;
       if (img) {
         const { width, height } = img;
@@ -334,7 +316,6 @@ const PreviewerImage = memo(() => {
           height: height * 0.8,
         } as PixelCrop);
       } else {
-        // Fallback if image not loaded yet
         setCrop({
           unit: "px",
           x: 20,
@@ -495,7 +476,7 @@ const PreviewerImage = memo(() => {
       >
         <div
           ref={previewRef}
-          className="w-[30%] h-full bg-background border-l shadow-lg flex flex-col"
+          className="w-[50%] h-full bg-background border-l shadow-lg flex flex-col"
         >
           <div className="p-4 border-b flex justify-between items-center">
             {isCropping ? (
@@ -571,7 +552,7 @@ const PreviewerImage = memo(() => {
                   <ReactCrop
                     crop={crop}
                     onChange={(c) => setCrop(c as PixelCrop)}
-                    className="w-full h-full"
+                    className="flex items-center justify-center"
                     ruleOfThirds
                   >
                     <img
@@ -581,10 +562,10 @@ const PreviewerImage = memo(() => {
                       className="rounded-lg"
                       draggable={true}
                       style={{
-                        width: "auto",
+                        maxWidth: "none",
+                        maxHeight: "none",
+                        width: "100%",
                         height: "auto",
-                        maxWidth: "100%",
-                        maxHeight: "100%",
                         objectFit: "contain",
                       }}
                     />
