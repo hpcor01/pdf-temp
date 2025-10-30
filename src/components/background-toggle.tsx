@@ -1,6 +1,6 @@
 "use client";
 
-import { useId } from "react";
+import { useId, useEffect, useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { useLanguageKey } from "@/hooks/use-i18n";
@@ -13,6 +13,11 @@ export function BackgroundToggle({
 }: BackgroundToggleProps) {
   const removeBgId = useId();
   const buttons = useLanguageKey("buttons");
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
 
   const handleRemoveBgChange = (checked: boolean) => {
     setIsRemoveBgChecked(checked);
@@ -22,10 +27,10 @@ export function BackgroundToggle({
     <div className="flex items-center gap-2">
       <Checkbox
         id={removeBgId}
-        checked={isRemoveBgChecked}
+        checked={isHydrated ? false : false}
         onCheckedChange={handleRemoveBgChange}
-        className="cursor-pointer"
-        disabled={isProcessing}
+        className="cursor-not-allowed"
+        disabled={false}
       >
         <Label htmlFor={removeBgId} className="cursor-pointer py-2">
           {buttons["button-remove-background"]}
