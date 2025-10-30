@@ -1,0 +1,150 @@
+{
+  "languages-selected": {
+    "label": "Selecionar idiomas",
+    "locales": {
+      "pt-br": {
+        "label": "Português do Brasil",
+        "flag": "pt-BR",
+        "default-selected": true
+      },
+      "en-en": {
+        "label": "Inglês",
+        "flag": "en-EN"
+      },
+      "el-gr": {
+        "label": "Grego",
+        "flag": "el-GR"
+      },
+      "he-il": {
+        "label": "Hebraico",
+        "flag": "he-IL"
+      },
+      "es-es": {
+        "label": "Espanhol",
+        "flag": "es-ES"
+      }
+    }
+  },
+  "buttons": {
+    "toggle-button-theme": {
+      "label": "Trocar cor do tema para claro ou escuro",
+      "theme": {
+        "light": "Claro",
+        "dark": "Escuro",
+        "system": "Sistema"
+      }
+    },
+    "button-save": "Salvar",
+    "button-convert-to-pdf": "Converter para PDF",
+    "button-remove-background": "Remover fundo",
+    "button-toggle-previewer-image": {
+      "active": "Ativado realçar imagem",
+      "disabled": "Desativado realçar imagem"
+    },
+    "button-toggle-selected-all": {
+      "active": "Selecionar todos",
+      "disabled": "Desmarcar todos"
+    }
+  },
+  "combobox": {
+    "placeholder": "Selecionar idioma...",
+    "search-placeholder": "Buscar idioma...",
+    "no-language-found": "Nenhum idioma encontrado."
+  },
+  "header": {
+    "processing": "Processando...",
+    "generating-file": "Seu arquivo está sendo gerado, por favor aguarde.",
+    "no-column-selected-title": "Nenhuma coluna selecionada",
+    "no-column-selected-description": "Selecione pelo menos uma coluna para salvar.",
+    "pdfs-generated-title": "PDFs gerados",
+    "pdfs-generated-description": "{{count}} PDF(s) foram salvos com fundo removido.",
+    "pdf-generated-title": "PDF gerado",
+    "pdf-generated-description": "{{count}} PDF(s) foram salvos.",
+    "images-downloaded-title": "Imagens baixadas",
+    "images-downloaded-description": "{{count}} imagem(s) foram baixadas com fundo removido.",
+    "download-started-title": "Download iniciado",
+    "download-started-description": "Baixando imagens individuais...",
+    "cancelled-title": "Cancelado",
+    "cancelled-description": "Operação de salvamento cancelada.",
+    "error-title": "Erro",
+    "error-description": "Falha ao processar as imagens.",
+    "partial-error-title": "Erro parcial",
+    "unsupported-browser-title": "Navegador não suportado",
+    "unsupported-browser-description": "Seu navegador não suporta o salvamento automático em pasta. Use um navegador moderno como Chrome ou Edge.",
+    "error-accessing-folder-title": "Erro ao acessar pasta"
+  },
+  "combobox-change-language": {
+    "select-language": "Selecionar idioma"
+  },
+  "column": {
+    "drag-drop-area": "Área para arrastar e soltar imagens",
+    "column-label": "Coluna {{title}}",
+    "select-column": "Selecionar coluna {{title}}",
+    "edit-column-title": "Editar título da coluna {{title}}",
+    "edit-column": "Editar coluna",
+    "remove-column": "Remover coluna",
+    "images-in-column": "Imagens na coluna {{title}}",
+    "total-images": "Total: {{count}}"
+  },
+  "image-card": {
+    "position-number": "{{number}}",
+    "image-actions": "Ações da imagem",
+    "remove-image": "Remover imagem {{fileName}}",
+    "rotate-image": "Rotacionar imagem {{fileName}}",
+    "zoom-image": "Zoom da imagem {{fileName}}",
+    "preview-image": "Pré-visualizar imagem {{fileName}}"
+  },
+  "mouse-previewer": {
+    "close-preview": "Fechar pré-visualização",
+    "rotation": "Rotação: {{degrees}}°",
+    "size": "Tamanho: {{size}} KB"
+  },
+  "previewer-image": {
+    "modal-label": "Modal de pré-visualização de imagem",
+    "preview-title": "Pré visualização da imagem",
+    "crop-image": "Cortar imagem",
+    "zoom-out": "Diminuir zoom",
+    "reset-zoom": "Redefinir zoom",
+    "zoom-in": "Aumentar zoom",
+    "close-preview": "Fechar pré-visualização",
+    "zoom-level": "{{percentage}}%",
+    "preview-container": "Contêiner de pré-visualização de imagem. Use a roda do mouse para dar zoom, clique e arraste para mover"
+  },
+  "crop-image": {
+    "crop-title": "Cortar Imagem",
+    "close-crop": "Fechar corte",
+    "cancel": "Cancelar",
+    "save": "Salvar",
+    "success-title": "Imagem cortada",
+    "success-description": "A imagem foi cortada com sucesso.",
+    "error-title": "Falha no corte",
+    "error-description": "Não foi possível cortar a imagem devido a restrições de CORS."
+  },
+  "btn-create-column": {
+    "create-column": "Criar nova coluna"
+  },
+  "update-toast": {
+    "new-version-title": "Nova versão disponível",
+    "new-version-description": "Uma nova versão do aplicativo está disponível. Clique em Atualizar para carregar a nova versão.",
+    "close-notification": "Fechar notificação",
+    "updating": "Atualizando...",
+    "update": "Atualizar",
+    "later": "Depois"
+  },
+  "save-location-toggle": {
+    "folder-selected-title": "Pasta de salvamento selecionada",
+    "folder-selected-description": "A pasta \"{path}\" será usada para salvar todos os arquivos.",
+    "error-selecting-folder-title": "Erro ao selecionar pasta",
+    "error-selecting-folder-description": "Não foi possível acessar a pasta selecionada. Verifique se a pasta está disponível e tente novamente.",
+    "single-folder": "Salvar em grupo",
+    "folder-per-column": "Salvar separado",
+    "default-folder": "pasta padrão",
+    "select-folder-prompt": "Selecione a pasta onde deseja salvar (OneDrive é compatível):"
+  },
+  "not-found": {
+    "page-title": "Página não encontrada",
+    "page-description": "A página que você solicitou mudou ou esta em desenvolvimento",
+    "image-alt": "Imagem de um gato pendurado no numero 404 indicando que a página não foi encontrada",
+    "back-to-dashboard": "Voltar para Dashboard"
+  }
+}
