@@ -29,7 +29,7 @@ export function BackgroundToggle({
         id={removeBgId}
         checked={isHydrated ? false : false}
         onCheckedChange={handleRemoveBgChange}
-        className="cursor-pointer"
+        className="cursor-not-allowed"
         disabled={false}
       >
         <Label htmlFor={removeBgId} className="cursor-pointer py-2">
