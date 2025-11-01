@@ -14,13 +14,13 @@ import {
   generateSinglePDFForColumns,
   savePDFToDirectory,
 } from "@/lib/pdf";
-import { removeBackgroundBatch } from "@/lib/rem-bg";
+
 import { useKanban } from "@/providers/kanban-provider";
 import type { HeaderProps } from "@/types/header";
-import type { Column } from "@/types/kanban";
+
 import { useSaveLocation } from "../hooks/use-save-location";
 import { useToast } from "../hooks/use-toast";
-import { BackgroundToggle } from "./background-toggle";
+
 import { LoadingOverlay } from "./loading-overlay";
 import { PDFToggle } from "./pdf-toggle";
 import { PreviewToggle } from "./preview-toggle";
@@ -38,7 +38,7 @@ export function Header({
   const saveLocationTranslations = useLanguageKey("save-location-toggle");
 
   const [isConvertToPDFChecked, setIsConvertToPDFChecked] = useState(true);
-  const [isRemoveBgChecked, setIsRemoveBgChecked] = useState(false);
+
   const [isSingleSaveLocation, setIsSingleSaveLocation] = useState(false);
   const [saveFolderPath, setSaveFolderPath] = useState("");
   const [toastOpen, setToastOpen] = useState(false);
@@ -64,7 +64,7 @@ export function Header({
     showToast,
   });
 
-  const triggerDownload = (url: string, filename: string) => {
+  const _triggerDownload = (url: string, filename: string) => {
     const link = document.createElement("a");
     link.href = url;
     link.download = filename;
@@ -169,56 +169,7 @@ export function Header({
         }
       }
 
-      if (isRemoveBgChecked && isConvertToPDFChecked) {
-        const processedColumns: Column[] = [];
-
-        for (const col of selectedCols) {
-          const processedItems = await removeBackgroundBatch(col.items);
-          processedColumns.push({
-            ...col,
-            items: processedItems,
-          });
-        }
-
-        if (isSingleSaveLocation) {
-          // Generate a single PDF with all columns when single save location is enabled
-          await generateSinglePDFForColumns(
-            processedColumns,
-            processedColumns.reduce(
-              (acc, col) => {
-                acc[col.id] = true;
-                return acc;
-              },
-              {} as Record<string, boolean>
-            )
-          );
-
-          setIsProcessing(false);
-          showToast(
-            "default",
-            headerTranslations["pdfs-generated-title"],
-            headerTranslations["pdfs-generated-description"].replace(
-              "{{count}}",
-              "1"
-            )
-          );
-        } else {
-          // Generate separate PDFs for each column
-          for (const col of processedColumns) {
-            await generatePDFForColumns([col], { [col.id]: true });
-          }
-
-          setIsProcessing(false);
-          showToast(
-            "default",
-            headerTranslations["pdfs-generated-title"],
-            headerTranslations["pdfs-generated-description"].replace(
-              "{{count}}",
-              selectedCols.length.toString()
-            )
-          );
-        }
-      } else if (!isRemoveBgChecked && isConvertToPDFChecked) {
+      if (isConvertToPDFChecked) {
         if (isSingleSaveLocation) {
           // Generate a single PDF with all columns when single save location is enabled
           await generateSinglePDFForColumns(columns, selectedColumns);
@@ -246,26 +197,6 @@ export function Header({
             )
           );
         }
-      } else if (isRemoveBgChecked && !isConvertToPDFChecked) {
-        let downloadCount = 0;
-
-        for (const col of selectedCols) {
-          const processedItems = await removeBackgroundBatch(col.items);
-          for (const item of processedItems) {
-            triggerDownload(item.src, item.fileName);
-            downloadCount++;
-          }
-        }
-
-        setIsProcessing(false);
-        showToast(
-          "default",
-          headerTranslations["images-downloaded-title"],
-          headerTranslations["images-downloaded-description"].replace(
-            "{{count}}",
-            downloadCount.toString()
-          )
-        );
       } else {
         setIsProcessing(false);
         showToast(
@@ -327,7 +258,7 @@ export function Header({
             onToggleAllChange={onToggleAllChange}
             toggleAllColumnsSave={toggleAllColumnsSave}
           />
-          <BackgroundToggle setIsRemoveBgChecked={setIsRemoveBgChecked} />
+
           <PDFToggle
             isProcessing={isProcessing}
             isConvertToPDFChecked={isConvertToPDFChecked}

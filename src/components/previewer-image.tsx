@@ -1,6 +1,5 @@
 "use client";
 
-import { removeBackground } from "@imgly/background-removal";
 import { Check, Crop, Eraser, Loader2, X, ZoomIn } from "lucide-react";
 import Image from "next/image";
 import type React from "react";
@@ -13,17 +12,17 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Slider } from "@/components/ui/slider";
+
 import { usePreviewer } from "@/providers/previewer-provider";
 
 export default function PreviewerImage() {
-  const { previewImage, updatePreviewImage, isPreviewerOpen } = usePreviewer();
+  const { previewImage, updatePreviewImage } = usePreviewer();
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
-  const [zoom, setZoom] = useState(100);
+  const [zoom] = useState(100);
   const [cropArea, setCropArea] = useState({
     x: 50,
     y: 50,
@@ -35,8 +34,9 @@ export default function PreviewerImage() {
   const [image, setImage] = useState<HTMLImageElement | null>(null);
   const [_croppedImage, setCroppedImage] = useState<string | null>(null);
 
-  // 🔹 Controle do modal de IA
-  const [openRemoveBg, setOpenRemoveBg] = useState(false);
+  // 🔹 Controle do modal de edição
+  const [openEditModal, setOpenEditModal] = useState(false);
+  const [editMode, setEditMode] = useState<"crop" | "remove-bg" | null>(null);
   const [processing, setProcessing] = useState(false);
   const [originalImage, setOriginalImage] = useState<string | null>(null);
   const [processedImage, setProcessedImage] = useState<string | null>(null);
@@ -106,35 +106,30 @@ export default function PreviewerImage() {
     });
   };
 
-  // 🔹 Função de IA (usando @imgly/background-removal)
+  // 🔹 Função de remoção de fundo (simulada)
   const handleRemoveBackground = useCallback(async () => {
     if (!previewImage?.src) return;
-    setOpenRemoveBg(true);
+    setOpenEditModal(true);
+    setEditMode("remove-bg");
     setProcessing(true);
     setProgress(0);
     setProcessedImage(null);
     setOriginalImage(previewImage.src);
 
     try {
-      const blob = await fetch(previewImage.src).then((r) => r.blob());
-      const resultBlob = await removeBackground(blob, {
-        progress: (key: string, current: number, total: number) => {
-          setProgress(Math.round((current / total) * 100));
-        },
-      });
-      const resultUrl = URL.createObjectURL(resultBlob);
-      setProcessedImage(resultUrl);
+      // Simulação de processamento
+      for (let i = 0; i <= 100; i += 10) {
+        setProgress(i);
+        await new Promise((resolve) => setTimeout(resolve, 200));
+      }
+      // Por enquanto, apenas copia a imagem original (remover fundo seria implementado aqui)
+      setProcessedImage(previewImage.src);
     } catch (err) {
       console.error("Erro ao remover fundo:", err);
     } finally {
       setProcessing(false);
     }
   }, [previewImage?.src]);
-
-  // Ativa automaticamente quando toggle “Remover fundo” estiver ligado
-  useEffect(() => {
-    if (isPreviewerOpen) handleRemoveBackground();
-  }, [isPreviewerOpen, handleRemoveBackground]);
 
   const handleConfirm = () => {
     if (processedImage)
@@ -145,11 +140,31 @@ export default function PreviewerImage() {
         id: previewImage?.id || "",
         rotation: previewImage?.rotation || 0,
       });
-    setOpenRemoveBg(false);
+    setOpenEditModal(false);
+    setEditMode(null);
   };
 
   const handleCancel = () => {
-    setOpenRemoveBg(false);
+    setOpenEditModal(false);
+    setEditMode(null);
+  };
+
+  // 🔹 Função para abrir modal de edição
+  const handleOpenEditModal = () => {
+    setOpenEditModal(true);
+  };
+
+  // 🔹 Função para iniciar recorte
+  const handleStartCrop = () => {
+    setEditMode("crop");
+    handleCrop();
+    setOpenEditModal(false);
+  };
+
+  // 🔹 Função para iniciar remoção de fundo
+  const handleStartRemoveBg = () => {
+    setEditMode("remove-bg");
+    handleRemoveBackground();
   };
 
   return (
@@ -167,10 +182,12 @@ export default function PreviewerImage() {
                   role="img"
                   aria-label="Imagem para edição"
                 >
-                  <img
+                  <Image
                     ref={imageRef}
                     src={previewImage.src}
                     alt="Imagem"
+                    width={800}
+                    height={600}
                     className="max-w-full max-h-[70vh] rounded-lg select-none"
                     style={{ transform: `scale(${zoom / 100})` }}
                     draggable={false}
@@ -184,6 +201,13 @@ export default function PreviewerImage() {
                       height: cropArea.height,
                     }}
                   />
+                  <Button
+                    onClick={handleOpenEditModal}
+                    className="absolute top-4 right-4 bg-emerald-600 hover:bg-emerald-700 text-white p-3 rounded-full shadow-lg"
+                    size="sm"
+                  >
+                    <ZoomIn className="w-5 h-5" />
+                  </Button>
                 </div>
               ) : (
                 <p className="text-gray-400 text-center w-full">
@@ -192,60 +216,32 @@ export default function PreviewerImage() {
               )}
             </div>
           </Card>
-
-          {/* Controles laterais */}
-          <div className="space-y-6 w-full lg:w-96">
-            <Card className="bg-[#27272A] border-gray-800 p-6">
-              <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                <ZoomIn className="w-5 h-5 text-emerald-500" /> Controles
-              </h3>
-              <div className="space-y-6">
-                <div>
-                  <label
-                    htmlFor="zoom-slider"
-                    className="text-sm text-gray-400"
-                  >
-                    Zoom: {zoom}%
-                  </label>
-                  <Slider
-                    id="zoom-slider"
-                    value={[zoom]}
-                    onValueChange={(v) => setZoom(v[0] || 100)}
-                    min={50}
-                    max={200}
-                    step={5}
-                  />
-                </div>
-
-                <Button
-                  onClick={handleCrop}
-                  className="w-full bg-gradient-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600 text-white py-6 rounded-xl shadow-lg shadow-emerald-500/20"
-                >
-                  <Crop className="w-5 h-5 mr-2" /> Recortar
-                </Button>
-
-                <Button
-                  onClick={handleRemoveBackground}
-                  variant="outline"
-                  className="w-full border-gray-700 text-gray-300 hover:bg-gray-800 py-6 rounded-xl flex items-center gap-2"
-                >
-                  <Eraser className="w-5 h-5 text-emerald-400" /> Remover fundo
-                  (IA)
-                </Button>
-              </div>
-            </Card>
-          </div>
         </div>
 
         {/* Canvas oculto */}
         <canvas ref={canvasRef} className="hidden" />
 
-        {/* 🔹 Modal de IA */}
-        <Dialog open={openRemoveBg} onOpenChange={setOpenRemoveBg}>
+        {/* 🔹 Modal de edição */}
+        <Dialog open={openEditModal} onOpenChange={setOpenEditModal}>
           <DialogContent className="max-w-5xl h-[85vh] bg-zinc-900 border border-zinc-800 text-white p-0 overflow-hidden">
             <DialogHeader className="p-4 border-b border-zinc-800 flex justify-between items-center">
               <DialogTitle className="flex items-center gap-2 text-lg">
-                <Eraser className="w-5 h-5 text-emerald-500" /> Remover fundo
+                {editMode === "crop" ? (
+                  <>
+                    <Crop className="w-5 h-5 text-emerald-500" /> Recortar
+                    imagem
+                  </>
+                ) : editMode === "remove-bg" ? (
+                  <>
+                    <Eraser className="w-5 h-5 text-emerald-500" /> Remover
+                    fundo
+                  </>
+                ) : (
+                  <>
+                    <ZoomIn className="w-5 h-5 text-emerald-500" /> Editar
+                    imagem
+                  </>
+                )}
               </DialogTitle>
               <Button
                 variant="ghost"
@@ -257,11 +253,41 @@ export default function PreviewerImage() {
             </DialogHeader>
 
             <div className="flex flex-col md:flex-row items-center justify-center h-full w-full bg-zinc-950">
-              {processing ? (
+              {!editMode ? (
+                // Modal de seleção de ferramenta
+                <div className="flex flex-col items-center justify-center h-full w-full text-center space-y-8">
+                  <h2 className="text-2xl font-semibold text-white mb-4">
+                    Escolha uma ferramenta de edição
+                  </h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl">
+                    <Button
+                      onClick={handleStartCrop}
+                      className="h-32 flex flex-col items-center justify-center gap-4 bg-gradient-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600 text-white rounded-xl shadow-lg shadow-emerald-500/20"
+                    >
+                      <Crop className="w-8 h-8" />
+                      <span className="text-lg font-medium">Recortar</span>
+                      <span className="text-sm opacity-80">
+                        Selecione uma área
+                      </span>
+                    </Button>
+                    <Button
+                      onClick={handleStartRemoveBg}
+                      variant="outline"
+                      className="h-32 flex flex-col items-center justify-center gap-4 border-gray-700 text-gray-300 hover:bg-gray-800 rounded-xl"
+                    >
+                      <Eraser className="w-8 h-8 text-emerald-400" />
+                      <span className="text-lg font-medium">Remover fundo</span>
+                      <span className="text-sm opacity-80">IA (simulado)</span>
+                    </Button>
+                  </div>
+                </div>
+              ) : processing ? (
                 <div className="flex flex-col items-center justify-center h-full w-full text-center">
                   <Loader2 className="w-10 h-10 text-emerald-500 animate-spin mb-4" />
                   <p className="text-gray-400 text-sm mb-2">
-                    Removendo fundo...
+                    {editMode === "crop"
+                      ? "Processando recorte..."
+                      : "Removendo fundo..."}
                   </p>
                   <p className="text-gray-500 text-xs">{progress}%</p>
                 </div>
@@ -284,7 +310,7 @@ export default function PreviewerImage() {
                       <p className="mb-2 text-gray-400 text-sm">Depois</p>
                       <Image
                         src={processedImage}
-                        alt="Sem fundo"
+                        alt="Processada"
                         width={400}
                         height={400}
                         className="rounded-lg border border-emerald-700 object-contain max-h-[60vh] bg-transparent"
@@ -295,7 +321,7 @@ export default function PreviewerImage() {
               )}
             </div>
 
-            {!processing && processedImage && (
+            {!processing && processedImage && editMode && (
               <div className="flex justify-center gap-4 p-4 border-t border-zinc-800 bg-zinc-900">
                 <Button
                   onClick={handleConfirm}
