@@ -1,308 +1,305 @@
 "use client";
 
-import React, { useRef, useState, useEffect, useCallback } from "react";
-import { Crop, RotateCcw, ZoomIn, ZoomOut } from "lucide-react";
+import { removeBackground } from "@imgly/background-removal";
+import { Check, Crop, Eraser, Loader2, X, ZoomIn } from "lucide-react";
+import Image from "next/image";
+import type React from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Slider } from "@/components/ui/slider";
 import { usePreviewer } from "@/providers/previewer-provider";
-import { useKanban } from "@/providers/kanban-provider";
-import { Toast } from "@/components/ui/toast";
 
-export function PreviewerImage() {
-  const {
-    previewImage,
-    previewImageColumnId,
-    isPreviewerOpen,
-    closePreviewer,
-    updatePreviewImage,
-  } = usePreviewer();
-  const { updateImage } = useKanban();
+export default function PreviewerImage() {
+  const { imageUrl, updatePreviewImage, removeBackgroundToggle } =
+    usePreviewer();
 
-  const [croppedImage, setCroppedImage] = useState<string | null>(null);
-  const [toastOpen, setToastOpen] = useState(false);
-  const [toastTitle, setToastTitle] = useState("");
-  const [toastDescription, setToastDescription] = useState("");
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const imageRef = useRef<HTMLImageElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
-  const showToast = (title: string, desc: string) => {
-    setToastTitle(title);
-    setToastDescription(desc);
-    setToastOpen(true);
-  };
-
-  const handleSaveCrop = useCallback(
-    (cropped: string) => {
-      if (previewImage) {
-        const updated = { ...previewImage, src: cropped };
-        updatePreviewImage(updated);
-        if (previewImageColumnId) updateImage(previewImageColumnId, updated);
-        showToast("Imagem cortada", "O recorte foi salvo com sucesso.");
-      }
-    },
-    [previewImage, previewImageColumnId, updateImage, updatePreviewImage]
-  );
-
-  if (!isPreviewerOpen || !previewImage) return null;
-
-  return (
-    <>
-      <CropModal
-        imageSrc={previewImage.src}
-        onClose={closePreviewer}
-        onSave={handleSaveCrop}
-      />
-      <Toast
-        title={toastTitle}
-        description={toastDescription}
-        open={toastOpen}
-        onOpenChange={setToastOpen}
-        variant="default"
-      />
-    </>
-  );
-}
-
-function CropModal({
-  imageSrc,
-  onClose,
-  onSave,
-}: {
-  imageSrc: string;
-  onClose: () => void;
-  onSave: (cropped: string) => void;
-}) {
-  const [image, setImage] = useState<HTMLImageElement | null>(null);
-  const [zoom, setZoom] = useState(1);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [draggingImage, setDraggingImage] = useState(false);
-  const [selection, setSelection] = useState({
-    x: 200,
-    y: 100,
-    width: 400,
-    height: 300,
+  const [zoom, setZoom] = useState(100);
+  const [cropArea, setCropArea] = useState({
+    x: 50,
+    y: 50,
+    width: 200,
+    height: 200,
   });
-  const [draggingSelection, setDraggingSelection] = useState(false);
-  const [resizing, setResizing] = useState<string | null>(null);
-  const [startPos, setStartPos] = useState({ x: 0, y: 0 });
-  const [startSelection, setStartSelection] = useState(selection);
-  const [startPosition, setStartPosition] = useState(position);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [image, setImage] = useState<HTMLImageElement | null>(null);
+  const [_croppedImage, setCroppedImage] = useState<string | null>(null);
 
-  // Carregar imagem
+  // 🔹 Controle do modal de IA
+  const [openRemoveBg, setOpenRemoveBg] = useState(false);
+  const [processing, setProcessing] = useState(false);
+  const [originalImage, setOriginalImage] = useState<string | null>(null);
+  const [processedImage, setProcessedImage] = useState<string | null>(null);
+  const [progress, setProgress] = useState<number>(0);
+
+  // 🔹 Inicializa imagem
   useEffect(() => {
+    if (!imageUrl) return;
     const img = new Image();
-    img.crossOrigin = "anonymous";
+    img.src = imageUrl;
     img.onload = () => setImage(img);
-    img.src = imageSrc;
-  }, [imageSrc]);
+  }, [imageUrl]);
 
-  // Reset handlers
+  // Eventos de arraste para área de recorte
+  const handleMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+    setDragStart({ x: e.clientX, y: e.clientY });
+  };
+
+  const handleMouseMove = useCallback(
+    (e: MouseEvent) => {
+      if (!isDragging) return;
+      const dx = e.clientX - dragStart.x;
+      const dy = e.clientY - dragStart.y;
+      setCropArea((prev) => ({ ...prev, x: prev.x + dx, y: prev.y + dy }));
+      setDragStart({ x: e.clientX, y: e.clientY });
+    },
+    [isDragging, dragStart.x, dragStart.y]
+  );
+
+  const handleMouseUp = useCallback(() => setIsDragging(false), []);
+
   useEffect(() => {
-    const handleUp = () => {
-      setDraggingImage(false);
-      setDraggingSelection(false);
-      setResizing(null);
+    if (isDragging) {
+      document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("mouseup", handleMouseUp);
+    }
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
     };
-    window.addEventListener("mouseup", handleUp);
-    return () => window.removeEventListener("mouseup", handleUp);
-  }, []);
+  }, [isDragging, handleMouseMove, handleMouseUp]);
 
-  const handleMouseMove = (e: React.MouseEvent) => {
-    const dx = e.clientX - startPos.x;
-    const dy = e.clientY - startPos.y;
-
-    if (draggingImage) {
-      setPosition({
-        x: startPosition.x + dx,
-        y: startPosition.y + dy,
-      });
-    }
-
-    if (draggingSelection) {
-      setSelection({
-        ...startSelection,
-        x: startSelection.x + dx,
-        y: startSelection.y + dy,
-      });
-    }
-
-    if (resizing) {
-      let newSel = { ...startSelection };
-      if (resizing.includes("e")) newSel.width = Math.max(50, startSelection.width + dx);
-      if (resizing.includes("s")) newSel.height = Math.max(50, startSelection.height + dy);
-      if (resizing.includes("w")) {
-        newSel.width = Math.max(50, startSelection.width - dx);
-        newSel.x = startSelection.x + dx;
-      }
-      if (resizing.includes("n")) {
-        newSel.height = Math.max(50, startSelection.height - dy);
-        newSel.y = startSelection.y + dy;
-      }
-      setSelection(newSel);
-    }
-  };
-
-  // Drag imagem
-  const handleImageMouseDown = (e: React.MouseEvent) => {
-    setDraggingImage(true);
-    setStartPos({ x: e.clientX, y: e.clientY });
-    setStartPosition(position);
-  };
-
-  const handleSelectionMouseDown = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setDraggingSelection(true);
-    setStartPos({ x: e.clientX, y: e.clientY });
-    setStartSelection(selection);
-  };
-
-  const handleResizeMouseDown = (e: React.MouseEvent, dir: string) => {
-    e.stopPropagation();
-    setResizing(dir);
-    setStartPos({ x: e.clientX, y: e.clientY });
-    setStartSelection(selection);
-  };
-
-  // Aplicar recorte (corrigido)
+  // Função de recorte
   const handleCrop = () => {
-    if (!image || !canvasRef.current || !containerRef.current) return;
+    if (!image || !canvasRef.current) return;
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d")!;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    const scale = zoom / 100;
+    const sx = cropArea.x / scale;
+    const sy = cropArea.y / scale;
+    const sw = cropArea.width / scale;
+    const sh = cropArea.height / scale;
+    canvas.width = cropArea.width;
+    canvas.height = cropArea.height;
+    ctx.drawImage(image, sx, sy, sw, sh, 0, 0, cropArea.width, cropArea.height);
+    const dataUrl = canvas.toDataURL("image/png");
+    setCroppedImage(dataUrl);
+    updatePreviewImage(dataUrl);
+  };
 
-    const container = containerRef.current.getBoundingClientRect();
-    const imgDisplayWidth = image.width * zoom;
-    const imgDisplayHeight = image.height * zoom;
+  // 🔹 Função de IA (usando @imgly/background-removal)
+  const handleRemoveBackground = useCallback(async () => {
+    if (!imageUrl) return;
+    setOpenRemoveBg(true);
+    setProcessing(true);
+    setProgress(0);
+    setProcessedImage(null);
+    setOriginalImage(imageUrl);
 
-    const imgCenterX = container.width / 2 + position.x;
-    const imgCenterY = container.height / 2 + position.y;
+    try {
+      const blob = await fetch(imageUrl).then((r) => r.blob());
+      const resultBlob = await removeBackground(blob, {
+        progress: (p: number) => setProgress(Math.round(p * 100)),
+      });
+      const resultUrl = URL.createObjectURL(resultBlob);
+      setProcessedImage(resultUrl);
+    } catch (err) {
+      console.error("Erro ao remover fundo:", err);
+    } finally {
+      setProcessing(false);
+    }
+  }, [imageUrl]);
 
-    const imgX = imgCenterX - imgDisplayWidth / 2;
-    const imgY = imgCenterY - imgDisplayHeight / 2;
+  // Ativa automaticamente quando toggle “Remover fundo” estiver ligado
+  useEffect(() => {
+    if (removeBackgroundToggle) handleRemoveBackground();
+  }, [removeBackgroundToggle, handleRemoveBackground]);
 
-    const sx = (selection.x - imgX) / zoom;
-    const sy = (selection.y - imgY) / zoom;
-    const sw = selection.width / zoom;
-    const sh = selection.height / zoom;
+  const handleConfirm = () => {
+    if (processedImage) updatePreviewImage(processedImage);
+    setOpenRemoveBg(false);
+  };
 
-    canvas.width = selection.width;
-    canvas.height = selection.height;
-
-    ctx.drawImage(image, sx, sy, sw, sh, 0, 0, selection.width, selection.height);
-
-    const result = canvas.toDataURL("image/png");
-    onSave(result);
-    onClose();
+  const handleCancel = () => {
+    setOpenRemoveBg(false);
   };
 
   return (
-    <div className="fixed inset-0 z-[9999] bg-black/80 flex items-center justify-center select-none">
-      <div
-        ref={containerRef}
-        className="relative w-[95%] h-[90%] bg-[#18181B] overflow-hidden rounded-2xl border border-gray-700"
-        onMouseMove={handleMouseMove}
-      >
-        {/* Imagem */}
-        {image && (
-          <img
-            src={image.src}
-            alt="Crop"
-            draggable={false}
-            onMouseDown={handleImageMouseDown}
-            className="absolute top-1/2 left-1/2 object-contain cursor-grab"
-            style={{
-              transform: `translate(-50%, -50%) scale(${zoom}) translate(${position.x / zoom}px, ${position.y / zoom}px)`,
-            }}
-          />
-        )}
+    <div className="min-h-screen bg-[#18181B] p-4 md:p-8">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Área principal */}
+          <Card className="bg-[#27272A] border-gray-800 flex-1 overflow-hidden">
+            <div className="relative p-6 flex items-center justify-center">
+              {imageUrl ? (
+                <div
+                  ref={containerRef}
+                  className="relative cursor-crosshair"
+                  onMouseDown={handleMouseDown}
+                  role="img"
+                  aria-label="Imagem para edição"
+                >
+                  <img
+                    ref={imageRef}
+                    src={imageUrl}
+                    alt="Imagem"
+                    className="max-w-full max-h-[70vh] rounded-lg select-none"
+                    style={{ transform: `scale(${zoom / 100})` }}
+                    draggable={false}
+                  />
+                  <div
+                    className="absolute border-2 border-emerald-500 pointer-events-none"
+                    style={{
+                      left: cropArea.x,
+                      top: cropArea.y,
+                      width: cropArea.width,
+                      height: cropArea.height,
+                    }}
+                  />
+                </div>
+              ) : (
+                <p className="text-gray-400 text-center w-full">
+                  Nenhuma imagem carregada
+                </p>
+              )}
+            </div>
+          </Card>
 
-        {/* Seleção */}
-        <div
-          className="absolute border-2 border-emerald-500 bg-transparent cursor-move"
-          style={{
-            left: selection.x,
-            top: selection.y,
-            width: selection.width,
-            height: selection.height,
-          }}
-          onMouseDown={handleSelectionMouseDown}
-        >
-          {/* Grade */}
-          <div className="absolute inset-0 grid grid-cols-3 grid-rows-3 pointer-events-none">
-            {[...Array(9)].map((_, i) => (
-              <div key={i} className="border border-emerald-500/30" />
-            ))}
+          {/* Controles laterais */}
+          <div className="space-y-6 w-full lg:w-96">
+            <Card className="bg-[#27272A] border-gray-800 p-6">
+              <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                <ZoomIn className="w-5 h-5 text-emerald-500" /> Controles
+              </h3>
+              <div className="space-y-6">
+                <div>
+                  <label
+                    htmlFor="zoom-slider"
+                    className="text-sm text-gray-400"
+                  >
+                    Zoom: {zoom}%
+                  </label>
+                  <Slider
+                    id="zoom-slider"
+                    value={[zoom]}
+                    onValueChange={(v) => setZoom(v[0])}
+                    min={50}
+                    max={200}
+                    step={5}
+                  />
+                </div>
+
+                <Button
+                  onClick={handleCrop}
+                  className="w-full bg-gradient-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600 text-white py-6 rounded-xl shadow-lg shadow-emerald-500/20"
+                >
+                  <Crop className="w-5 h-5 mr-2" /> Recortar
+                </Button>
+
+                <Button
+                  onClick={handleRemoveBackground}
+                  variant="outline"
+                  className="w-full border-gray-700 text-gray-300 hover:bg-gray-800 py-6 rounded-xl flex items-center gap-2"
+                >
+                  <Eraser className="w-5 h-5 text-emerald-400" /> Remover fundo
+                  (IA)
+                </Button>
+              </div>
+            </Card>
           </div>
-
-          {/* Alças */}
-          {["nw", "n", "ne", "w", "e", "sw", "s", "se"].map((handle) => (
-            <div
-              key={handle}
-              className="absolute w-4 h-4 bg-emerald-500 rounded-full border-2 border-white cursor-pointer z-10"
-              style={{
-                top: handle.includes("n")
-                  ? -6
-                  : handle.includes("s")
-                  ? "calc(100% - 6px)"
-                  : "calc(50% - 6px)",
-                left: handle.includes("w")
-                  ? -6
-                  : handle.includes("e")
-                  ? "calc(100% - 6px)"
-                  : "calc(50% - 6px)",
-                cursor: `${handle}-resize`,
-              }}
-              onMouseDown={(e) => handleResizeMouseDown(e, handle)}
-            />
-          ))}
         </div>
 
-        {/* Máscara */}
-        <div className="absolute inset-0 pointer-events-none">
-          <svg width="100%" height="100%">
-            <defs>
-              <mask id="cropMask">
-                <rect width="100%" height="100%" fill="white" />
-                <rect
-                  x={selection.x}
-                  y={selection.y}
-                  width={selection.width}
-                  height={selection.height}
-                  fill="black"
-                />
-              </mask>
-            </defs>
-            <rect width="100%" height="100%" fill="black" opacity="0.6" mask="url(#cropMask)" />
-          </svg>
-        </div>
-
-        {/* Controles */}
-        <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-4 bg-black/70 rounded-full px-6 py-3 items-center">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => setZoom((z) => Math.max(0.2, z - 0.1))}
-          >
-            <ZoomOut className="w-4 h-4" />
-          </Button>
-          <span className="text-white">{Math.round(zoom * 100)}%</span>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => setZoom((z) => Math.min(3, z + 0.1))}
-          >
-            <ZoomIn className="w-4 h-4" />
-          </Button>
-          <Button variant="outline" size="sm" onClick={() => setZoom(1)}>
-            <RotateCcw className="w-4 h-4 mr-1" /> Reset
-          </Button>
-          <Button size="sm" onClick={handleCrop}>
-            <Crop className="w-4 h-4 mr-1" /> Salvar
-          </Button>
-          <Button variant="destructive" size="sm" onClick={onClose}>
-            Cancelar
-          </Button>
-        </div>
-
+        {/* Canvas oculto */}
         <canvas ref={canvasRef} className="hidden" />
+
+        {/* 🔹 Modal de IA */}
+        <Dialog open={openRemoveBg} onOpenChange={setOpenRemoveBg}>
+          <DialogContent className="max-w-5xl h-[85vh] bg-zinc-900 border border-zinc-800 text-white p-0 overflow-hidden">
+            <DialogHeader className="p-4 border-b border-zinc-800 flex justify-between items-center">
+              <DialogTitle className="flex items-center gap-2 text-lg">
+                <Eraser className="w-5 h-5 text-emerald-500" /> Remover fundo
+              </DialogTitle>
+              <Button
+                variant="ghost"
+                onClick={handleCancel}
+                className="text-gray-400 hover:text-white"
+              >
+                <X className="w-5 h-5" />
+              </Button>
+            </DialogHeader>
+
+            <div className="flex flex-col md:flex-row items-center justify-center h-full w-full bg-zinc-950">
+              {processing ? (
+                <div className="flex flex-col items-center justify-center h-full w-full text-center">
+                  <Loader2 className="w-10 h-10 text-emerald-500 animate-spin mb-4" />
+                  <p className="text-gray-400 text-sm mb-2">
+                    Removendo fundo...
+                  </p>
+                  <p className="text-gray-500 text-xs">{progress}%</p>
+                </div>
+              ) : (
+                <div className="grid md:grid-cols-2 gap-4 p-6 w-full h-full place-items-center">
+                  {originalImage && (
+                    <div className="flex flex-col items-center justify-center">
+                      <p className="mb-2 text-gray-400 text-sm">Antes</p>
+                      <Image
+                        src={originalImage}
+                        alt="Original"
+                        width={400}
+                        height={400}
+                        className="rounded-lg border border-zinc-800 object-contain max-h-[60vh]"
+                      />
+                    </div>
+                  )}
+                  {processedImage && (
+                    <div className="flex flex-col items-center justify-center">
+                      <p className="mb-2 text-gray-400 text-sm">Depois</p>
+                      <Image
+                        src={processedImage}
+                        alt="Sem fundo"
+                        width={400}
+                        height={400}
+                        className="rounded-lg border border-emerald-700 object-contain max-h-[60vh] bg-transparent"
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {!processing && processedImage && (
+              <div className="flex justify-center gap-4 p-4 border-t border-zinc-800 bg-zinc-900">
+                <Button
+                  onClick={handleConfirm}
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white flex items-center gap-2"
+                >
+                  <Check className="w-4 h-4" /> Confirmar
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={handleCancel}
+                  className="border-gray-700 text-gray-300 hover:bg-gray-800 flex items-center gap-2"
+                >
+                  <X className="w-4 h-4" /> Cancelar
+                </Button>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
