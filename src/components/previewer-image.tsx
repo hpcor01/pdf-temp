@@ -119,8 +119,12 @@ export default function PreviewerImage() {
 
     try {
       const blob = await removeBackground(previewImage.src);
-      const url = URL.createObjectURL(blob);
-      setProcessedImage(url);
+      const reader = new FileReader();
+      reader.onload = () => {
+        const dataUrl = reader.result as string;
+        setProcessedImage(dataUrl);
+      };
+      reader.readAsDataURL(blob);
     } catch (err) {
       console.error("Erro ao remover fundo:", err);
     } finally {
@@ -160,7 +164,7 @@ export default function PreviewerImage() {
   return (
     <div className="min-h-screen bg-[#18181B] p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
-        <div className="flex flex-col lg:flex-row gap-6">
+        <div className="flex flex-col gap-6">
           {/* Área principal */}
           <Card className="bg-[#27272A] border-gray-800 flex-1 overflow-hidden">
             <div className="relative p-6 flex items-center justify-center">
