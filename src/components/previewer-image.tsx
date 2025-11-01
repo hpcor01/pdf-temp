@@ -17,8 +17,7 @@ import { Slider } from "@/components/ui/slider";
 import { usePreviewer } from "@/providers/previewer-provider";
 
 export default function PreviewerImage() {
-  const { imageUrl, updatePreviewImage, removeBackgroundToggle } =
-    usePreviewer();
+  const { previewImage, updatePreviewImage, isPreviewerOpen } = usePreviewer();
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
@@ -45,11 +44,11 @@ export default function PreviewerImage() {
 
   // 🔹 Inicializa imagem
   useEffect(() => {
-    if (!imageUrl) return;
+    if (!previewImage?.src) return;
     const img = new Image();
-    img.src = imageUrl;
+    img.src = previewImage.src;
     img.onload = () => setImage(img);
-  }, [imageUrl]);
+  }, [previewImage?.src]);
 
   // Eventos de arraste para área de recorte
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -98,20 +97,23 @@ export default function PreviewerImage() {
     ctx.drawImage(image, sx, sy, sw, sh, 0, 0, cropArea.width, cropArea.height);
     const dataUrl = canvas.toDataURL("image/png");
     setCroppedImage(dataUrl);
-    updatePreviewImage(dataUrl);
+    updatePreviewImage({
+      src: dataUrl,
+      fileName: previewImage?.fileName || "cropped.png",
+    });
   };
 
   // 🔹 Função de IA (usando @imgly/background-removal)
   const handleRemoveBackground = useCallback(async () => {
-    if (!imageUrl) return;
+    if (!previewImage?.src) return;
     setOpenRemoveBg(true);
     setProcessing(true);
     setProgress(0);
     setProcessedImage(null);
-    setOriginalImage(imageUrl);
+    setOriginalImage(previewImage.src);
 
     try {
-      const blob = await fetch(imageUrl).then((r) => r.blob());
+      const blob = await fetch(previewImage.src).then((r) => r.blob());
       const resultBlob = await removeBackground(blob, {
         progress: (p: number) => setProgress(Math.round(p * 100)),
       });
@@ -122,15 +124,19 @@ export default function PreviewerImage() {
     } finally {
       setProcessing(false);
     }
-  }, [imageUrl]);
+  }, [previewImage?.src]);
 
   // Ativa automaticamente quando toggle “Remover fundo” estiver ligado
   useEffect(() => {
-    if (removeBackgroundToggle) handleRemoveBackground();
-  }, [removeBackgroundToggle, handleRemoveBackground]);
+    if (isPreviewerOpen) handleRemoveBackground();
+  }, [isPreviewerOpen, handleRemoveBackground]);
 
   const handleConfirm = () => {
-    if (processedImage) updatePreviewImage(processedImage);
+    if (processedImage)
+      updatePreviewImage({
+        src: processedImage,
+        fileName: previewImage?.fileName || "processed.png",
+      });
     setOpenRemoveBg(false);
   };
 
@@ -145,7 +151,7 @@ export default function PreviewerImage() {
           {/* Área principal */}
           <Card className="bg-[#27272A] border-gray-800 flex-1 overflow-hidden">
             <div className="relative p-6 flex items-center justify-center">
-              {imageUrl ? (
+              {previewImage?.src ? (
                 <div
                   ref={containerRef}
                   className="relative cursor-crosshair"
@@ -155,7 +161,7 @@ export default function PreviewerImage() {
                 >
                   <img
                     ref={imageRef}
-                    src={imageUrl}
+                    src={previewImage.src}
                     alt="Imagem"
                     className="max-w-full max-h-[70vh] rounded-lg select-none"
                     style={{ transform: `scale(${zoom / 100})` }}
@@ -196,7 +202,7 @@ export default function PreviewerImage() {
                   <Slider
                     id="zoom-slider"
                     value={[zoom]}
-                    onValueChange={(v) => setZoom(v[0])}
+                    onValueChange={(v) => setZoom(v[0] || 100)}
                     min={50}
                     max={200}
                     step={5}
