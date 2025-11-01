@@ -45,7 +45,7 @@ export default function PreviewerImage() {
   // 🔹 Inicializa imagem
   useEffect(() => {
     if (!previewImage?.src) return;
-    const img = new Image();
+    const img = new window.Image();
     img.src = previewImage.src;
     img.onload = () => setImage(img);
   }, [previewImage?.src]);
@@ -98,8 +98,11 @@ export default function PreviewerImage() {
     const dataUrl = canvas.toDataURL("image/png");
     setCroppedImage(dataUrl);
     updatePreviewImage({
+      ...previewImage,
       src: dataUrl,
       fileName: previewImage?.fileName || "cropped.png",
+      id: previewImage?.id || "",
+      rotation: previewImage?.rotation || 0,
     });
   };
 
@@ -115,7 +118,9 @@ export default function PreviewerImage() {
     try {
       const blob = await fetch(previewImage.src).then((r) => r.blob());
       const resultBlob = await removeBackground(blob, {
-        progress: (p: number) => setProgress(Math.round(p * 100)),
+        progress: (key: string, current: number, total: number) => {
+          setProgress(Math.round((current / total) * 100));
+        },
       });
       const resultUrl = URL.createObjectURL(resultBlob);
       setProcessedImage(resultUrl);
@@ -134,8 +139,11 @@ export default function PreviewerImage() {
   const handleConfirm = () => {
     if (processedImage)
       updatePreviewImage({
+        ...previewImage,
         src: processedImage,
         fileName: previewImage?.fileName || "processed.png",
+        id: previewImage?.id || "",
+        rotation: previewImage?.rotation || 0,
       });
     setOpenRemoveBg(false);
   };
