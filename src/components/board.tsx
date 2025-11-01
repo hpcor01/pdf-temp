@@ -8,7 +8,7 @@ import { usePreview } from "@/providers/preview-provider";
 import { usePreviewer } from "@/providers/previewer-provider";
 import type { ColumnProps } from "@/types/column";
 import { BtnCreateColumn } from "./btn-create-column";
-import { PreviewerImage } from "./previewer-image";
+import PreviewerImage from "./previewer-image";
 
 // Dynamically import ColumnComponent with optimized loading
 const ColumnComponent = dynamic<ColumnProps>(
