@@ -1,5 +1,6 @@
 "use client";
 
+import { removeBackground } from "@imgly/background-removal";
 import { Check, Crop, Eraser, Loader2, X, ZoomIn } from "lucide-react";
 import Image from "next/image";
 import type React from "react";
@@ -106,7 +107,7 @@ export default function PreviewerImage() {
     });
   };
 
-  // 🔹 Função de remoção de fundo (simulada)
+  // 🔹 Função de remoção de fundo
   const handleRemoveBackground = useCallback(async () => {
     if (!previewImage?.src) return;
     setOpenEditModal(true);
@@ -117,13 +118,9 @@ export default function PreviewerImage() {
     setOriginalImage(previewImage.src);
 
     try {
-      // Simulação de processamento
-      for (let i = 0; i <= 100; i += 10) {
-        setProgress(i);
-        await new Promise((resolve) => setTimeout(resolve, 200));
-      }
-      // Por enquanto, apenas copia a imagem original (remover fundo seria implementado aqui)
-      setProcessedImage(previewImage.src);
+      const blob = await removeBackground(previewImage.src);
+      const url = URL.createObjectURL(blob);
+      setProcessedImage(url);
     } catch (err) {
       console.error("Erro ao remover fundo:", err);
     } finally {
@@ -149,16 +146,9 @@ export default function PreviewerImage() {
     setEditMode(null);
   };
 
-  // 🔹 Função para abrir modal de edição
-  const handleOpenEditModal = () => {
-    setOpenEditModal(true);
-  };
-
   // 🔹 Função para iniciar recorte
   const handleStartCrop = () => {
-    setEditMode("crop");
     handleCrop();
-    setOpenEditModal(false);
   };
 
   // 🔹 Função para iniciar remoção de fundo
@@ -202,11 +192,18 @@ export default function PreviewerImage() {
                     }}
                   />
                   <Button
-                    onClick={handleOpenEditModal}
+                    onClick={handleStartCrop}
+                    className="absolute top-4 left-4 bg-emerald-600 hover:bg-emerald-700 text-white p-3 rounded-full shadow-lg"
+                    size="sm"
+                  >
+                    <Crop className="w-5 h-5" />
+                  </Button>
+                  <Button
+                    onClick={handleStartRemoveBg}
                     className="absolute top-4 right-4 bg-emerald-600 hover:bg-emerald-700 text-white p-3 rounded-full shadow-lg"
                     size="sm"
                   >
-                    <ZoomIn className="w-5 h-5" />
+                    <Eraser className="w-5 h-5" />
                   </Button>
                 </div>
               ) : (
@@ -253,35 +250,7 @@ export default function PreviewerImage() {
             </DialogHeader>
 
             <div className="flex flex-col md:flex-row items-center justify-center h-full w-full bg-zinc-950">
-              {!editMode ? (
-                // Modal de seleção de ferramenta
-                <div className="flex flex-col items-center justify-center h-full w-full text-center space-y-8">
-                  <h2 className="text-2xl font-semibold text-white mb-4">
-                    Escolha uma ferramenta de edição
-                  </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl">
-                    <Button
-                      onClick={handleStartCrop}
-                      className="h-32 flex flex-col items-center justify-center gap-4 bg-gradient-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600 text-white rounded-xl shadow-lg shadow-emerald-500/20"
-                    >
-                      <Crop className="w-8 h-8" />
-                      <span className="text-lg font-medium">Recortar</span>
-                      <span className="text-sm opacity-80">
-                        Selecione uma área
-                      </span>
-                    </Button>
-                    <Button
-                      onClick={handleStartRemoveBg}
-                      variant="outline"
-                      className="h-32 flex flex-col items-center justify-center gap-4 border-gray-700 text-gray-300 hover:bg-gray-800 rounded-xl"
-                    >
-                      <Eraser className="w-8 h-8 text-emerald-400" />
-                      <span className="text-lg font-medium">Remover fundo</span>
-                      <span className="text-sm opacity-80">IA (simulado)</span>
-                    </Button>
-                  </div>
-                </div>
-              ) : processing ? (
+              {processing ? (
                 <div className="flex flex-col items-center justify-center h-full w-full text-center">
                   <Loader2 className="w-10 h-10 text-emerald-500 animate-spin mb-4" />
                   <p className="text-gray-400 text-sm mb-2">
