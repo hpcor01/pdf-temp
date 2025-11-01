@@ -327,11 +327,7 @@ export function Header({
             onToggleAllChange={onToggleAllChange}
             toggleAllColumnsSave={toggleAllColumnsSave}
           />
-          <BackgroundToggle
-            isProcessing={isProcessing}
-            isRemoveBgChecked={isRemoveBgChecked}
-            setIsRemoveBgChecked={setIsRemoveBgChecked}
-          />
+          <BackgroundToggle setIsRemoveBgChecked={setIsRemoveBgChecked} />
           <PDFToggle
             isProcessing={isProcessing}
             isConvertToPDFChecked={isConvertToPDFChecked}
