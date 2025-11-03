@@ -138,7 +138,7 @@ export default function PreviewerImage() {
     );
 
     const dataUrl = canvas.toDataURL("image/png");
-    updatePreviewImage({ ...previewImage, url: dataUrl });
+    updatePreviewImage({ ...previewImage, src: dataUrl });
     setOpenCrop(false);
   };
 
