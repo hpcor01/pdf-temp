@@ -144,15 +144,15 @@ export default function PreviewerImage() {
 
   // Remove fundo via IA
   const handleRemoveBackground = async () => {
-    if (!previewImage?.url) return;
+    if (!previewImage?.src) return;
     setOpenRemoveBg(true);
     setProcessing(true);
     setProgress(0);
     setProcessedImage(null);
-    setOriginalImage(previewImage.url);
+    setOriginalImage(previewImage.src);
 
     try {
-      const blob = await fetch(previewImage.url).then((r) => r.blob());
+      const blob = await fetch(previewImage.src).then((r) => r.blob());
       const resultBlob = await removeBackground(blob, {
         progress: (_status: string, p: number) =>
           setProgress(Math.round(p * 100)),
@@ -172,9 +172,9 @@ export default function PreviewerImage() {
 
         <div className="flex flex-col items-center gap-6">
           <Card className="bg-[#27272A] border-gray-800 w-full max-w-4xl flex items-center justify-center p-4 relative">
-            {previewImage?.url ? (
+            {previewImage?.src ? (
               <Image
-                src={previewImage.url}
+                src={previewImage.src}
                 alt="Imagem"
                 className="max-w-full max-h-[70vh] rounded-lg object-contain"
                 style={{ transform: `scale(${zoom / 100})` }}
