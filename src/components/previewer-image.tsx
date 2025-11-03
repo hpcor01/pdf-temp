@@ -1,60 +1,59 @@
 "use client";
-
-import React, { useEffect, useRef, useState } from "react";
+import { removeBackground } from "@imgly/background-removal";
+import { Check, Crop, Eraser, Loader2, X } from "lucide-react";
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Slider } from "@/components/ui/slider";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
-  Upload,
-  Download,
-  RotateCcw,
-  ZoomIn,
-  Crop,
-  Eraser,
-  X,
-  Check,
-  Loader2,
-} from "lucide-react";
-import { removeBackground } from "@imgly/background-removal";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Slider } from "@/components/ui/slider";
 import { usePreviewer } from "@/providers/previewer-provider";
-import { useKanban } from "@/providers/kanban-provider";
 
 export default function PreviewerImage() {
-  const { imageUrl, updatePreviewImage, removeBackgroundToggle } = usePreviewer();
-  const { closePreview } = useKanban();
+  const { previewImage, updatePreviewImage } = usePreviewer();
 
-  const [image, setImage] = useState<HTMLImageElement | null>(null);
   const [zoom, setZoom] = useState(100);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [image, setImage] = useState<HTMLImageElement | null>(null);
 
-  // 🔹 Recorte
+  // Estados do recorte
   const [openCrop, setOpenCrop] = useState(false);
-  const [cropArea, setCropArea] = useState({ x: 100, y: 100, width: 200, height: 200 });
+  const [cropArea, setCropArea] = useState({
+    x: 100,
+    y: 100,
+    width: 200,
+    height: 200,
+  });
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [resizeHandle, setResizeHandle] = useState<string | null>(null);
 
-  // 🔹 Remover fundo (IA)
+  // Estados do remover fundo
   const [openRemoveBg, setOpenRemoveBg] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [originalImage, setOriginalImage] = useState<string | null>(null);
   const [processedImage, setProcessedImage] = useState<string | null>(null);
   const [progress, setProgress] = useState<number>(0);
 
-  // Carrega imagem base
+  // Carrega imagem
   useEffect(() => {
-    if (!imageUrl) return;
-    const img = new Image();
-    img.src = imageUrl;
+    if (!previewImage?.url) return;
+    const img = new window.Image() as HTMLImageElement;
+    img.src = previewImage.url;
     img.onload = () => setImage(img);
-  }, [imageUrl]);
+  }, [previewImage]);
 
-  // 🟢 Controle de redimensionamento
-  const handleMouseDown = (e: React.MouseEvent, handle: string | null = null) => {
+  // Controle de arrastar/redimensionar recorte
+  const handleMouseDown = (
+    e: React.MouseEvent,
+    handle: string | null = null
+  ) => {
     e.preventDefault();
     e.stopPropagation();
     setDragStart({ x: e.clientX, y: e.clientY });
@@ -66,38 +65,43 @@ export default function PreviewerImage() {
     }
   };
 
-  const handleMouseMove = (e: MouseEvent) => {
-    if (!isDragging && !isResizing) return;
-    const dx = e.clientX - dragStart.x;
-    const dy = e.clientY - dragStart.y;
-    setDragStart({ x: e.clientX, y: e.clientY });
+  const handleMouseMove = useCallback(
+    (e: MouseEvent) => {
+      if (!isDragging && !isResizing) return;
+      const dx = e.clientX - dragStart.x;
+      const dy = e.clientY - dragStart.y;
+      setDragStart({ x: e.clientX, y: e.clientY });
 
-    setCropArea((prev) => {
-      const newArea = { ...prev };
-      if (isDragging) {
-        newArea.x += dx;
-        newArea.y += dy;
-      } else if (isResizing && resizeHandle) {
-        if (resizeHandle.includes("e")) newArea.width = Math.max(50, prev.width + dx);
-        if (resizeHandle.includes("s")) newArea.height = Math.max(50, prev.height + dy);
-        if (resizeHandle.includes("w")) {
+      setCropArea((prev) => {
+        const newArea = { ...prev };
+        if (isDragging) {
           newArea.x += dx;
-          newArea.width = Math.max(50, prev.width - dx);
-        }
-        if (resizeHandle.includes("n")) {
           newArea.y += dy;
-          newArea.height = Math.max(50, prev.height - dy);
+        } else if (isResizing && resizeHandle) {
+          if (resizeHandle.includes("e"))
+            newArea.width = Math.max(50, prev.width + dx);
+          if (resizeHandle.includes("s"))
+            newArea.height = Math.max(50, prev.height + dy);
+          if (resizeHandle.includes("w")) {
+            newArea.x += dx;
+            newArea.width = Math.max(50, prev.width - dx);
+          }
+          if (resizeHandle.includes("n")) {
+            newArea.y += dy;
+            newArea.height = Math.max(50, prev.height - dy);
+          }
         }
-      }
-      return newArea;
-    });
-  };
+        return newArea;
+      });
+    },
+    [isDragging, isResizing, dragStart, resizeHandle]
+  );
 
-  const handleMouseUp = () => {
+  const handleMouseUp = useCallback(() => {
     setIsDragging(false);
     setIsResizing(false);
     setResizeHandle(null);
-  };
+  }, []);
 
   useEffect(() => {
     if (isDragging || isResizing) {
@@ -108,11 +112,11 @@ export default function PreviewerImage() {
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [isDragging, isResizing, dragStart, resizeHandle]);
+  }, [isDragging, isResizing, handleMouseMove, handleMouseUp]);
 
-  // 🟢 Aplicar recorte
+  // Aplica recorte
   const handleCrop = () => {
-    if (!image || !canvasRef.current) return;
+    if (!image || !canvasRef.current || !previewImage) return;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
@@ -134,23 +138,24 @@ export default function PreviewerImage() {
     );
 
     const dataUrl = canvas.toDataURL("image/png");
-    updatePreviewImage(dataUrl);
+    updatePreviewImage({ ...previewImage, url: dataUrl });
     setOpenCrop(false);
   };
 
-  // 🧠 Remover fundo via IA
+  // Remove fundo via IA
   const handleRemoveBackground = async () => {
-    if (!imageUrl) return;
+    if (!previewImage?.url) return;
     setOpenRemoveBg(true);
     setProcessing(true);
     setProgress(0);
     setProcessedImage(null);
-    setOriginalImage(imageUrl);
+    setOriginalImage(previewImage.url);
 
     try {
-      const blob = await fetch(imageUrl).then((r) => r.blob());
+      const blob = await fetch(previewImage.url).then((r) => r.blob());
       const resultBlob = await removeBackground(blob, {
-        progress: (p: number) => setProgress(Math.round(p * 100)),
+        progress: (_status: string, p: number) =>
+          setProgress(Math.round(p * 100)),
       });
       const resultUrl = URL.createObjectURL(resultBlob);
       setProcessedImage(resultUrl);
@@ -160,22 +165,16 @@ export default function PreviewerImage() {
       setProcessing(false);
     }
   };
-
-  useEffect(() => {
-    if (removeBackgroundToggle) handleRemoveBackground();
-  }, [removeBackgroundToggle]);
   return (
     <div className="min-h-screen bg-[#18181B] p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
-        {/* Canvas oculto */}
         <canvas ref={canvasRef} className="hidden" />
 
         <div className="flex flex-col items-center gap-6">
-          {/* Imagem principal */}
           <Card className="bg-[#27272A] border-gray-800 w-full max-w-4xl flex items-center justify-center p-4 relative">
-            {imageUrl ? (
-              <img
-                src={imageUrl}
+            {previewImage?.url ? (
+              <Image
+                src={previewImage.url}
                 alt="Imagem"
                 className="max-w-full max-h-[70vh] rounded-lg object-contain"
                 style={{ transform: `scale(${zoom / 100})` }}
@@ -186,13 +185,18 @@ export default function PreviewerImage() {
             )}
           </Card>
 
-          {/* Controles */}
           <div className="flex flex-wrap justify-center gap-4 w-full max-w-3xl">
             <div className="flex flex-col items-center w-64">
-              <label className="text-sm text-gray-400 mb-1">Zoom: {zoom}%</label>
+              <label
+                htmlFor="zoom-slider"
+                className="text-sm text-gray-400 mb-1"
+              >
+                Zoom: {zoom}%
+              </label>
               <Slider
+                id="zoom-slider"
                 value={[zoom]}
-                onValueChange={(v) => setZoom(v[0])}
+                onValueChange={(v) => setZoom(v?.[0] ?? 100)}
                 min={25}
                 max={200}
                 step={5}
@@ -216,14 +220,18 @@ export default function PreviewerImage() {
           </div>
         </div>
 
-        {/* 🟢 Modal de Recorte */}
+        {/* Modal Recorte */}
         <Dialog open={openCrop} onOpenChange={setOpenCrop}>
           <DialogContent className="max-w-5xl h-[85vh] bg-zinc-900 border border-zinc-800 text-white p-0 overflow-hidden">
             <DialogHeader className="p-4 border-b border-zinc-800 flex justify-between items-center">
               <DialogTitle className="flex items-center gap-2 text-lg">
                 <Crop className="w-5 h-5 text-emerald-500" /> Recortar Imagem
               </DialogTitle>
-              <Button variant="ghost" onClick={() => setOpenCrop(false)} className="text-gray-400 hover:text-white">
+              <Button
+                variant="ghost"
+                onClick={() => setOpenCrop(false)}
+                className="text-gray-400 hover:text-white"
+              >
                 <X className="w-5 h-5" />
               </Button>
             </DialogHeader>
@@ -231,16 +239,14 @@ export default function PreviewerImage() {
             <div className="relative w-full h-full flex items-center justify-center bg-zinc-950">
               {image ? (
                 <div className="relative w-[90%] h-[80%] flex items-center justify-center">
-                  <img
+                  <Image
                     src={image.src}
                     alt="Imagem"
                     className="max-w-full max-h-full object-contain select-none"
                     style={{ transform: `scale(${zoom / 100})` }}
                     draggable={false}
                   />
-
-                  {/* Área de recorte */}
-                  <div
+                  <button
                     className="absolute border-2 border-emerald-500 bg-black/10 cursor-move"
                     style={{
                       left: cropArea.x,
@@ -249,36 +255,50 @@ export default function PreviewerImage() {
                       height: cropArea.height,
                     }}
                     onMouseDown={(e) => handleMouseDown(e)}
+                    type="button"
                   >
-                    {/* Linhas de grade */}
                     <div className="absolute inset-0 grid grid-cols-3 grid-rows-3 pointer-events-none">
-                      {[...Array(9)].map((_, i) => (
-                        <div key={i} className="border border-emerald-500/30" />
+                      {[
+                        "grid-0",
+                        "grid-1",
+                        "grid-2",
+                        "grid-3",
+                        "grid-4",
+                        "grid-5",
+                        "grid-6",
+                        "grid-7",
+                        "grid-8",
+                      ].map((key) => (
+                        <div
+                          key={key}
+                          className="border border-emerald-500/30"
+                        />
                       ))}
                     </div>
-
-                    {/* Alças de redimensionamento */}
-                    {["nw", "n", "ne", "w", "e", "sw", "s", "se"].map((handle) => (
-                      <div
-                        key={handle}
-                        className="absolute w-5 h-5 bg-emerald-500 border-2 border-white rounded-full cursor-pointer hover:scale-125 transition-transform"
-                        style={{
-                          top: handle.includes("n")
-                            ? -10
-                            : handle.includes("s")
-                            ? "calc(100% - 10px)"
-                            : "calc(50% - 10px)",
-                          left: handle.includes("w")
-                            ? -10
-                            : handle.includes("e")
-                            ? "calc(100% - 10px)"
-                            : "calc(50% - 10px)",
-                          cursor: `${handle}-resize`,
-                        }}
-                        onMouseDown={(e) => handleMouseDown(e, handle)}
-                      />
-                    ))}
-                  </div>
+                    {["nw", "n", "ne", "w", "e", "sw", "s", "se"].map(
+                      (handle) => (
+                        <button
+                          key={handle}
+                          className="absolute w-5 h-5 bg-emerald-500 border-2 border-white rounded-full cursor-pointer hover:scale-125 transition-transform"
+                          style={{
+                            top: handle.includes("n")
+                              ? -10
+                              : handle.includes("s")
+                                ? "calc(100% - 10px)"
+                                : "calc(50% - 10px)",
+                            left: handle.includes("w")
+                              ? -10
+                              : handle.includes("e")
+                                ? "calc(100% - 10px)"
+                                : "calc(50% - 10px)",
+                            cursor: `${handle}-resize`,
+                          }}
+                          onMouseDown={(e) => handleMouseDown(e, handle)}
+                          type="button"
+                        />
+                      )
+                    )}
+                  </button>
                 </div>
               ) : (
                 <p className="text-gray-500">Nenhuma imagem carregada</p>
@@ -303,14 +323,18 @@ export default function PreviewerImage() {
           </DialogContent>
         </Dialog>
 
-        {/* 🧠 Modal de IA (Remover Fundo) */}
+        {/* Modal IA */}
         <Dialog open={openRemoveBg} onOpenChange={setOpenRemoveBg}>
           <DialogContent className="max-w-5xl h-[85vh] bg-zinc-900 border border-zinc-800 text-white p-0 overflow-hidden">
             <DialogHeader className="p-4 border-b border-zinc-800 flex justify-between items-center">
               <DialogTitle className="flex items-center gap-2 text-lg">
                 <Eraser className="w-5 h-5 text-emerald-500" /> Remover Fundo
               </DialogTitle>
-              <Button variant="ghost" onClick={() => setOpenRemoveBg(false)} className="text-gray-400 hover:text-white">
+              <Button
+                variant="ghost"
+                onClick={() => setOpenRemoveBg(false)}
+                className="text-gray-400 hover:text-white"
+              >
                 <X className="w-5 h-5" />
               </Button>
             </DialogHeader>
@@ -319,7 +343,9 @@ export default function PreviewerImage() {
               {processing ? (
                 <div className="flex flex-col items-center justify-center h-full w-full text-center">
                   <Loader2 className="w-10 h-10 text-emerald-500 animate-spin mb-4" />
-                  <p className="text-gray-400 text-sm mb-2">Removendo fundo...</p>
+                  <p className="text-gray-400 text-sm mb-2">
+                    Removendo fundo...
+                  </p>
                   <p className="text-gray-500 text-xs">{progress}%</p>
                 </div>
               ) : (
@@ -351,11 +377,17 @@ export default function PreviewerImage() {
                 </div>
               )}
             </div>
+
             {!processing && processedImage && (
               <div className="flex justify-center gap-4 p-4 border-t border-zinc-800 bg-zinc-900">
                 <Button
                   onClick={() => {
-                    if (processedImage) updatePreviewImage(processedImage);
+                    if (processedImage && previewImage) {
+                      updatePreviewImage({
+                        ...previewImage,
+                        url: processedImage,
+                      });
+                    }
                     setOpenRemoveBg(false);
                   }}
                   className="bg-emerald-600 hover:bg-emerald-700 text-white flex items-center gap-2"
