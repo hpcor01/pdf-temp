@@ -385,7 +385,7 @@ export default function PreviewerImage() {
                     if (processedImage && previewImage) {
                       updatePreviewImage({
                         ...previewImage,
-                        url: processedImage,
+                        src: processedImage,
                       });
                     }
                     setOpenRemoveBg(false);
