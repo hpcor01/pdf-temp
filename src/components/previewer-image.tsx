@@ -43,9 +43,9 @@ export default function PreviewerImage() {
 
   // Carrega imagem
   useEffect(() => {
-    if (!previewImage?.url) return;
+    if (!previewImage?.src) return;
     const img = new window.Image() as HTMLImageElement;
-    img.src = previewImage.url;
+    img.src = previewImage.src;
     img.onload = () => setImage(img);
   }, [previewImage]);
 
