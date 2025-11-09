@@ -1,0 +1,139 @@
+[1mdiff --git a/src/components/header.tsx b/src/components/header.tsx[m
+[1mindex 05d96a0..3eb3b12 100644[m
+[1m--- a/src/components/header.tsx[m
+[1m+++ b/src/components/header.tsx[m
+[36m@@ -31,14 +31,13 @@[m [mexport function Header({[m
+   onToggleAllChange,[m
+   toggleAllColumnsSave,[m
+ }: HeaderProps) {[m
+[31m-  const { selectedColumns, columns } = useKanban();[m
+[32m+[m[32m  const { selectedColumns, columns, isRemoveBgChecked, setIsRemoveBgChecked } = useKanban();[m
+ [m
+   const buttons = useLanguageKey("buttons");[m
+   const headerTranslations = useLanguageKey("header");[m
+   const saveLocationTranslations = useLanguageKey("save-location-toggle");[m
+ [m
+   const [isConvertToPDFChecked, setIsConvertToPDFChecked] = useState(true);[m
+[31m-  const [isRemoveBgChecked, setIsRemoveBgChecked] = useState(false);[m
+   const [isSingleSaveLocation, setIsSingleSaveLocation] = useState(false);[m
+   const [saveFolderPath, setSaveFolderPath] = useState("");[m
+   const [toastOpen, setToastOpen] = useState(false);[m
+[36m@@ -170,51 +169,32 @@[m [mexport function Header({[m
+       }[m
+ [m
+       if (isRemoveBgChecked && isConvertToPDFChecked) {[m
+[31m-        const processedColumns: Column[] = [];[m
+[31m-[m
+[31m-        for (const col of selectedCols) {[m
+[31m-          const processedItems = await removeBackgroundBatch(col.items);[m
+[31m-          processedColumns.push({[m
+[31m-            ...col,[m
+[31m-            items: processedItems,[m
+[31m-          });[m
+[31m-        }[m
+[31m-[m
+[32m+[m[32m        // Background removal will be handled in the modal, not here[m
+[32m+[m[32m        // For now, just generate PDFs normally[m
+         if (isSingleSaveLocation) {[m
+           // Generate a single PDF with all columns when single save location is enabled[m
+[31m-          await generateSinglePDFForColumns([m
+[31m-            processedColumns,[m
+[31m-            processedColumns.reduce([m
+[31m-              (acc, col) => {[m
+[31m-                acc[col.id] = true;[m
+[31m-                return acc;[m
+[31m-              },[m
+[31m-              {} as Record<string, boolean>[m
+[31m-            )[m
+[31m-          );[m
+[32m+[m[32m          await generateSinglePDFForColumns(columns, selectedColumns);[m
+ [m
+           setIsProcessing(false);[m
+           showToast([m
+             "default",[m
+[31m-            headerTranslations["pdfs-generated-title"],[m
+[31m-            headerTranslations["pdfs-generated-description"].replace([m
+[32m+[m[32m            headerTranslations["pdf-generated-title"],[m
+[32m+[m[32m            headerTranslations["pdf-generated-description"].replace([m
+               "{{count}}",[m
+               "1"[m
+             )[m
+           );[m
+         } else {[m
+           // Generate separate PDFs for each column[m
+[31m-          for (const col of processedColumns) {[m
+[31m-            await generatePDFForColumns([col], { [col.id]: true });[m
+[31m-          }[m
+[32m+[m[32m          await generatePDFForColumns(columns, selectedColumns);[m
+ [m
+           setIsProcessing(false);[m
+           showToast([m
+             "default",[m
+[31m-            headerTranslations["pdfs-generated-title"],[m
+[31m-            headerTranslations["pdfs-generated-description"].replace([m
+[32m+[m[32m            headerTranslations["pdf-generated-title"],[m
+[32m+[m[32m            headerTranslations["pdf-generated-description"].replace([m
+               "{{count}}",[m
+[31m-              selectedCols.length.toString()[m
+[32m+[m[32m              selectedColumnsCount.toString()[m
+             )[m
+           );[m
+         }[m
+[36m@@ -247,11 +227,12 @@[m [mexport function Header({[m
+           );[m
+         }[m
+       } else if (isRemoveBgChecked && !isConvertToPDFChecked) {[m
+[32m+[m[32m        // Background removal will be handled in the modal, not here[m
+[32m+[m[32m        // For now, just download images normally[m
+         let downloadCount = 0;[m
+ [m
+         for (const col of selectedCols) {[m
+[31m-          const processedItems = await removeBackgroundBatch(col.items);[m
+[31m-          for (const item of processedItems) {[m
+[32m+[m[32m          for (const item of col.items) {[m
+             triggerDownload(item.src, item.fileName);[m
+             downloadCount++;[m
+           }[m
+[1mdiff --git a/src/providers/kanban-provider.tsx b/src/providers/kanban-provider.tsx[m
+[1mindex ae3656c..33dff7a 100644[m
+[1m--- a/src/providers/kanban-provider.tsx[m
+[1m+++ b/src/providers/kanban-provider.tsx[m
+[36m@@ -24,6 +24,7 @@[m [mexport function KanbanProvider({ children }: { children: ReactNode }) {[m
+   const [selectedColumns, setSelectedColumns] = useState<[m
+     Record<string, boolean>[m
+   >({});[m
+[32m+[m[32m  const [isRemoveBgChecked, setIsRemoveBgChecked] = useState(false);[m
+ [m
+   // Memoize areAllColumnsSelected to prevent unnecessary recalculations[m
+   const areAllColumnsSelected = useMemo([m
+[36m@@ -225,6 +226,8 @@[m [mexport function KanbanProvider({ children }: { children: ReactNode }) {[m
+     () => ({[m
+       columns,[m
+       selectedColumns,[m
+[32m+[m[32m      isRemoveBgChecked,[m
+[32m+[m[32m      setIsRemoveBgChecked,[m
+       addColumn,[m
+       removeColumn,[m
+       renameColumn,[m
+[36m@@ -242,6 +245,8 @@[m [mexport function KanbanProvider({ children }: { children: ReactNode }) {[m
+     [[m
+       columns,[m
+       selectedColumns,[m
+[32m+[m[32m      isRemoveBgChecked,[m
+[32m+[m[32m      setIsRemoveBgChecked,[m
+       addColumn,[m
+       removeColumn,[m
+       renameColumn,[m
+[1mdiff --git a/src/types/kanban.d.ts b/src/types/kanban.d.ts[m
+[1mindex 5a3144a..378ac66 100644[m
+[1m--- a/src/types/kanban.d.ts[m
+[1m+++ b/src/types/kanban.d.ts[m
+[36m@@ -19,6 +19,8 @@[m [mexport interface Column {[m
+ export interface KanbanContextType {[m
+   columns: Column[];[m
+   selectedColumns: Record<string, boolean>;[m
+[32m+[m[32m  isRemoveBgChecked: boolean;[m
+[32m+[m[32m  setIsRemoveBgChecked: (checked: boolean) => void;[m
+   addColumn: (title: string) => void;[m
+   removeColumn: (id: string) => void;[m
+   renameColumn: (id: string, title: string) => void;[m
