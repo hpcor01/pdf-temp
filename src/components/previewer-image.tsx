@@ -15,7 +15,7 @@ export function PreviewerImage() {
     closePreviewer,
     updatePreviewImage,
   } = usePreviewer();
-  const { updateImage } = useKanban();
+  const { updateImage, isRemoveBgChecked } = useKanban();
 
   const [croppedImage, setCroppedImage] = useState<string | null>(null);
   const [toastOpen, setToastOpen] = useState(false);
@@ -40,15 +40,35 @@ export function PreviewerImage() {
     [previewImage, previewImageColumnId, updateImage, updatePreviewImage]
   );
 
+  const handleSaveBackgroundRemoval = useCallback(
+    (processed: string) => {
+      if (previewImage) {
+        const updated = { ...previewImage, src: processed };
+        updatePreviewImage(updated);
+        if (previewImageColumnId) updateImage(previewImageColumnId, updated);
+        showToast("Fundo removido", "O fundo foi removido com sucesso.");
+      }
+    },
+    [previewImage, previewImageColumnId, updateImage, updatePreviewImage]
+  );
+
   if (!isPreviewerOpen || !previewImage) return null;
 
   return (
     <>
-      <CropModal
-        imageSrc={previewImage.src}
-        onClose={closePreviewer}
-        onSave={handleSaveCrop}
-      />
+      {isRemoveBgChecked ? (
+        <BackgroundRemovalModal
+          imageSrc={previewImage.src}
+          onClose={closePreviewer}
+          onSave={handleSaveBackgroundRemoval}
+        />
+      ) : (
+        <CropModal
+          imageSrc={previewImage.src}
+          onClose={closePreviewer}
+          onSave={handleSaveCrop}
+        />
+      )}
       <Toast
         title={toastTitle}
         description={toastDescription}
@@ -57,6 +77,103 @@ export function PreviewerImage() {
         variant="default"
       />
     </>
+  );
+}
+
+function BackgroundRemovalModal({
+  imageSrc,
+  onClose,
+  onSave,
+}: {
+  imageSrc: string;
+  onClose: () => void;
+  onSave: (processed: string) => void;
+}) {
+  const [image, setImage] = useState<HTMLImageElement | null>(null);
+  const [processedImage, setProcessedImage] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  // Carregar imagem
+  useEffect(() => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => setImage(img);
+    img.src = imageSrc;
+  }, [imageSrc]);
+
+  const handleRemoveBackground = async () => {
+    if (!image) return;
+
+    setIsProcessing(true);
+    try {
+      const { removeBackground } = await import("@imgly/background-removal");
+
+      const blob = await fetch(image.src).then(res => res.blob());
+      const processedBlob = await removeBackground(blob);
+      const processedUrl = URL.createObjectURL(processedBlob);
+
+      setProcessedImage(processedUrl);
+    } catch (error) {
+      console.error("Error removing background:", error);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleSave = () => {
+    if (processedImage) {
+      onSave(processedImage);
+      onClose();
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-[9999] bg-black/80 flex items-center justify-center select-none">
+      <div className="relative w-[95%] h-[90%] bg-[#18181B] overflow-hidden rounded-2xl border border-gray-700 flex flex-col">
+        {/* Imagem */}
+        <div className="flex-1 flex items-center justify-center p-4">
+          {processedImage ? (
+            <img
+              src={processedImage}
+              alt="Background removed"
+              className="max-w-full max-h-full object-contain"
+            />
+          ) : image ? (
+            <img
+              src={image.src}
+              alt="Original"
+              className="max-w-full max-h-full object-contain"
+            />
+          ) : (
+            <div className="text-white">Carregando imagem...</div>
+          )}
+        </div>
+
+        {/* Controles */}
+        <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-4 bg-black/70 rounded-full px-6 py-3 items-center">
+          {!processedImage && (
+            <Button
+              size="sm"
+              onClick={handleRemoveBackground}
+              disabled={isProcessing}
+            >
+              {isProcessing ? "Processando..." : "Remover Fundo"}
+            </Button>
+          )}
+          {processedImage && (
+            <Button size="sm" onClick={handleSave}>
+              Salvar
+            </Button>
+          )}
+          <Button variant="destructive" size="sm" onClick={onClose}>
+            Cancelar
+          </Button>
+        </div>
+
+        <canvas ref={canvasRef} className="hidden" />
+      </div>
+    </div>
   );
 }
 
