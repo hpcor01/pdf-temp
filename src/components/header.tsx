@@ -31,14 +31,13 @@ export function Header({
   onToggleAllChange,
   toggleAllColumnsSave,
 }: HeaderProps) {
-  const { selectedColumns, columns } = useKanban();
+  const { selectedColumns, columns, isRemoveBgChecked, setIsRemoveBgChecked } = useKanban();
 
   const buttons = useLanguageKey("buttons");
   const headerTranslations = useLanguageKey("header");
   const saveLocationTranslations = useLanguageKey("save-location-toggle");
 
   const [isConvertToPDFChecked, setIsConvertToPDFChecked] = useState(true);
-  const [isRemoveBgChecked, setIsRemoveBgChecked] = useState(false);
   const [isSingleSaveLocation, setIsSingleSaveLocation] = useState(false);
   const [saveFolderPath, setSaveFolderPath] = useState("");
   const [toastOpen, setToastOpen] = useState(false);
@@ -170,51 +169,32 @@ export function Header({
       }
 
       if (isRemoveBgChecked && isConvertToPDFChecked) {
-        const processedColumns: Column[] = [];
-
-        for (const col of selectedCols) {
-          const processedItems = await removeBackgroundBatch(col.items);
-          processedColumns.push({
-            ...col,
-            items: processedItems,
-          });
-        }
-
+        // Background removal will be handled in the modal, not here
+        // For now, just generate PDFs normally
         if (isSingleSaveLocation) {
           // Generate a single PDF with all columns when single save location is enabled
-          await generateSinglePDFForColumns(
-            processedColumns,
-            processedColumns.reduce(
-              (acc, col) => {
-                acc[col.id] = true;
-                return acc;
-              },
-              {} as Record<string, boolean>
-            )
-          );
+          await generateSinglePDFForColumns(columns, selectedColumns);
 
           setIsProcessing(false);
           showToast(
             "default",
-            headerTranslations["pdfs-generated-title"],
-            headerTranslations["pdfs-generated-description"].replace(
+            headerTranslations["pdf-generated-title"],
+            headerTranslations["pdf-generated-description"].replace(
               "{{count}}",
               "1"
             )
           );
         } else {
           // Generate separate PDFs for each column
-          for (const col of processedColumns) {
-            await generatePDFForColumns([col], { [col.id]: true });
-          }
+          await generatePDFForColumns(columns, selectedColumns);
 
           setIsProcessing(false);
           showToast(
             "default",
-            headerTranslations["pdfs-generated-title"],
-            headerTranslations["pdfs-generated-description"].replace(
+            headerTranslations["pdf-generated-title"],
+            headerTranslations["pdf-generated-description"].replace(
               "{{count}}",
-              selectedCols.length.toString()
+              selectedColumnsCount.toString()
             )
           );
         }
@@ -247,11 +227,12 @@ export function Header({
           );
         }
       } else if (isRemoveBgChecked && !isConvertToPDFChecked) {
+        // Background removal will be handled in the modal, not here
+        // For now, just download images normally
         let downloadCount = 0;
 
         for (const col of selectedCols) {
-          const processedItems = await removeBackgroundBatch(col.items);
-          for (const item of processedItems) {
+          for (const item of col.items) {
             triggerDownload(item.src, item.fileName);
             downloadCount++;
           }
