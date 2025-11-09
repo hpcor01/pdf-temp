@@ -14,7 +14,7 @@ import {
   generateSinglePDFForColumns,
   savePDFToDirectory,
 } from "@/lib/pdf";
-import { removeBackgroundBatch } from "@/lib/rem-bg";
+
 import { useKanban } from "@/providers/kanban-provider";
 import type { HeaderProps } from "@/types/header";
 import type { Column } from "@/types/kanban";
