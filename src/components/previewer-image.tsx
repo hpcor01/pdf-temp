@@ -109,7 +109,8 @@ function BackgroundRemovalModal({
     try {
       const { removeBackground } = await import("@imgly/background-removal");
 
-      const blob = await fetch(image.src).then(res => res.blob());
+      const response = await fetch(image.src);
+      const blob = await response.blob();
       const processedBlob = await removeBackground(blob);
       const processedUrl = URL.createObjectURL(processedBlob);
 
