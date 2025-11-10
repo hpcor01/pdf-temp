@@ -24,6 +24,7 @@ export function KanbanProvider({ children }: { children: ReactNode }) {
   const [selectedColumns, setSelectedColumns] = useState<
     Record<string, boolean>
   >({});
+  const [isRemoveBgChecked, setIsRemoveBgChecked] = useState(false);
 
   // Memoize areAllColumnsSelected to prevent unnecessary recalculations
   const areAllColumnsSelected = useMemo(
@@ -225,6 +226,8 @@ export function KanbanProvider({ children }: { children: ReactNode }) {
     () => ({
       columns,
       selectedColumns,
+      isRemoveBgChecked,
+      setIsRemoveBgChecked,
       addColumn,
       removeColumn,
       renameColumn,
@@ -242,6 +245,8 @@ export function KanbanProvider({ children }: { children: ReactNode }) {
     [
       columns,
       selectedColumns,
+      isRemoveBgChecked,
+      setIsRemoveBgChecked,
       addColumn,
       removeColumn,
       renameColumn,
