@@ -143,7 +143,7 @@ function BackgroundRemovalModal({
       const response = await fetch(image.src);
       const blob = await response.blob();
       const processedBlob = await removeBackground(blob, {
-        model: 'u2net', // Better model for documents and fine details
+        model: 'isnet', // Better model for documents and fine details
         output: {
           format: 'image/png',
           quality: 0.8,
