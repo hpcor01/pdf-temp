@@ -111,10 +111,33 @@ function BackgroundRemovalModal({
 
       const response = await fetch(image.src);
       const blob = await response.blob();
-      const processedBlob = await removeBackground(blob);
-      const processedUrl = URL.createObjectURL(processedBlob);
+      const processedBlob = await removeBackground(blob, {
+        publicPath: '/models/',
+        output: {
+          format: 'image/png',
+          quality: 0.8,
+        },
+      });
 
-      setProcessedImage(processedUrl);
+      // Convert to white background
+      const canvas = canvasRef.current;
+      if (canvas) {
+        const ctx = canvas.getContext("2d")!;
+        const img = new Image();
+        img.onload = () => {
+          canvas.width = img.width;
+          canvas.height = img.height;
+          ctx.fillStyle = "white";
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0);
+          const whiteBgUrl = canvas.toDataURL("image/png");
+          setProcessedImage(whiteBgUrl);
+        };
+        img.src = URL.createObjectURL(processedBlob);
+      } else {
+        const processedUrl = URL.createObjectURL(processedBlob);
+        setProcessedImage(processedUrl);
+      }
     } catch (error) {
       console.error("Error removing background:", error);
     } finally {
