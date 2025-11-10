@@ -93,6 +93,10 @@ function BackgroundRemovalModal({
   const [processedImage, setProcessedImage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [zoom, setZoom] = useState(1);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [draggingImage, setDraggingImage] = useState(false);
+  const [startPos, setStartPos] = useState({ x: 0, y: 0 });
+  const [startPosition, setStartPosition] = useState(position);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   // Carregar imagem
@@ -102,6 +106,32 @@ function BackgroundRemovalModal({
     img.onload = () => setImage(img);
     img.src = imageSrc;
   }, [imageSrc]);
+
+  // Reset handlers
+  useEffect(() => {
+    const handleUp = () => {
+      setDraggingImage(false);
+    };
+    window.addEventListener("mouseup", handleUp);
+    return () => window.removeEventListener("mouseup", handleUp);
+  }, []);
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (draggingImage) {
+      const dx = e.clientX - startPos.x;
+      const dy = e.clientY - startPos.y;
+      setPosition({
+        x: startPosition.x + dx,
+        y: startPosition.y + dy,
+      });
+    }
+  };
+
+  const handleImageMouseDown = (e: React.MouseEvent) => {
+    setDraggingImage(true);
+    setStartPos({ x: e.clientX, y: e.clientY });
+    setStartPosition(position);
+  };
 
   const handleRemoveBackground = async () => {
     if (!image) return;
@@ -113,7 +143,6 @@ function BackgroundRemovalModal({
       const response = await fetch(image.src);
       const blob = await response.blob();
       const processedBlob = await removeBackground(blob, {
-        publicPath: '/models/',
         output: {
           format: 'image/png',
           quality: 0.8,
@@ -155,22 +184,31 @@ function BackgroundRemovalModal({
 
   return (
     <div className="fixed inset-0 z-[9999] bg-black/80 flex items-center justify-center select-none">
-      <div className="relative w-[95%] h-[90%] bg-[#18181B] overflow-hidden rounded-2xl border border-gray-700 flex flex-col">
+      <div
+        className="relative w-[95%] h-[90%] bg-[#18181B] overflow-hidden rounded-2xl border border-gray-700 flex flex-col"
+        onMouseMove={handleMouseMove}
+      >
         {/* Imagem */}
         <div className="flex-1 flex items-center justify-center p-4">
           {processedImage ? (
             <img
               src={processedImage}
               alt="Background removed"
-              className="max-w-full max-h-full object-contain"
-              style={{ transform: `scale(${zoom})` }}
+              className="absolute top-1/2 left-1/2 object-contain cursor-grab"
+              onMouseDown={handleImageMouseDown}
+              style={{
+                transform: `translate(-50%, -50%) scale(${zoom}) translate(${position.x}px, ${position.y}px)`,
+              }}
             />
           ) : image ? (
             <img
               src={image.src}
               alt="Original"
-              className="max-w-full max-h-full object-contain"
-              style={{ transform: `scale(${zoom})` }}
+              className="absolute top-1/2 left-1/2 object-contain cursor-grab"
+              onMouseDown={handleImageMouseDown}
+              style={{
+                transform: `translate(-50%, -50%) scale(${zoom}) translate(${position.x}px, ${position.y}px)`,
+              }}
             />
           ) : (
             <div className="text-white">Carregando imagem...</div>
