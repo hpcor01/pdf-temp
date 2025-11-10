@@ -246,6 +246,7 @@ export function KanbanProvider({ children }: { children: ReactNode }) {
       columns,
       selectedColumns,
       isRemoveBgChecked,
+      setIsRemoveBgChecked,
       addColumn,
       removeColumn,
       renameColumn,
