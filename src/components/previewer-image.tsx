@@ -92,6 +92,7 @@ function BackgroundRemovalModal({
   const [image, setImage] = useState<HTMLImageElement | null>(null);
   const [processedImage, setProcessedImage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [zoom, setZoom] = useState(1);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   // Carregar imagem
@@ -162,12 +163,14 @@ function BackgroundRemovalModal({
               src={processedImage}
               alt="Background removed"
               className="max-w-full max-h-full object-contain"
+              style={{ transform: `scale(${zoom})` }}
             />
           ) : image ? (
             <img
               src={image.src}
               alt="Original"
               className="max-w-full max-h-full object-contain"
+              style={{ transform: `scale(${zoom})` }}
             />
           ) : (
             <div className="text-white">Carregando imagem...</div>
@@ -176,6 +179,21 @@ function BackgroundRemovalModal({
 
         {/* Controles */}
         <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-4 bg-black/70 rounded-full px-6 py-3 items-center">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setZoom((z) => Math.max(0.2, z - 0.1))}
+          >
+            <ZoomOut className="w-4 h-4" />
+          </Button>
+          <span className="text-white">{Math.round(zoom * 100)}%</span>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setZoom((z) => Math.min(3, z + 0.1))}
+          >
+            <ZoomIn className="w-4 h-4" />
+          </Button>
           {!processedImage && (
             <Button
               size="sm"
