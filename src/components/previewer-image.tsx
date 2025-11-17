@@ -145,26 +145,19 @@ function BackgroundRemovalModal({
       const response = await fetch(image.src);
       const blob = await response.blob();
 
-      // Simulate progress updates since the library doesn't provide progress
-      const progressInterval = setInterval(() => {
-        setProgress((prev) => {
-          if (prev >= 90) {
-            clearInterval(progressInterval);
-            return 90;
-          }
-          return prev + 10;
-        });
-      }, 200);
+      // Remove simulated progress since we now use the library's progress callback
 
       const processedBlob = await removeBackground(blob, {
-        model: 'isnet', // Better model for documents and fine details
+        model: 'isnet_quint8', // Less aggressive model for documents to avoid erasing parts
         output: {
           format: 'image/png',
-          quality: 0.8,
+          quality: 1.0, // Higher quality for better accuracy
+        },
+        progress: (key: string, current: number, total: number) => {
+          setProgress(Math.round((current / total) * 100));
         },
       });
 
-      clearInterval(progressInterval);
       setProgress(100);
 
       // Convert to white background
