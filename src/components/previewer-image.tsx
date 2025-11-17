@@ -92,6 +92,7 @@ function BackgroundRemovalModal({
   const [image, setImage] = useState<HTMLImageElement | null>(null);
   const [processedImage, setProcessedImage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [progress, setProgress] = useState(0);
   const [zoom, setZoom] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [draggingImage, setDraggingImage] = useState(false);
@@ -137,11 +138,24 @@ function BackgroundRemovalModal({
     if (!image) return;
 
     setIsProcessing(true);
+    setProgress(0);
     try {
       const { removeBackground } = await import("@imgly/background-removal");
 
       const response = await fetch(image.src);
       const blob = await response.blob();
+
+      // Simulate progress updates since the library doesn't provide progress
+      const progressInterval = setInterval(() => {
+        setProgress((prev) => {
+          if (prev >= 90) {
+            clearInterval(progressInterval);
+            return 90;
+          }
+          return prev + 10;
+        });
+      }, 200);
+
       const processedBlob = await removeBackground(blob, {
         model: 'isnet', // Better model for documents and fine details
         output: {
@@ -149,6 +163,9 @@ function BackgroundRemovalModal({
           quality: 0.8,
         },
       });
+
+      clearInterval(progressInterval);
+      setProgress(100);
 
       // Convert to white background
       const canvas = canvasRef.current;
@@ -173,6 +190,7 @@ function BackgroundRemovalModal({
       console.error("Error removing background:", error);
     } finally {
       setIsProcessing(false);
+      setProgress(0);
     }
   };
 
@@ -196,6 +214,7 @@ function BackgroundRemovalModal({
               src={processedImage}
               alt="Background removed"
               className="absolute top-1/2 left-1/2 object-contain cursor-grab"
+              draggable={false}
               onMouseDown={handleImageMouseDown}
               style={{
                 transform: `translate(-50%, -50%) scale(${zoom}) translate(${position.x}px, ${position.y}px)`,
@@ -206,6 +225,7 @@ function BackgroundRemovalModal({
               src={image.src}
               alt="Original"
               className="absolute top-1/2 left-1/2 object-contain cursor-grab"
+              draggable={false}
               onMouseDown={handleImageMouseDown}
               style={{
                 transform: `translate(-50%, -50%) scale(${zoom}) translate(${position.x}px, ${position.y}px)`,
@@ -239,7 +259,7 @@ function BackgroundRemovalModal({
               onClick={handleRemoveBackground}
               disabled={isProcessing}
             >
-              {isProcessing ? "Processando..." : "Remover Fundo"}
+              {isProcessing ? `Processando... ${progress}%` : "Remover Fundo"}
             </Button>
           )}
           {processedImage && (
