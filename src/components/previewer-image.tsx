@@ -146,22 +146,8 @@ function BackgroundRemovalModal({
       const response = await fetch(image.src);
       const blob = await response.blob();
 
-      // Initialize layout analyzer for text detection
-      await layoutAnalyzer.initialize();
-
-      // Detect text regions in the document
-      const textRegions = await layoutAnalyzer.detectTextRegions(image);
-
-      // Create preservation mask for text areas
-      const maskCanvas = document.createElement('canvas');
-      maskCanvas.width = image.width;
-      maskCanvas.height = image.height;
-      const preservationMask = await layoutAnalyzer.createPreservationMask(image, textRegions, maskCanvas);
-
-      // Apply background removal with text preservation
-      // Note: The @imgly/background-removal library doesn't support custom masks directly
-      // We'll use a two-step approach: first segment, then apply custom processing
-      const segmentedBlob = await removeBackground(blob, {
+      // Simple background removal without text preservation to avoid UI freezing
+      const processedBlob = await removeBackground(blob, {
         model: 'isnet_quint8', // Less aggressive model for documents
         output: {
           format: 'image/png',
@@ -171,9 +157,6 @@ function BackgroundRemovalModal({
           setProgress(Math.round((current / total) * 100));
         },
       });
-
-      // Apply text preservation by compositing with the mask
-      const processedBlob = await applyTextPreservation(segmentedBlob, preservationMask, image);
 
       setProgress(100);
 

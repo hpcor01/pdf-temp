@@ -55,66 +55,10 @@ export class LayoutAnalyzer {
   }
 
   private async basicTextDetection(canvas: HTMLCanvasElement): Promise<TextRegion[]> {
-    const regions: TextRegion[] = [];
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return regions;
-
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const data = imageData.data;
-
-    // Simple edge detection to find potential text areas
-    const edges = new Uint8Array(canvas.width * canvas.height);
-
-    for (let y = 1; y < canvas.height - 1; y++) {
-      for (let x = 1; x < canvas.width - 1; x++) {
-        const idx = (y * canvas.width + x) * 4;
-        const gray = (data[idx]! + data[idx + 1]! + data[idx + 2]!) / 3;
-
-        // Simple Sobel edge detection
-        const idxUp = ((y - 1) * canvas.width + x) * 4;
-        const idxDown = ((y + 1) * canvas.width + x) * 4;
-        const idxLeft = (y * canvas.width + (x - 1)) * 4;
-        const idxRight = (y * canvas.width + (x + 1)) * 4;
-
-        const grayUp = (data[idxUp]! + data[idxUp + 1]! + data[idxUp + 2]!) / 3;
-        const grayDown = (data[idxDown]! + data[idxDown + 1]! + data[idxDown + 2]!) / 3;
-        const grayLeft = (data[idxLeft]! + data[idxLeft + 1]! + data[idxLeft + 2]!) / 3;
-        const grayRight = (data[idxRight]! + data[idxRight + 1]! + data[idxRight + 2]!) / 3;
-
-        const edgeX = grayRight - grayLeft;
-        const edgeY = grayDown - grayUp;
-        const edge = Math.sqrt(edgeX * edgeX + edgeY * edgeY);
-
-        edges[y * canvas.width + x] = edge > 50 ? 255 : 0; // Threshold
-      }
-    }
-
-    // Group edges into regions (simplified clustering)
-    const visited = new Set<number>();
-    const minRegionSize = 100; // Minimum pixels for a text region
-
-    for (let y = 0; y < canvas.height; y++) {
-      for (let x = 0; x < canvas.width; x++) {
-        const idx = y * canvas.width + x;
-        if (edges[idx] === 255 && !visited.has(idx)) {
-          // Flood fill to find connected region
-          const region = this.floodFill(edges, visited, x, y, canvas.width, canvas.height);
-          if (region.length >= minRegionSize) {
-            const bounds = this.getBounds(region, canvas.width);
-            regions.push({
-              x: bounds.minX,
-              y: bounds.minY,
-              width: bounds.maxX - bounds.minX,
-              height: bounds.maxY - bounds.minY,
-              confidence: 0.5, // Low confidence for fallback method
-              label: 'potential_text'
-            });
-          }
-        }
-      }
-    }
-
-    return regions;
+    // For now, return empty regions to avoid performance issues
+    // This disables text detection temporarily to prevent UI freezing
+    console.log('Text detection disabled for performance - returning empty regions');
+    return [];
   }
 
   private floodFill(
