@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { usePreviewer } from "@/providers/previewer-provider";
 import { useKanban } from "@/providers/kanban-provider";
 import { Toast } from "@/components/ui/toast";
+import { layoutAnalyzer, TextRegion } from "@/lib/layout-analysis";
 
 export function PreviewerImage() {
   const {
@@ -145,14 +146,25 @@ function BackgroundRemovalModal({
       const response = await fetch(image.src);
       const blob = await response.blob();
 
-      // Remove simulated progress since we now use the library's progress callback
+      // Initialize layout analyzer for text detection
+      await layoutAnalyzer.initialize();
 
+      // Detect text regions in the document
+      const textRegions = await layoutAnalyzer.detectTextRegions(image);
+
+      // Create preservation mask for text areas
+      const maskCanvas = document.createElement('canvas');
+      const preservationMask = await layoutAnalyzer.createPreservationMask(image, textRegions, maskCanvas);
+
+      // Apply background removal with text preservation
       const processedBlob = await removeBackground(blob, {
-        model: 'isnet_quint8', // Less aggressive model for documents to avoid erasing parts
+        model: 'isnet_quint8', // Less aggressive model for documents
         output: {
           format: 'image/png',
-          quality: 1.0, // Higher quality for better accuracy
+          quality: 1.0,
         },
+        // Use the preservation mask to protect text areas
+        mask: preservationMask,
         progress: (key: string, current: number, total: number) => {
           setProgress(Math.round((current / total) * 100));
         },
