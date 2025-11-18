@@ -17,17 +17,10 @@ export class LayoutAnalyzer {
   async initialize(): Promise<void> {
     if (this.isInitialized) return;
 
-    try {
-      // Initialize the LayoutLMv3 model for document layout analysis
-      this.processor = await pipeline('document-question-answering', 'impira/layoutlm-document-qa', {
-        device: 'webgpu', // Use WebGPU if available, fallback to CPU
-      });
-      this.isInitialized = true;
-    } catch (error) {
-      console.warn('LayoutLMv3 initialization failed, falling back to basic text detection:', error);
-      // Fallback to basic OCR if LayoutLMv3 fails
-      this.isInitialized = true;
-    }
+    // Skip LayoutLMv3 initialization to avoid blocking the UI
+    // Rely on basic text detection which is faster and doesn't freeze the page
+    console.log('Using basic text detection for performance');
+    this.isInitialized = true;
   }
 
   async detectTextRegions(imageElement: HTMLImageElement): Promise<TextRegion[]> {
@@ -50,33 +43,8 @@ export class LayoutAnalyzer {
       // Convert to base64 for processing
       const imageData = canvas.toDataURL('image/png');
 
-      if (this.processor) {
-        // Use LayoutLMv3 for advanced layout analysis
-        const result = await this.processor({
-          image: imageData,
-          question: "What are the text regions in this document?",
-        });
-
-        // Parse the result to extract text regions
-        // Note: This is a simplified parsing - actual implementation would depend on model output format
-        if (result && Array.isArray(result)) {
-          result.forEach((item: any) => {
-            if (item.bbox && item.label === 'text') {
-              regions.push({
-                x: item.bbox[0] * canvas.width,
-                y: item.bbox[1] * canvas.height,
-                width: (item.bbox[2] - item.bbox[0]) * canvas.width,
-                height: (item.bbox[3] - item.bbox[1]) * canvas.height,
-                confidence: item.score || 0.8,
-                label: 'text'
-              });
-            }
-          });
-        }
-      } else {
-        // Fallback: Use basic edge detection for potential text areas
-        regions.push(...await this.basicTextDetection(canvas));
-      }
+      // Use basic edge detection for potential text areas (faster and doesn't freeze UI)
+      regions.push(...await this.basicTextDetection(canvas));
 
     } catch (error) {
       console.error('Error detecting text regions:', error);
