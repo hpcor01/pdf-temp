@@ -7,6 +7,7 @@ import { usePreviewer } from "@/providers/previewer-provider";
 import { useKanban } from "@/providers/kanban-provider";
 import { Toast } from "@/components/ui/toast";
 import { layoutAnalyzer, TextRegion } from "@/lib/layout-analysis";
+import { createWorker } from 'tesseract.js';
 
 export function PreviewerImage() {
   const {
@@ -146,9 +147,9 @@ function BackgroundRemovalModal({
       const response = await fetch(image.src);
       const blob = await response.blob();
 
-      // Simple background removal without text preservation to avoid UI freezing
+      // Use the default model which is more conservative for documents
       const processedBlob = await removeBackground(blob, {
-        model: 'isnet_quint8', // Less aggressive model for documents
+        model: 'isnet', // Default model - more conservative for preserving details
         output: {
           format: 'image/png',
           quality: 1.0,
@@ -218,12 +219,12 @@ function BackgroundRemovalModal({
         // Create image data for the result
         const resultData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
-        // Apply mask: where mask is white (text areas), keep original image
+        // Apply mask: where mask is black (text areas), keep original image
         for (let i = 0; i < resultData.data.length; i += 4) {
           const maskIndex = Math.floor(i / 4) * 4;
           const maskValue = maskData.data[maskIndex] || 0; // Use red channel as mask
 
-          if (maskValue > 128) { // Text area
+          if (maskValue < 128) { // Text area (black in mask)
             // Keep original image pixels
             const x = (i / 4) % canvas.width;
             const y = Math.floor((i / 4) / canvas.width);
