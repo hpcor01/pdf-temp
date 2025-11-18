@@ -154,21 +154,26 @@ function BackgroundRemovalModal({
 
       // Create preservation mask for text areas
       const maskCanvas = document.createElement('canvas');
+      maskCanvas.width = image.width;
+      maskCanvas.height = image.height;
       const preservationMask = await layoutAnalyzer.createPreservationMask(image, textRegions, maskCanvas);
 
       // Apply background removal with text preservation
-      const processedBlob = await removeBackground(blob, {
+      // Note: The @imgly/background-removal library doesn't support custom masks directly
+      // We'll use a two-step approach: first segment, then apply custom processing
+      const segmentedBlob = await removeBackground(blob, {
         model: 'isnet_quint8', // Less aggressive model for documents
         output: {
           format: 'image/png',
           quality: 1.0,
         },
-        // Use the preservation mask to protect text areas
-        mask: preservationMask,
         progress: (key: string, current: number, total: number) => {
           setProgress(Math.round((current / total) * 100));
         },
       });
+
+      // Apply text preservation by compositing with the mask
+      const processedBlob = await applyTextPreservation(segmentedBlob, preservationMask, image);
 
       setProgress(100);
 
@@ -198,6 +203,85 @@ function BackgroundRemovalModal({
       setProgress(0);
     }
   };
+
+  // Helper function to apply text preservation
+  async function applyTextPreservation(segmentedBlob: Blob, maskCanvas: HTMLCanvasElement, originalImage: HTMLImageElement): Promise<Blob> {
+    return new Promise((resolve, reject) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        reject(new Error('Could not get canvas context'));
+        return;
+      }
+
+      canvas.width = originalImage.width;
+      canvas.height = originalImage.height;
+
+      // Load the segmented image
+      const segmentedImg = new Image();
+      segmentedImg.onload = () => {
+        // Draw the segmented image
+        ctx.drawImage(segmentedImg, 0, 0);
+
+        // Get mask data
+        const maskCtx = maskCanvas.getContext('2d');
+        if (!maskCtx) {
+          reject(new Error('Could not get mask canvas context'));
+          return;
+        }
+
+        const maskData = maskCtx.getImageData(0, 0, maskCanvas.width, maskCanvas.height);
+
+        // Create image data for the result
+        const resultData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+        // Apply mask: where mask is white (text areas), keep original image
+        for (let i = 0; i < resultData.data.length; i += 4) {
+          const maskIndex = Math.floor(i / 4) * 4;
+          const maskValue = maskData.data[maskIndex] || 0; // Use red channel as mask
+
+          if (maskValue > 128) { // Text area
+            // Keep original image pixels
+            const x = (i / 4) % canvas.width;
+            const y = Math.floor((i / 4) / canvas.width);
+            const originalPixel = (originalImage.width > x && originalImage.height > y ?
+              getImagePixel(originalImage, x, y) : [255, 255, 255, 255]) as [number, number, number, number];
+
+            const [r, g, b, a] = originalPixel;
+            resultData.data[i] = r;     // R
+            resultData.data[i + 1] = g; // G
+            resultData.data[i + 2] = b; // B
+            resultData.data[i + 3] = 255; // A (fully opaque)
+          }
+          // Non-text areas keep the segmented result
+        }
+
+        ctx.putImageData(resultData, 0, 0);
+        canvas.toBlob((blob) => {
+          if (blob) {
+            resolve(blob);
+          } else {
+            reject(new Error('Could not create blob'));
+          }
+        }, 'image/png');
+      };
+      segmentedImg.onerror = () => reject(new Error('Could not load segmented image'));
+      segmentedImg.src = URL.createObjectURL(segmentedBlob);
+    });
+  }
+
+  // Helper function to get pixel data from image
+  function getImagePixel(img: HTMLImageElement, x: number, y: number): [number, number, number, number] {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return [255, 255, 255, 255];
+
+    canvas.width = img.width;
+    canvas.height = img.height;
+    ctx.drawImage(img, 0, 0);
+    const data = ctx.getImageData(x, y, 1, 1).data;
+    return [data[0], data[1], data[2], data[3]] as [number, number, number, number];
+  }
 
   const handleSave = () => {
     if (processedImage) {

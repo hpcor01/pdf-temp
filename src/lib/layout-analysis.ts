@@ -11,7 +11,7 @@ export interface TextRegion {
 }
 
 export class LayoutAnalyzer {
-  private processor: Pipeline | null = null;
+  private processor: any = null;
   private isInitialized = false;
 
   async initialize(): Promise<void> {
@@ -202,7 +202,7 @@ export class LayoutAnalyzer {
     imageElement: HTMLImageElement,
     textRegions: TextRegion[],
     canvas: HTMLCanvasElement
-  ): Promise<ImageData> {
+  ): Promise<HTMLCanvasElement> {
     const ctx = canvas.getContext('2d');
     if (!ctx) throw new Error('Could not get canvas context');
 
@@ -239,7 +239,8 @@ export class LayoutAnalyzer {
       }
     });
 
-    return maskData;
+    ctx.putImageData(maskData, 0, 0);
+    return canvas;
   }
 }
 
