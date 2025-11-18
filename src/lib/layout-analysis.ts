@@ -100,7 +100,7 @@ export class LayoutAnalyzer {
     for (let y = 1; y < canvas.height - 1; y++) {
       for (let x = 1; x < canvas.width - 1; x++) {
         const idx = (y * canvas.width + x) * 4;
-        const gray = (data[idx] + data[idx + 1] + data[idx + 2]) / 3;
+        const gray = (data[idx]! + data[idx + 1]! + data[idx + 2]!) / 3;
 
         // Simple Sobel edge detection
         const idxUp = ((y - 1) * canvas.width + x) * 4;
@@ -108,10 +108,10 @@ export class LayoutAnalyzer {
         const idxLeft = (y * canvas.width + (x - 1)) * 4;
         const idxRight = (y * canvas.width + (x + 1)) * 4;
 
-        const grayUp = (data[idxUp] + data[idxUp + 1] + data[idxUp + 2]) / 3;
-        const grayDown = (data[idxDown] + data[idxDown + 1] + data[idxDown + 2]) / 3;
-        const grayLeft = (data[idxLeft] + data[idxLeft + 1] + data[idxLeft + 2]) / 3;
-        const grayRight = (data[idxRight] + data[idxRight + 1] + data[idxRight + 2]) / 3;
+        const grayUp = (data[idxUp]! + data[idxUp + 1]! + data[idxUp + 2]!) / 3;
+        const grayDown = (data[idxDown]! + data[idxDown + 1]! + data[idxDown + 2]!) / 3;
+        const grayLeft = (data[idxLeft]! + data[idxLeft + 1]! + data[idxLeft + 2]!) / 3;
+        const grayRight = (data[idxRight]! + data[idxRight + 1]! + data[idxRight + 2]!) / 3;
 
         const edgeX = grayRight - grayLeft;
         const edgeY = grayDown - grayUp;
