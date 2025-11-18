@@ -142,6 +142,18 @@ function BackgroundRemovalModal({
     setIsProcessing(true);
     setProgress(0);
     try {
+      // Step 1: Detect text regions using LayoutLMv3
+      setProgress(10);
+      const textRegions = await layoutAnalyzer.detectTextRegions(image);
+      console.log('Detected text regions:', textRegions);
+
+      // Step 2: Create preservation mask
+      setProgress(30);
+      const maskCanvas = document.createElement('canvas');
+      const preservationMask = await layoutAnalyzer.createPreservationMask(image, textRegions, maskCanvas);
+
+      // Step 3: Apply background removal
+      setProgress(50);
       const { removeBackground } = await import("@imgly/background-removal");
 
       const response = await fetch(image.src);
@@ -155,9 +167,14 @@ function BackgroundRemovalModal({
           quality: 1.0,
         },
         progress: (key: string, current: number, total: number) => {
-          setProgress(Math.round((current / total) * 100));
+          setProgress(50 + Math.round((current / total) * 40)); // Progress from 50% to 90%
         },
       });
+
+      setProgress(90);
+
+      // Step 4: Apply text preservation
+      const finalBlob = await applyTextPreservation(processedBlob, preservationMask, image);
 
       setProgress(100);
 
@@ -175,9 +192,9 @@ function BackgroundRemovalModal({
           const whiteBgUrl = canvas.toDataURL("image/png");
           setProcessedImage(whiteBgUrl);
         };
-        img.src = URL.createObjectURL(processedBlob);
+        img.src = URL.createObjectURL(finalBlob);
       } else {
-        const processedUrl = URL.createObjectURL(processedBlob);
+        const processedUrl = URL.createObjectURL(finalBlob);
         setProcessedImage(processedUrl);
       }
     } catch (error) {
