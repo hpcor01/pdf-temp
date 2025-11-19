@@ -20,7 +20,7 @@ export class LayoutAnalyzer {
       console.log('Initializing LayoutLMv3 for document layout analysis...');
       this.processor = await pipeline('document-question-answering', 'impira/layoutlm-document-qa', {
         device: 'webgpu'
-      });
+      }) as Pipeline;
       console.log('LayoutLMv3 initialized successfully');
       this.isInitialized = true;
     } catch (error) {
@@ -68,25 +68,7 @@ export class LayoutAnalyzer {
         regions.push(...await this.basicTextDetection(canvas));
       }
 
-      // Also use Tesseract for more precise text detection
-      if (this.tesseractWorker) {
-        const result = await this.tesseractWorker.recognize(imageElement);
-        const words = result.data.words || [];
 
-        // Convert Tesseract words to TextRegion format
-        words.forEach((word: any) => {
-          if (word.confidence > 60) { // Only high confidence words
-            regions.push({
-              x: word.bbox.x0,
-              y: word.bbox.y0,
-              width: word.bbox.x1 - word.bbox.x0,
-              height: word.bbox.y1 - word.bbox.y0,
-              confidence: word.confidence / 100,
-              label: 'text'
-            });
-          }
-        });
-      }
 
       // Fallback to basic detection if model fails
       if (regions.length === 0) {
