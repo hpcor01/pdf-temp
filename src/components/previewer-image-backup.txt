@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { usePreviewer } from "@/providers/previewer-provider";
 import { useKanban } from "@/providers/kanban-provider";
 import { Toast } from "@/components/ui/toast";
+import { layoutAnalyzer } from "@/lib/layout-analysis";
 
 export function PreviewerImage() {
   const {
@@ -92,6 +93,7 @@ function BackgroundRemovalModal({
   const [image, setImage] = useState<HTMLImageElement | null>(null);
   const [processedImage, setProcessedImage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [progress, setProgress] = useState(0);
   const [zoom, setZoom] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [draggingImage, setDraggingImage] = useState(false);
@@ -137,17 +139,30 @@ function BackgroundRemovalModal({
     if (!image) return;
 
     setIsProcessing(true);
+    setProgress(0);
     try {
+      // Simplified background removal without text detection
+      setProgress(20);
       const { removeBackground } = await import("@imgly/background-removal");
 
       const response = await fetch(image.src);
       const blob = await response.blob();
+
+      setProgress(40);
+
+      // Use the default model which is more conservative for documents
       const processedBlob = await removeBackground(blob, {
+        model: 'isnet', // Default model - more conservative for preserving details
         output: {
           format: 'image/png',
-          quality: 0.8,
+          quality: 1.0,
+        },
+        progress: (key: string, current: number, total: number) => {
+          setProgress(40 + Math.round((current / total) * 50)); // Progress from 40% to 90%
         },
       });
+
+      setProgress(95);
 
       // Convert to white background
       const canvas = canvasRef.current;
@@ -168,12 +183,17 @@ function BackgroundRemovalModal({
         const processedUrl = URL.createObjectURL(processedBlob);
         setProcessedImage(processedUrl);
       }
+
+      setProgress(100);
     } catch (error) {
       console.error("Error removing background:", error);
     } finally {
       setIsProcessing(false);
+      setProgress(0);
     }
   };
+
+
 
   const handleSave = () => {
     if (processedImage) {
@@ -195,6 +215,7 @@ function BackgroundRemovalModal({
               src={processedImage}
               alt="Background removed"
               className="absolute top-1/2 left-1/2 object-contain cursor-grab"
+              draggable={false}
               onMouseDown={handleImageMouseDown}
               style={{
                 transform: `translate(-50%, -50%) scale(${zoom}) translate(${position.x}px, ${position.y}px)`,
@@ -205,6 +226,7 @@ function BackgroundRemovalModal({
               src={image.src}
               alt="Original"
               className="absolute top-1/2 left-1/2 object-contain cursor-grab"
+              draggable={false}
               onMouseDown={handleImageMouseDown}
               style={{
                 transform: `translate(-50%, -50%) scale(${zoom}) translate(${position.x}px, ${position.y}px)`,
@@ -238,7 +260,7 @@ function BackgroundRemovalModal({
               onClick={handleRemoveBackground}
               disabled={isProcessing}
             >
-              {isProcessing ? "Processando..." : "Remover Fundo"}
+              {isProcessing ? `Processando... ${progress}%` : "Remover Fundo"}
             </Button>
           )}
           {processedImage && (
