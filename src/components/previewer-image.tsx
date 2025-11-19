@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { usePreviewer } from "@/providers/previewer-provider";
 import { useKanban } from "@/providers/kanban-provider";
 import { Toast } from "@/components/ui/toast";
-import { layoutAnalyzer, TextRegion } from "@/lib/layout-analysis";
+import { layoutAnalyzer } from "@/lib/layout-analysis";
 
 export function PreviewerImage() {
   const {
@@ -141,22 +141,14 @@ function BackgroundRemovalModal({
     setIsProcessing(true);
     setProgress(0);
     try {
-      // Step 1: Detect text regions using LayoutLMv3
-      setProgress(10);
-      const textRegions = await layoutAnalyzer.detectTextRegions(image);
-      console.log('Detected text regions:', textRegions);
-
-      // Step 2: Create preservation mask
-      setProgress(30);
-      const maskCanvas = document.createElement('canvas');
-      const preservationMask = await layoutAnalyzer.createPreservationMask(image, textRegions, maskCanvas);
-
-      // Step 3: Apply background removal
-      setProgress(50);
+      // Simplified background removal without text detection
+      setProgress(20);
       const { removeBackground } = await import("@imgly/background-removal");
 
       const response = await fetch(image.src);
       const blob = await response.blob();
+
+      setProgress(40);
 
       // Use the default model which is more conservative for documents
       const processedBlob = await removeBackground(blob, {
@@ -166,16 +158,11 @@ function BackgroundRemovalModal({
           quality: 1.0,
         },
         progress: (key: string, current: number, total: number) => {
-          setProgress(50 + Math.round((current / total) * 40)); // Progress from 50% to 90%
+          setProgress(40 + Math.round((current / total) * 50)); // Progress from 40% to 90%
         },
       });
 
-      setProgress(90);
-
-      // Step 4: Apply text preservation
-      const finalBlob = await applyTextPreservation(processedBlob, preservationMask, image);
-
-      setProgress(100);
+      setProgress(95);
 
       // Convert to white background
       const canvas = canvasRef.current;
@@ -191,11 +178,13 @@ function BackgroundRemovalModal({
           const whiteBgUrl = canvas.toDataURL("image/png");
           setProcessedImage(whiteBgUrl);
         };
-        img.src = URL.createObjectURL(finalBlob);
+        img.src = URL.createObjectURL(processedBlob);
       } else {
-        const processedUrl = URL.createObjectURL(finalBlob);
+        const processedUrl = URL.createObjectURL(processedBlob);
         setProcessedImage(processedUrl);
       }
+
+      setProgress(100);
     } catch (error) {
       console.error("Error removing background:", error);
     } finally {
@@ -204,84 +193,7 @@ function BackgroundRemovalModal({
     }
   };
 
-  // Helper function to apply text preservation
-  async function applyTextPreservation(segmentedBlob: Blob, maskCanvas: HTMLCanvasElement, originalImage: HTMLImageElement): Promise<Blob> {
-    return new Promise((resolve, reject) => {
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      if (!ctx) {
-        reject(new Error('Could not get canvas context'));
-        return;
-      }
 
-      canvas.width = originalImage.width;
-      canvas.height = originalImage.height;
-
-      // Load the segmented image
-      const segmentedImg = new Image();
-      segmentedImg.onload = () => {
-        // Draw the segmented image
-        ctx.drawImage(segmentedImg, 0, 0);
-
-        // Get mask data
-        const maskCtx = maskCanvas.getContext('2d');
-        if (!maskCtx) {
-          reject(new Error('Could not get mask canvas context'));
-          return;
-        }
-
-        const maskData = maskCtx.getImageData(0, 0, maskCanvas.width, maskCanvas.height);
-
-        // Create image data for the result
-        const resultData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-
-        // Apply mask: where mask is black (text areas), keep original image
-        for (let i = 0; i < resultData.data.length; i += 4) {
-          const maskIndex = Math.floor(i / 4) * 4;
-          const maskValue = maskData.data[maskIndex] || 0; // Use red channel as mask
-
-          if (maskValue < 128) { // Text area (black in mask)
-            // Keep original image pixels
-            const x = (i / 4) % canvas.width;
-            const y = Math.floor((i / 4) / canvas.width);
-            const originalPixel = (originalImage.width > x && originalImage.height > y ?
-              getImagePixel(originalImage, x, y) : [255, 255, 255, 255]) as [number, number, number, number];
-
-            const [r, g, b, a] = originalPixel;
-            resultData.data[i] = r;     // R
-            resultData.data[i + 1] = g; // G
-            resultData.data[i + 2] = b; // B
-            resultData.data[i + 3] = 255; // A (fully opaque)
-          }
-          // Non-text areas keep the segmented result
-        }
-
-        ctx.putImageData(resultData, 0, 0);
-        canvas.toBlob((blob) => {
-          if (blob) {
-            resolve(blob);
-          } else {
-            reject(new Error('Could not create blob'));
-          }
-        }, 'image/png');
-      };
-      segmentedImg.onerror = () => reject(new Error('Could not load segmented image'));
-      segmentedImg.src = URL.createObjectURL(segmentedBlob);
-    });
-  }
-
-  // Helper function to get pixel data from image
-  function getImagePixel(img: HTMLImageElement, x: number, y: number): [number, number, number, number] {
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return [255, 255, 255, 255];
-
-    canvas.width = img.width;
-    canvas.height = img.height;
-    ctx.drawImage(img, 0, 0);
-    const data = ctx.getImageData(x, y, 1, 1).data;
-    return [data[0], data[1], data[2], data[3]] as [number, number, number, number];
-  }
 
   const handleSave = () => {
     if (processedImage) {

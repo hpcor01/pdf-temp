@@ -30,57 +30,10 @@ export class LayoutAnalyzer {
   }
 
   async detectTextRegions(imageElement: HTMLImageElement): Promise<TextRegion[]> {
-    if (!this.isInitialized) {
-      await this.initialize();
-    }
-
-    const regions: TextRegion[] = [];
-
-    try {
-      // Create a canvas to process the image
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      if (!ctx) throw new Error('Could not get canvas context');
-
-      canvas.width = imageElement.width;
-      canvas.height = imageElement.height;
-      ctx.drawImage(imageElement, 0, 0);
-
-      // Convert to base64 for processing
-      const imageData = canvas.toDataURL('image/png');
-
-      // Use LayoutLMv3 for document layout analysis
-      if (this.processor) {
-        const result = await this.processor({
-          image: imageData,
-          question: "What are the text regions in this document?"
-        });
-
-        // Parse the result to extract text regions
-        // LayoutLMv3 returns structured data about document elements
-        console.log('LayoutLMv3 result:', result);
-
-        // For now, we'll use a simplified approach to extract regions
-        // In a full implementation, you'd parse the model's output more thoroughly
-        regions.push(...this.parseLayoutResult(result, imageElement));
-      } else {
-        // Fallback to basic detection if model fails
-        regions.push(...await this.basicTextDetection(canvas));
-      }
-
-
-
-      // Fallback to basic detection if model fails
-      if (regions.length === 0) {
-        regions.push(...await this.basicTextDetection(canvas));
-      }
-
-    } catch (error) {
-      console.error('Error detecting text regions:', error);
-      // Return empty array on error
-    }
-
-    return regions;
+    // Temporarily disable text detection to ensure background removal works
+    // Return empty regions to avoid interfering with background removal
+    console.log('Text detection disabled - returning empty regions for background removal');
+    return [];
   }
 
   private parseLayoutResult(result: any, imageElement: HTMLImageElement): TextRegion[] {
