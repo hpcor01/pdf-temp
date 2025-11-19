@@ -1,4 +1,3 @@
-import * as tf from '@tensorflow/tfjs';
 import { pipeline, Pipeline } from '@huggingface/transformers';
 
 export interface TextRegion {
@@ -19,7 +18,9 @@ export class LayoutAnalyzer {
 
     try {
       console.log('Initializing LayoutLMv3 for document layout analysis...');
-      this.processor = await pipeline('document-question-answering', 'impira/layoutlm-document-qa');
+      this.processor = await pipeline('document-question-answering', 'impira/layoutlm-document-qa', {
+        device: 'webgpu'
+      });
       console.log('LayoutLMv3 initialized successfully');
       this.isInitialized = true;
     } catch (error) {
@@ -67,6 +68,31 @@ export class LayoutAnalyzer {
         regions.push(...await this.basicTextDetection(canvas));
       }
 
+      // Also use Tesseract for more precise text detection
+      if (this.tesseractWorker) {
+        const result = await this.tesseractWorker.recognize(imageElement);
+        const words = result.data.words || [];
+
+        // Convert Tesseract words to TextRegion format
+        words.forEach((word: any) => {
+          if (word.confidence > 60) { // Only high confidence words
+            regions.push({
+              x: word.bbox.x0,
+              y: word.bbox.y0,
+              width: word.bbox.x1 - word.bbox.x0,
+              height: word.bbox.y1 - word.bbox.y0,
+              confidence: word.confidence / 100,
+              label: 'text'
+            });
+          }
+        });
+      }
+
+      // Fallback to basic detection if model fails
+      if (regions.length === 0) {
+        regions.push(...await this.basicTextDetection(canvas));
+      }
+
     } catch (error) {
       console.error('Error detecting text regions:', error);
       // Return empty array on error
@@ -87,31 +113,31 @@ export class LayoutAnalyzer {
         const answer = result.answer;
 
         // For demonstration, create regions based on common document areas
-        // In practice, you'd parse the actual bounding boxes from the model
+        // But make them less aggressive to avoid over-preservation
         regions.push({
           x: 0,
           y: 0,
           width: imageElement.width,
-          height: imageElement.height * 0.1, // Header area
-          confidence: 0.8,
+          height: imageElement.height * 0.05, // Smaller header area
+          confidence: 0.6,
           label: 'header'
         });
 
         regions.push({
           x: 0,
-          y: imageElement.height * 0.1,
+          y: imageElement.height * 0.05,
           width: imageElement.width,
-          height: imageElement.height * 0.8, // Main content
-          confidence: 0.9,
+          height: imageElement.height * 0.9, // Main content
+          confidence: 0.7,
           label: 'content'
         });
 
         regions.push({
           x: 0,
-          y: imageElement.height * 0.9,
+          y: imageElement.height * 0.95,
           width: imageElement.width,
-          height: imageElement.height * 0.1, // Footer area
-          confidence: 0.7,
+          height: imageElement.height * 0.05, // Smaller footer area
+          confidence: 0.5,
           label: 'footer'
         });
       }

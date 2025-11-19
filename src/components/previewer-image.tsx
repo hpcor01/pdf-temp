@@ -7,7 +7,6 @@ import { usePreviewer } from "@/providers/previewer-provider";
 import { useKanban } from "@/providers/kanban-provider";
 import { Toast } from "@/components/ui/toast";
 import { layoutAnalyzer, TextRegion } from "@/lib/layout-analysis";
-import { createWorker } from 'tesseract.js';
 
 export function PreviewerImage() {
   const {
