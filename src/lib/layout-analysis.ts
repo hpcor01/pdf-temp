@@ -10,7 +10,7 @@ export interface TextRegion {
 }
 
 export class LayoutAnalyzer {
-  private processor: Pipeline | null = null;
+  private processor: any = null;
   private isInitialized = false;
 
   async initialize(): Promise<void> {
@@ -18,9 +18,9 @@ export class LayoutAnalyzer {
 
     try {
       console.log('Initializing LayoutLMv3 for document layout analysis...');
-      this.processor = await pipeline('document-question-answering', 'impira/layoutlm-document-qa', {
+      this.processor = await (pipeline as any)('document-question-answering', 'impira/layoutlm-document-qa', {
         device: 'webgpu'
-      }) as Pipeline;
+      });
       console.log('LayoutLMv3 initialized successfully');
       this.isInitialized = true;
     } catch (error) {
