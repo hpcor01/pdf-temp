@@ -1,0 +1,4 @@
+{
+  "name": "AI Background Remover",
+  "description": "A tool to automatically remove backgrounds from images using Gemini 2.5 Flash Image."
+}
