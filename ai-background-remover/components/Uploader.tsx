@@ -21,10 +21,10 @@ export const Uploader: React.FC<UploaderProps> = ({ onFileSelect }) => {
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
-    
+
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       const file = e.dataTransfer.files[0];
-      if (file.type.startsWith('image/')) {
+      if (file && file.type.startsWith('image/')) {
         onFileSelect(file);
       } else {
         alert("Please upload an image file.");
