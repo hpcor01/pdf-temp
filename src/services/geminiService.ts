@@ -4,20 +4,26 @@ import { GoogleGenAI } from "@google/genai";
 // API Key is injected via process.env.API_KEY
 const apiKey = process.env.API_KEY;
 if (!apiKey) {
-  throw new Error('API_KEY environment variable is not set');
+  throw new Error("API_KEY environment variable is not set");
 }
 const ai = new GoogleGenAI({ apiKey });
 
 /**
  * Converts a File object to a Base64 string.
  */
-export const fileToGenerativePart = async (file: File): Promise<{ inlineData: { data: string; mimeType: string } }> => {
+export const fileToGenerativePart = async (
+  file: File
+): Promise<{ inlineData: { data: string; mimeType: string } }> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onloadend = () => {
-      if (typeof reader.result === 'string') {
+      if (typeof reader.result === "string") {
         // Remove the data URL prefix (e.g., "data:image/jpeg;base64,")
-        const base64Data = reader.result.split(',')[1];
+        const base64Data = reader.result.split(",")[1];
+        if (!base64Data) {
+          reject(new Error("Invalid data URL format"));
+          return;
+        }
         resolve({
           inlineData: {
             data: base64Data,
@@ -25,7 +31,7 @@ export const fileToGenerativePart = async (file: File): Promise<{ inlineData: { 
           },
         });
       } else {
-        reject(new Error('Failed to read file as string'));
+        reject(new Error("Failed to read file as string"));
       }
     };
     reader.onerror = reject;
@@ -41,7 +47,7 @@ export const removeBackground = async (file: File): Promise<string> => {
     const imagePart = await fileToGenerativePart(file);
 
     // Using gemini-2.5-flash-image for image editing tasks
-    const model = 'gemini-2.5-flash-image';
+    const model = "gemini-2.5-flash-image";
 
     const response = await ai.models.generateContent({
       model: model,
@@ -56,10 +62,15 @@ export const removeBackground = async (file: File): Promise<string> => {
     });
 
     // Iterate through parts to find the image output
-    if (response.candidates && response.candidates[0] && response.candidates[0].content && response.candidates[0].content.parts) {
+    if (
+      response.candidates &&
+      response.candidates[0] &&
+      response.candidates[0].content &&
+      response.candidates[0].content.parts
+    ) {
       for (const part of response.candidates[0].content.parts) {
         if (part.inlineData && part.inlineData.data) {
-          const mimeType = part.inlineData.mimeType || 'image/png';
+          const mimeType = part.inlineData.mimeType || "image/png";
           return `data:${mimeType};base64,${part.inlineData.data}`;
         }
       }
