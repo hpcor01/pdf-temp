@@ -498,3 +498,4 @@ function CropModal({
       </div>
     </div>
   );
+}
