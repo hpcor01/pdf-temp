@@ -79,3 +79,4 @@ export const Uploader: React.FC<UploaderProps> = ({ onFileSelect }) => {
     </div>
   );
 };
+
