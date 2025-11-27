@@ -34,7 +34,10 @@ export const Uploader: React.FC<UploaderProps> = ({ onFileSelect }) => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      onFileSelect(e.target.files[0]);
+      const file = e.target.files[0];
+      if (file) {
+        onFileSelect(file);
+      }
     }
   };
 
