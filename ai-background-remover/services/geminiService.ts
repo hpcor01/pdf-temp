@@ -7,13 +7,19 @@ const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 /**
  * Converts a File object to a Base64 string.
  */
-export const fileToGenerativePart = async (file: File): Promise<{ inlineData: { data: string; mimeType: string } }> => {
+export const fileToGenerativePart = async (
+  file: File
+): Promise<{ inlineData: { data: string; mimeType: string } }> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onloadend = () => {
       const base64String = reader.result as string;
       // Remove the data URL prefix (e.g., "data:image/jpeg;base64,")
-      const base64Data = base64String.split(',')[1];
+      const base64Data = base64String.split(",")[1];
+      if (!base64Data) {
+        reject(new Error("Failed to extract base64 data from file"));
+        return;
+      }
       resolve({
         inlineData: {
           data: base64Data,
@@ -34,7 +40,7 @@ export const removeBackground = async (file: File): Promise<string> => {
     const imagePart = await fileToGenerativePart(file);
 
     // Using gemini-2.5-flash-image for image editing tasks
-    const model = 'gemini-2.5-flash-image';
+    const model = "gemini-2.5-flash-image";
 
     const response = await ai.models.generateContent({
       model: model,
@@ -52,7 +58,7 @@ export const removeBackground = async (file: File): Promise<string> => {
     if (response.candidates && response.candidates[0].content.parts) {
       for (const part of response.candidates[0].content.parts) {
         if (part.inlineData && part.inlineData.data) {
-          const mimeType = part.inlineData.mimeType || 'image/png';
+          const mimeType = part.inlineData.mimeType || "image/png";
           return `data:${mimeType};base64,${part.inlineData.data}`;
         }
       }
