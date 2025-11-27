@@ -55,7 +55,12 @@ export const removeBackground = async (file: File): Promise<string> => {
     });
 
     // Iterate through parts to find the image output
-    if (response.candidates && response.candidates[0].content.parts) {
+    if (
+      response.candidates &&
+      response.candidates[0] &&
+      response.candidates[0].content &&
+      response.candidates[0].content.parts
+    ) {
       for (const part of response.candidates[0].content.parts) {
         if (part.inlineData && part.inlineData.data) {
           const mimeType = part.inlineData.mimeType || "image/png";
