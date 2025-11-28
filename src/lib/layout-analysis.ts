@@ -40,7 +40,7 @@ export class LayoutAnalyzer {
     const regions: TextRegion[] = [];
 
     try {
-      // LayoutLMv3 typically returns answers with bounding boxes
+      // LayoutLMv3 typically returns answers with bounding boxes.
       // This is a simplified parsing - adjust based on actual model output
       if (result && result.answer) {
         // Assuming the model returns structured data about text regions
