@@ -1,15 +1,7 @@
+import { removeBackground as removeBackgroundGemini } from "@/services/geminiService";
 import type { ImageItem } from "@/types/kanban";
 
 export async function removeBackground(src: string): Promise<string> {
-  const apiKey = process.env.NEXT_PUBLIC_REMOVE_BG_API_KEY;
-
-  if (!apiKey) {
-    console.warn(
-      "NEXT_PUBLIC_REMOVE_BG_API_KEY not set, returning original image"
-    );
-    return src;
-  }
-
   try {
     let imageBlob: Blob;
 
@@ -26,32 +18,11 @@ export async function removeBackground(src: string): Promise<string> {
       imageBlob = await response.blob();
     }
 
-    const formData = new FormData();
-    formData.append("image_file", imageBlob, "image.png");
-    formData.append("size", "auto");
+    // Convert blob to File object for Gemini service
+    const file = new File([imageBlob], "image.png", { type: imageBlob.type });
 
-    const apiResponse = await fetch("https://api.remove.bg/v1.0/removebg", {
-      method: "POST",
-      headers: {
-        "X-Api-Key": apiKey,
-      },
-      body: formData,
-    });
-
-    if (!apiResponse.ok) {
-      throw new Error(
-        `Remove.bg API error: ${apiResponse.status} ${apiResponse.statusText}`
-      );
-    }
-
-    const resultBlob = await apiResponse.blob();
-
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = reject;
-      reader.readAsDataURL(resultBlob);
-    });
+    // Use Gemini AI for background removal
+    return await removeBackgroundGemini(file);
   } catch (error) {
     console.error("Error removing background:", error);
     return src;
