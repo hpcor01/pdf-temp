@@ -18,7 +18,7 @@ export async function removeBackground(src: string): Promise<string> {
       imageBlob = await response.blob();
     }
 
-    // Convert blob to File object for Gemini service
+    // Convert blob to File object for Gemini
     const file = new File([imageBlob], "image.png", { type: imageBlob.type });
 
     // Use Gemini AI for background removal
