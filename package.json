@@ -39,7 +39,7 @@
     ]
   },
   "dependencies": {
-    "@google/genai": "^1.30.0",
+    "@google/generative-ai": "^0.21.0",
     "@hello-pangea/dnd": "^18.0.1",
     "@huggingface/transformers": "^3.7.6",
 

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import type { VersionResponse } from "@/types/api-update";
-import { removeImageBackground } from "@/lib/services/geminiService";
+import type { VersionResponse } from "@/types/api-update.d";
+import { removeImageBackground } from "@/services/geminiService";
 
 /**
  * GET /api/version

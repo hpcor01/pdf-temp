@@ -6,7 +6,7 @@ const apiKey = process.env.GEMINI_API_KEY;
 if (!apiKey) {
   throw new Error("GEMINI_API_KEY environment variable is not set");
 }
-const ai = new GoogleGenAI({ apiKey });
+const ai = new GoogleGenerativeAI({ apiKey });
 
 /**
  * Converts a File object to a Base64 string.
@@ -82,3 +82,5 @@ export const removeBackground = async (file: File): Promise<string> => {
     throw error;
   }
 };
+
+export const removeImageBackground = removeBackground;
