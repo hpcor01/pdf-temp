@@ -19,7 +19,7 @@ function extractOriginalImageUrl(nextImageUrl: string): string {
 function loadImage(src: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const img = new Image();
-    if (src.startsWith("http")) img.crossOrigin = "anonymous";
+    if (src.startsWith("http")) img.crossOrigin = "*";
     img.onload = () => resolve(img);
     img.onerror = (err) => reject(err);
     img.src = src;

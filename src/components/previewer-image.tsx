@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { usePreviewer } from "@/providers/previewer-provider";
 import { useKanban } from "@/providers/kanban-provider";
 import { Toast } from "@/components/ui/toast";
+import { layoutAnalyzer } from "@/lib/layout-analysis";
 
 export function PreviewerImage() {
   const {
@@ -92,6 +93,12 @@ function BackgroundRemovalModal({
   const [image, setImage] = useState<HTMLImageElement | null>(null);
   const [processedImage, setProcessedImage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [zoom, setZoom] = useState(1);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [draggingImage, setDraggingImage] = useState(false);
+  const [startPos, setStartPos] = useState({ x: 0, y: 0 });
+  const [startPosition, setStartPosition] = useState(position);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   // Carregar imagem
@@ -102,25 +109,70 @@ function BackgroundRemovalModal({
     img.src = imageSrc;
   }, [imageSrc]);
 
+  // Reset handlers
+  useEffect(() => {
+    const handleUp = () => {
+      setDraggingImage(false);
+    };
+    window.addEventListener("mouseup", handleUp);
+    return () => window.removeEventListener("mouseup", handleUp);
+  }, []);
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (draggingImage) {
+      const dx = e.clientX - startPos.x;
+      const dy = e.clientY - startPos.y;
+      setPosition({
+        x: startPosition.x + dx,
+        y: startPosition.y + dy,
+      });
+    }
+  };
+
+  const handleImageMouseDown = (e: React.MouseEvent) => {
+    setDraggingImage(true);
+    setStartPos({ x: e.clientX, y: e.clientY });
+    setStartPosition(position);
+  };
+
   const handleRemoveBackground = async () => {
     if (!image) return;
 
     setIsProcessing(true);
+    setProgress(0);
     try {
-      const { removeBackground } = await import("@imgly/background-removal");
+      console.log("Starting background removal with Gemini...");
+      setProgress(20);
 
+      // Convert image src to File object
       const response = await fetch(image.src);
       const blob = await response.blob();
-      const processedBlob = await removeBackground(blob);
-      const processedUrl = URL.createObjectURL(processedBlob);
+      const file = new File([blob], "image.png", { type: blob.type });
+      console.log("File created:", file);
 
-      setProcessedImage(processedUrl);
+      setProgress(40);
+
+      // Use Gemini AI for background removal
+      console.log("Importing Gemini service...");
+      const { removeBackground } = await import("@/services/geminiService");
+      console.log("Gemini service imported, calling removeBackground...");
+      const processedImageUrl = await removeBackground(file);
+      console.log("Background removal completed:", processedImageUrl);
+
+      setProgress(95);
+
+      setProcessedImage(processedImageUrl);
+      setProgress(100);
     } catch (error) {
       console.error("Error removing background:", error);
+      alert(`Erro ao remover fundo: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
     } finally {
       setIsProcessing(false);
+      setProgress(0);
     }
   };
+
+
 
   const handleSave = () => {
     if (processedImage) {
@@ -131,20 +183,33 @@ function BackgroundRemovalModal({
 
   return (
     <div className="fixed inset-0 z-[9999] bg-black/80 flex items-center justify-center select-none">
-      <div className="relative w-[95%] h-[90%] bg-[#18181B] overflow-hidden rounded-2xl border border-gray-700 flex flex-col">
+      <div
+        className="relative w-[95%] h-[90%] bg-[#18181B] overflow-hidden rounded-2xl border border-gray-700 flex flex-col"
+        onMouseMove={handleMouseMove}
+      >
         {/* Imagem */}
         <div className="flex-1 flex items-center justify-center p-4">
           {processedImage ? (
             <img
               src={processedImage}
               alt="Background removed"
-              className="max-w-full max-h-full object-contain"
+              className="absolute top-1/2 left-1/2 object-contain cursor-grab"
+              draggable={false}
+              onMouseDown={handleImageMouseDown}
+              style={{
+                transform: `translate(-50%, -50%) scale(${zoom}) translate(${position.x}px, ${position.y}px)`,
+              }}
             />
           ) : image ? (
             <img
               src={image.src}
               alt="Original"
-              className="max-w-full max-h-full object-contain"
+              className="absolute top-1/2 left-1/2 object-contain cursor-grab"
+              draggable={false}
+              onMouseDown={handleImageMouseDown}
+              style={{
+                transform: `translate(-50%, -50%) scale(${zoom}) translate(${position.x}px, ${position.y}px)`,
+              }}
             />
           ) : (
             <div className="text-white">Carregando imagem...</div>
@@ -153,13 +218,28 @@ function BackgroundRemovalModal({
 
         {/* Controles */}
         <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-4 bg-black/70 rounded-full px-6 py-3 items-center">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setZoom((z) => Math.max(0.2, z - 0.1))}
+          >
+            <ZoomOut className="w-4 h-4" />
+          </Button>
+          <span className="text-white">{Math.round(zoom * 100)}%</span>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setZoom((z) => Math.min(3, z + 0.1))}
+          >
+            <ZoomIn className="w-4 h-4" />
+          </Button>
           {!processedImage && (
             <Button
               size="sm"
               onClick={handleRemoveBackground}
               disabled={isProcessing}
             >
-              {isProcessing ? "Processando..." : "Remover Fundo"}
+              {isProcessing ? `Processando... ${progress}%` : "Remover Fundo"}
             </Button>
           )}
           {processedImage && (

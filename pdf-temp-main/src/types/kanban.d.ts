@@ -19,6 +19,8 @@ export interface Column {
 export interface KanbanContextType {
   columns: Column[];
   selectedColumns: Record<string, boolean>;
+  isRemoveBgChecked: boolean;
+  setIsRemoveBgChecked: (checked: boolean) => void;
   addColumn: (title: string) => void;
   removeColumn: (id: string) => void;
   renameColumn: (id: string, title: string) => void;

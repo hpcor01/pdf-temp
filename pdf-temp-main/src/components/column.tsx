@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { useLanguageKey } from "@/hooks/use-i18n";
+import { generateUUID } from "@/lib/utils";
 import { useKanban } from "@/providers/kanban-provider";
 import type { Column, ImageItem } from "@/types/kanban";
 
@@ -96,7 +97,7 @@ const ColumnComponent = memo(
                 new URL(url).pathname.split("/").pop() || "image"
               ) || "image";
             const newImage = {
-              id: crypto.randomUUID(),
+              id: generateUUID(),
               src: url,
               fileName,
               rotation: 0,
@@ -112,7 +113,7 @@ const ColumnComponent = memo(
         const imageFiles = files.filter((f) => f.type.startsWith("image/"));
         if (imageFiles.length > 0) {
           const newImages = imageFiles.map((file) => ({
-            id: crypto.randomUUID(),
+            id: generateUUID(),
             src: URL.createObjectURL(file),
             fileName: file.name,
             rotation: 0,
