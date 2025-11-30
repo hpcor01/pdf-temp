@@ -141,7 +141,7 @@ function BackgroundRemovalModal({
     setIsProcessing(true);
     setProgress(0);
     try {
-      console.log("Starting background removal with Gemini...");
+      console.log("Starting background removal...");
       setProgress(20);
 
       // Convert image src to File object
@@ -152,11 +152,19 @@ function BackgroundRemovalModal({
 
       setProgress(40);
 
-      // Use Gemini AI for background removal
-      console.log("Importing Gemini service...");
-      const { removeBackground } = await import("@/services/geminiService");
-      console.log("Gemini service imported, calling removeBackground...");
-      const processedImageUrl = await removeBackground(file);
+      // Use API endpoint for background removal
+      const form = new FormData();
+      form.append("file", file);
+
+      const res = await fetch("/api/remove-bg", {
+        method: "POST",
+        body: form,
+      });
+
+      if (!res.ok) throw new Error("Erro ao remover fundo");
+
+      const processedBlob = await res.blob();
+      const processedImageUrl = URL.createObjectURL(processedBlob);
       console.log("Background removal completed:", processedImageUrl);
 
       setProgress(95);

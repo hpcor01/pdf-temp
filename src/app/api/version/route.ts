@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import type { VersionResponse } from "@/types/api-update";
+import { removeImageBackground } from "@/lib/services/geminiService";
 
 /**
  * GET /api/version
@@ -27,3 +28,34 @@ export async function GET(): Promise<NextResponse<VersionResponse>> {
 }
 
 export const dynamic = "force-dynamic"; // Ensure this route is never cached
+
+export async function POST(req: Request) {
+  try {
+    const form = await req.formData();
+    const file = form.get("file") as File;
+
+    if (!file) {
+      return NextResponse.json(
+        { error: "Nenhum arquivo enviado" },
+        { status: 400 }
+      );
+    }
+
+    // Chama o Gemini no servidor
+    const result = await removeImageBackground(file);
+
+    // Retorna a imagem já com fundo removido
+    return new NextResponse(result, {
+      status: 200,
+      headers: {
+        "Content-Type": "image/png",
+      }
+    });
+  } catch (error) {
+    console.error("Erro no Gemini:", error);
+    return NextResponse.json(
+      { error: "Erro ao remover fundo" },
+      { status: 500 }
+    );
+  }
+}
