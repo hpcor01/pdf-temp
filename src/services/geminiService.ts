@@ -1,10 +1,10 @@
 import { GoogleGenAI } from "@google/genai";
 
 // Initialize the client
-// API Key is injected via process.env.API_KEY
-const apiKey = process.env.API_KEY;
+// API Key is injected via process.env.GEMINI_API_KEY
+const apiKey = process.env.GEMINI_API_KEY;
 if (!apiKey) {
-  throw new Error("API_KEY environment variable is not set");
+  throw new Error("GEMINI_API_KEY environment variable is not set");
 }
 const ai = new GoogleGenAI({ apiKey });
 
