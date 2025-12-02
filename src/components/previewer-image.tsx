@@ -212,6 +212,7 @@ function BackgroundRemovalModal({
               alt="Background removed"
               className="absolute top-1/2 left-1/2 object-contain cursor-grab"
               draggable={false}
+              loading="eager"
               onMouseDown={handleImageMouseDown}
               style={{
                 transform: `translate(-50%, -50%) scale(${zoom}) translate(${position.x}px, ${position.y}px)`,
@@ -223,6 +224,7 @@ function BackgroundRemovalModal({
               alt="Original"
               className="absolute top-1/2 left-1/2 object-contain cursor-grab"
               draggable={false}
+              loading="eager"
               onMouseDown={handleImageMouseDown}
               style={{
                 transform: `translate(-50%, -50%) scale(${zoom}) translate(${position.x}px, ${position.y}px)`,
@@ -421,6 +423,7 @@ function CropModal({
             src={image.src}
             alt="Crop"
             draggable={false}
+            loading="eager"
             onMouseDown={handleImageMouseDown}
             className="absolute top-1/2 left-1/2 object-contain cursor-grab"
             style={{
@@ -517,8 +520,7 @@ function CropModal({
           </Button>
         </div>
 
-        <canvas ref={canvasRef} className="hidden" />
-      </div>
+        <canvas ref={canvasRef} className="hidden" />      </div>
     </div>
   );
 }

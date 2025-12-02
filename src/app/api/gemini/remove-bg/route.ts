@@ -27,6 +27,8 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error("Error in gemini/remove-bg API:", errorMessage);
+    console.error("Full error object:", error);
+    console.error("Stack trace:", error instanceof Error ? error.stack : "No stack trace");
     return NextResponse.json(
       { error: "Erro ao remover fundo", details: errorMessage },
       { status: 500 }
