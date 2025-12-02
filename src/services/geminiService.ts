@@ -4,8 +4,12 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 // API Key is injected via process.env.GEMINI_API_KEY
 const apiKey = process.env.GEMINI_API_KEY;
 if (!apiKey) {
-  console.error('Missing GEMINI_API_KEY environment variable. Please set it in your Vercel project settings or .env.local');
-  throw new Error("GEMINI_API_KEY is not configured. Check server logs for details.");
+  console.error(
+    "Missing GEMINI_API_KEY environment variable. Please set it in your Vercel project settings or .env.local"
+  );
+  throw new Error(
+    "GEMINI_API_KEY is not configured. Check server logs for details."
+  );
 }
 const ai = new GoogleGenerativeAI(apiKey);
 
@@ -74,8 +78,8 @@ export const removeBackground = async (file: File): Promise<string> => {
   try {
     const imagePart = await fileToGenerativePart(file);
 
-    // Using gemini-2.0-flash-exp for image editing tasks
-    const model = "gemini-2.0-flash-exp";
+    // Using gemini-1.5-flash for better rate limits and reliability
+    const model = process.env.DEFAULT_AI_MODEL || "gemini-1.5-flash";
 
     const generativeModel = ai.getGenerativeModel({ model: model });
 
