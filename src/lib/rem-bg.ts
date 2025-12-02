@@ -1,14 +1,11 @@
 import type { ImageItem } from "@/types/kanban";
 
 export async function removeBackground(src: string): Promise<string> {
-  const apiKey = process.env.NEXT_PUBLIC_REMOVE_BG_API_KEY;
-
-  if (!apiKey) {
-    console.warn(
-      "NEXT_PUBLIC_REMOVE_BG_API_KEY not set, returning original image"
-    );
-    return src;
-  }
+  // Disabled: Using Gemini for background removal instead
+  console.warn(
+    "Remove.bg service is disabled. Using Gemini for background removal."
+  );
+  return src;
 
   try {
     let imageBlob: Blob;
