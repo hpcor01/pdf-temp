@@ -25,9 +25,10 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error in gemini/remove-bg API:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Error in gemini/remove-bg API:', errorMessage);
     return NextResponse.json(
-      { error: 'Erro ao remover fundo' },
+      { error: 'Erro ao remover fundo', details: errorMessage },
       { status: 500 }
     );
   }

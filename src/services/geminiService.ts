@@ -4,7 +4,8 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 // API Key is injected via process.env.GEMINI_API_KEY
 const apiKey = process.env.GEMINI_API_KEY;
 if (!apiKey) {
-  throw new Error("GEMINI_API_KEY environment variable is not set");
+  console.error('Missing GEMINI_API_KEY environment variable. Please set it in your Vercel project settings or .env.local');
+  throw new Error("GEMINI_API_KEY is not configured. Check server logs for details.");
 }
 const ai = new GoogleGenerativeAI(apiKey);
 

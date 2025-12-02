@@ -161,7 +161,16 @@ function BackgroundRemovalModal({
         body: form,
       });
 
-      if (!res.ok) throw new Error("Erro ao remover fundo");
+      if (!res.ok) {
+        let errorDetail = "Erro desconhecido";
+        try {
+          const errorData = await res.json();
+          errorDetail = errorData.details || errorData.error || "Erro ao processar a imagem";
+        } catch {
+          errorDetail = `Erro do servidor (${res.status})`;
+        }
+        throw new Error(errorDetail);
+      }
 
       const processedBlob = await res.blob();
       const processedImageUrl = URL.createObjectURL(processedBlob);
