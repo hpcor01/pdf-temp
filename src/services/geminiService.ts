@@ -137,19 +137,17 @@ export const removeBackground = async (file: File): Promise<string> => {
  * Simply returns the original image as a data URL.
  */
 const fallbackBackgroundRemoval = async (file: File): Promise<string> => {
-  // Convert file to data URL
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === "string") {
-        resolve(reader.result);
-      } else {
-        reject(new Error("Failed to convert file to data URL"));
-      }
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
+  // Server-side: use arrayBuffer to convert to base64 data URL
+  if (file && typeof file.arrayBuffer === "function") {
+    const ab = await file.arrayBuffer();
+    const buffer = Buffer.from(ab);
+    const base64Data = buffer.toString("base64");
+    const mimeType = file.type || "image/png";
+    return `data:${mimeType};base64,${base64Data}`;
+  }
+
+  // Fallback for other cases (though unlikely in server context)
+  throw new Error("Unsupported file type for fallback background removal");
 };
 
 export const removeImageBackground = removeBackground;
