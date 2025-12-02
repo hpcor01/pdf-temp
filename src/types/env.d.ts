@@ -8,5 +8,7 @@ declare namespace NodeJS {
     NEXT_PUBLIC_VERSION?: string;
     NEXT_PUBLIC_POLL_INTERVAL?: string;
     NEXT_PUBLIC_AUTO_RELOAD_DELAY?: string;
+
+    REMOVE_BG_API_KEY?: string;
   }
 }
