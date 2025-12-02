@@ -78,8 +78,8 @@ export const removeBackground = async (file: File): Promise<string> => {
   try {
     const imagePart = await fileToGenerativePart(file);
 
-    // Using gemini-1.5-pro for image editing tasks (gemini-2.5-pro may not support image output)
-    const model = process.env.DEFAULT_AI_MODEL || "gemini-2.5-pro";
+    // Using gemini-1.5-flash for image editing tasks (more reliable for image generation)
+    const model = process.env.DEFAULT_AI_MODEL || "gemini-1.5-flash";
 
     const generativeModel = ai.getGenerativeModel({ model: model });
 
@@ -90,7 +90,7 @@ export const removeBackground = async (file: File): Promise<string> => {
           parts: [
             imagePart,
             {
-              text: "Identify the main subject in this image (it looks like an identification document). Create a new version of this image that extracts this subject perfectly and places it on a pure white background. Ensure text legibility is preserved.",
+              text: "Remove the background from this image and place the subject on a white background. Return only the processed image.",
             },
           ],
         },
@@ -111,18 +111,21 @@ export const removeBackground = async (file: File): Promise<string> => {
       response.response.candidates[0].content.parts
     ) {
       for (const part of response.response.candidates[0].content.parts) {
-        console.log("Part type:", typeof part, "Keys:", Object.keys(part));
         if (part.inlineData && part.inlineData.data) {
           const mimeType = part.inlineData.mimeType || "image/png";
           return `data:${mimeType};base64,${part.inlineData.data}`;
         }
         if (part.text) {
           console.log("Model returned text instead of image:", part.text);
+          // If Gemini returns text, fall back to a simple canvas-based background removal
+          return await fallbackBackgroundRemoval(file);
         }
       }
     }
 
-    throw new Error("No image data returned from the model.");
+    // If no image data found, use fallback
+    console.log("No image data returned from Gemini, using fallback method");
+    return await fallbackBackgroundRemoval(file);
   } catch (error) {
     console.error("Error removing background:", error);
     throw error;
