@@ -10,5 +10,6 @@ declare namespace NodeJS {
     NEXT_PUBLIC_AUTO_RELOAD_DELAY?: string;
 
     REMOVE_BG_API_KEY?: string;
+    GEMINI_API_KEY?: string;
   }
 }
