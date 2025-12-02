@@ -9,34 +9,61 @@ if (!apiKey) {
 const ai = new GoogleGenerativeAI(apiKey);
 
 /**
- * Converts a File object to a Base64 string.
+ * Converts a File/Blob/Buffer to the shape expected by the Gemini generative API.
+ * Works both in browser (File) and server (Blob/Buffer) contexts.
  */
 export const fileToGenerativePart = async (
-  file: File
+  file: any
 ): Promise<{ inlineData: { data: string; mimeType: string } }> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      if (typeof reader.result === "string") {
-        // Remove the data URL prefix (e.g., "data:image/jpeg;base64,")
-        const base64Data = reader.result.split(",")[1];
-        if (!base64Data) {
-          reject(new Error("Invalid data URL format"));
-          return;
-        }
-        resolve({
-          inlineData: {
-            data: base64Data,
-            mimeType: file.type,
-          },
-        });
-      } else {
-        reject(new Error("Failed to read file as string"));
-      }
+  // Server-side: objects from `formData.get('file')` usually have `arrayBuffer()`
+  if (file && typeof file.arrayBuffer === "function") {
+    const ab = await file.arrayBuffer();
+    const buffer = Buffer.from(ab);
+    const base64Data = buffer.toString("base64");
+    const mimeType = file.type || "image/png";
+    return {
+      inlineData: {
+        data: base64Data,
+        mimeType,
+      },
     };
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
+  }
+
+  // Client-side fallback: FileReader
+  if (typeof window !== "undefined" && typeof FileReader !== "undefined") {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (typeof reader.result === "string") {
+          const base64Data = reader.result.split(",")[1];
+          if (!base64Data) {
+            reject(new Error("Invalid data URL format"));
+            return;
+          }
+          resolve({
+            inlineData: {
+              data: base64Data,
+              mimeType: file.type,
+            },
+          });
+        } else {
+          reject(new Error("Failed to read file as string"));
+        }
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // Buffer fallback
+  if (Buffer.isBuffer(file)) {
+    const base64Data = file.toString("base64");
+    return {
+      inlineData: { data: base64Data, mimeType: "image/png" },
+    };
+  }
+
+  throw new Error("Unsupported file type for conversion to generative part");
 };
 
 /**

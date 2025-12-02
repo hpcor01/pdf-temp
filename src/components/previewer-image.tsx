@@ -156,7 +156,7 @@ function BackgroundRemovalModal({
       const form = new FormData();
       form.append("file", file);
 
-      const res = await fetch("/api/remove-bg", {
+      const res = await fetch("/api/gemini/remove-bg", {
         method: "POST",
         body: form,
       });
