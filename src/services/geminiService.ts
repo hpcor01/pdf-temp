@@ -49,16 +49,20 @@ export const removeBackground = async (file: File): Promise<string> => {
     // Using gemini-2.0-flash-exp for image editing tasks
     const model = "gemini-2.0-flash-exp";
 
-    const response = await ai.models.generateContent({
-      model: model,
-      contents: {
-        parts: [
-          imagePart,
-          {
-            text: "Identify the main subject in this image (it looks like an identification document). Create a new version of this image that extracts this subject perfectly and places it on a pure white background. Ensure text legibility is preserved.",
-          },
-        ],
-      },
+    const generativeModel = ai.getGenerativeModel({ model: model });
+
+    const response = await generativeModel.generateContent({
+      contents: [
+        {
+          role: "user",
+          parts: [
+            imagePart,
+            {
+              text: "Identify the main subject in this image (it looks like an identification document). Create a new version of this image that extracts this subject perfectly and places it on a pure white background. Ensure text legibility is preserved.",
+            },
+          ],
+        },
+      ],
     });
 
     // Iterate through parts to find the image output
