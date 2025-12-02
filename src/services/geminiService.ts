@@ -132,4 +132,24 @@ export const removeBackground = async (file: File): Promise<string> => {
   }
 };
 
+/**
+ * Fallback background removal when Gemini fails to generate image data.
+ * Simply returns the original image as a data URL.
+ */
+const fallbackBackgroundRemoval = async (file: File): Promise<string> => {
+  // Convert file to data URL
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        resolve(reader.result);
+      } else {
+        reject(new Error("Failed to convert file to data URL"));
+      }
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+};
+
 export const removeImageBackground = removeBackground;
