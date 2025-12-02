@@ -78,8 +78,8 @@ export const removeBackground = async (file: File): Promise<string> => {
   try {
     const imagePart = await fileToGenerativePart(file);
 
-    // Using gemini-2.5-pro for image editing tasks
-    const model = process.env.DEFAULT_AI_MODEL || "gemini-2.5-pro";
+    // Using gemini-1.5-pro for image editing tasks (gemini-2.5-pro may not support image output)
+    const model = process.env.DEFAULT_AI_MODEL || "gemini-1.5-pro";
 
     const generativeModel = ai.getGenerativeModel({ model: model });
 
@@ -97,6 +97,12 @@ export const removeBackground = async (file: File): Promise<string> => {
       ],
     });
 
+    // Log the full response for debugging
+    console.log(
+      "Gemini API response:",
+      JSON.stringify(response.response, null, 2)
+    );
+
     // Iterate through parts to find the image output
     if (
       response.response.candidates &&
@@ -105,9 +111,13 @@ export const removeBackground = async (file: File): Promise<string> => {
       response.response.candidates[0].content.parts
     ) {
       for (const part of response.response.candidates[0].content.parts) {
+        console.log("Part type:", typeof part, "Keys:", Object.keys(part));
         if (part.inlineData && part.inlineData.data) {
           const mimeType = part.inlineData.mimeType || "image/png";
           return `data:${mimeType};base64,${part.inlineData.data}`;
+        }
+        if (part.text) {
+          console.log("Model returned text instead of image:", part.text);
         }
       }
     }
