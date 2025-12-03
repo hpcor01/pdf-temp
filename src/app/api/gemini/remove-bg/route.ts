@@ -11,6 +11,7 @@ export async function POST(request: NextRequest) {
     }
 
     const result = await removeBackground(file);
+    console.log("API Route: removeBackground result:", result.substring(0, 100) + "...");
 
     // Convert base64 data URL to buffer
     const base64Data = result.split(",")[1];
@@ -18,6 +19,7 @@ export async function POST(request: NextRequest) {
       throw new Error("Invalid base64 data");
     }
     const buffer = Buffer.from(base64Data, "base64");
+    console.log("API Route: Buffer length:", buffer.length);
 
     return new NextResponse(buffer, {
       headers: {

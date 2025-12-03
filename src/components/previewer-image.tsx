@@ -161,6 +161,9 @@ function BackgroundRemovalModal({
         body: form,
       });
 
+      console.log("Frontend: Response status:", res.status);
+      console.log("Frontend: Response headers:", Object.fromEntries(res.headers.entries()));
+
       if (!res.ok) {
         let errorDetail = "Erro desconhecido";
         try {
@@ -173,6 +176,8 @@ function BackgroundRemovalModal({
       }
 
       const processedBlob = await res.blob();
+      console.log("Frontend: Processed blob size:", processedBlob.size);
+      console.log("Frontend: Processed blob type:", processedBlob.type);
       const processedImageUrl = URL.createObjectURL(processedBlob);
       console.log("Background removal completed:", processedImageUrl);
 
