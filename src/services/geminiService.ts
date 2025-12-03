@@ -78,8 +78,8 @@ export const removeBackground = async (file: File): Promise<string> => {
   try {
     const imagePart = await fileToGenerativePart(file);
 
-    // Using gemini-1.5-flash for image editing tasks (better for image generation and editing)
-    const model = process.env.DEFAULT_AI_MODEL || "gemini-2.0-lite";
+    // Using gemini-2.0-flash-lite for image editing tasks (better for image generation and editing)
+    const model = process.env.DEFAULT_AI_MODEL || "gemini-2.0-flash-lite";
 
     const generativeModel = ai.getGenerativeModel({ model: model });
 
