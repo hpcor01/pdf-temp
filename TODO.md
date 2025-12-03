@@ -1,0 +1,4 @@
+- [x] Update pdf-temp/src/lib/rem-bg.ts to import removeBackground from geminiService
+- [x] Modify removeBackground function to convert src data URL to File and call Gemini service
+- [x] Update removeBackgroundBatch to use the updated removeBackground
+- [ ] Test the functionality
