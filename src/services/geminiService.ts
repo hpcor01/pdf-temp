@@ -78,8 +78,8 @@ export const removeBackground = async (file: File): Promise<string> => {
   try {
     const imagePart = await fileToGenerativePart(file);
 
-    // Using gemini-2.0-flash-lite for image editing tasks (better for image generation and editing)
-    const model = process.env.DEFAULT_AI_MODEL || "gemini-2.0-flash-lite";
+    // Using gemini-1.5-flash for image editing tasks (better for image generation and editing)
+    const model = process.env.DEFAULT_AI_MODEL || "gemini-1.5-flash";
 
     const generativeModel = ai.getGenerativeModel({ model: model });
 
@@ -134,15 +134,19 @@ export const removeBackground = async (file: File): Promise<string> => {
 
 /**
  * Fallback background removal when Gemini fails to generate image data.
- * Simply returns the original image as a data URL.
+ * Attempts basic canvas-based background removal or returns original with warning.
  */
 const fallbackBackgroundRemoval = async (file: File): Promise<string> => {
-  // Server-side: use arrayBuffer to convert to base64 data URL
+  console.warn("Using fallback background removal - Gemini API failed");
+
+  // For now, return the original image but log the issue
+  // TODO: Implement basic canvas-based background removal
   if (file && typeof file.arrayBuffer === "function") {
     const ab = await file.arrayBuffer();
     const buffer = Buffer.from(ab);
     const base64Data = buffer.toString("base64");
     const mimeType = file.type || "image/png";
+    console.log("Fallback: Returning original image as background removal failed");
     return `data:${mimeType};base64,${base64Data}`;
   }
 

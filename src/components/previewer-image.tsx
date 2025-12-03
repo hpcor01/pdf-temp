@@ -145,8 +145,18 @@ function BackgroundRemovalModal({
       setProgress(20);
 
       // Convert image src to File object
-      const response = await fetch(image.src);
-      const blob = await response.blob();
+      let blob: Blob;
+      if (image.src.startsWith('data:')) {
+        // Handle data URLs
+        const response = await fetch(image.src);
+        blob = await response.blob();
+        console.log("Data URL converted to blob:", blob.size, "bytes");
+      } else {
+        // Handle regular URLs
+        const response = await fetch(image.src);
+        blob = await response.blob();
+        console.log("URL fetched to blob:", blob.size, "bytes");
+      }
       const file = new File([blob], "image.png", { type: blob.type });
       console.log("File created:", file);
 
@@ -156,10 +166,16 @@ function BackgroundRemovalModal({
       const form = new FormData();
       form.append("file", file);
 
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+
       const res = await fetch("/api/gemini/remove-bg", {
         method: "POST",
         body: form,
+        signal: controller.signal,
       });
+
+      clearTimeout(timeoutId);
 
       console.log("Frontend: Response status:", res.status);
       console.log("Frontend: Response headers:", Object.fromEntries(res.headers.entries()));
