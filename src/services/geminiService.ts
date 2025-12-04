@@ -1,159 +1,105 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 
-// Initialize the client
-// API Key is injected via process.env.GEMINI_API_KEY
-const apiKey = process.env.GEMINI_API_KEY;
-if (!apiKey) {
-  console.error(
-    "Missing GEMINI_API_KEY environment variable. Please set it in your Vercel project settings or .env.local"
-  );
-  throw new Error(
-    "GEMINI_API_KEY is not configured. Check server logs for details."
-  );
-}
-const ai = new GoogleGenerativeAI(apiKey);
-
-/**
- * Converts a File/Blob/Buffer to the shape expected by the Gemini generative API.
- * Works both in browser (File) and server (Blob/Buffer) contexts.
- */
-export const fileToGenerativePart = async (
-  file: any
-): Promise<{ inlineData: { data: string; mimeType: string } }> => {
-  // Server-side: objects from `formData.get('file')` usually have `arrayBuffer()`
-  if (file && typeof file.arrayBuffer === "function") {
-    const ab = await file.arrayBuffer();
-    const buffer = Buffer.from(ab);
-    const base64Data = buffer.toString("base64");
-    const mimeType = file.type || "image/png";
-    return {
-      inlineData: {
-        data: base64Data,
-        mimeType,
-      },
-    };
-  }
-
-  // Client-side fallback: FileReader
-  if (typeof window !== "undefined" && typeof FileReader !== "undefined") {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        if (typeof reader.result === "string") {
-          const base64Data = reader.result.split(",")[1];
-          if (!base64Data) {
-            reject(new Error("Invalid data URL format"));
-            return;
-          }
-          resolve({
-            inlineData: {
-              data: base64Data,
-              mimeType: file.type,
-            },
-          });
-        } else {
-          reject(new Error("Failed to read file as string"));
-        }
-      };
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-  }
-
-  // Buffer fallback
-  if (Buffer.isBuffer(file)) {
-    const base64Data = file.toString("base64");
-    return {
-      inlineData: { data: base64Data, mimeType: "image/png" },
-    };
-  }
-
-  throw new Error("Unsupported file type for conversion to generative part");
+const getAiClient = () => {
+  const apiKey = process.env.API_KEY;
+  if (!apiKey) throw new Error("API Key not found");
+  return new GoogleGenAI({ apiKey });
 };
 
-/**
- * Sends the image to Gemini to remove the background.
- */
-export const removeBackground = async (file: File): Promise<string> => {
+// Helper to convert blob/url to base64
+export const urlToBase64 = async (url: string): Promise<string> => {
+  const response = await fetch(url);
+  const blob = await response.blob();
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64String = reader.result as string;
+      // Remove data url prefix (e.g., "data:image/jpeg;base64,")
+      resolve(base64String.split(",")[1]);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+};
+
+export const removeBackground = async (imageUrl: string): Promise<string> => {
+  const ai = getAiClient();
+  const base64Data = await urlToBase64(imageUrl);
+
+  const model = "gemini-2.5-flash-image";
+  const prompt =
+    "Remove the background from this image. Return ONLY the object with a white or transparent background. Keep the main subject intact.";
+
   try {
-    const imagePart = await fileToGenerativePart(file);
-
-    // Using gemini-2.0-flash-lite for image editing tasks (higher free limit)
-    const model = process.env.DEFAULT_AI_MODEL || "gemini-2.0-flash-lite";
-
-    const generativeModel = ai.getGenerativeModel({ model: model });
-
-    const response = await generativeModel.generateContent({
-      contents: [
-        {
-          role: "user",
-          parts: [
-            imagePart,
-            {
-              text: "Remove the background from this image completely. Make the background transparent or white. Isolate the main subject and remove all background elements. Return only the edited image with no text or explanations.",
+    const response = await ai.models.generateContent({
+      model: model,
+      contents: {
+        parts: [
+          {
+            inlineData: {
+              mimeType: "image/png",
+              data: base64Data,
             },
-          ],
-        },
-      ],
+          },
+          { text: prompt },
+        ],
+      },
     });
 
-    // Log the full response for debugging
-    console.log(
-      "Gemini API response:",
-      JSON.stringify(response.response, null, 2)
-    );
-
-    // Iterate through parts to find the image output
-    if (
-      response.response.candidates &&
-      response.response.candidates[0] &&
-      response.response.candidates[0].content &&
-      response.response.candidates[0].content.parts
-    ) {
-      for (const part of response.response.candidates[0].content.parts) {
+    // We expect the model to return an image in the response
+    // Iterate through parts to find the image
+    const parts = response.candidates?.[0]?.content?.parts;
+    if (parts) {
+      for (const part of parts) {
         if (part.inlineData && part.inlineData.data) {
-          const mimeType = part.inlineData.mimeType || "image/png";
-          return `data:${mimeType};base64,${part.inlineData.data}`;
-        }
-        if (part.text) {
-          console.log("Model returned text instead of image:", part.text);
-          // If Gemini returns text, fall back to a simple canvas-based background removal
-          return await fallbackBackgroundRemoval(file);
+          return `data:image/png;base64,${part.inlineData.data}`;
         }
       }
     }
 
-    // If no image data found, use fallback
-    console.log("No image data returned from Gemini, using fallback method");
-    return await fallbackBackgroundRemoval(file);
+    throw new Error("No image returned from AI");
   } catch (error) {
-    console.error("Error removing background:", error);
+    console.error("Gemini Background Removal Error:", error);
     throw error;
   }
 };
 
-/**
- * Fallback background removal when Gemini fails to generate image data.
- * Attempts basic canvas-based background removal or returns original with warning.
- */
-const fallbackBackgroundRemoval = async (file: File): Promise<string> => {
-  console.warn("Using fallback background removal - Gemini API failed");
+export const enhanceImage = async (imageUrl: string): Promise<string> => {
+  const ai = getAiClient();
+  const base64Data = await urlToBase64(imageUrl);
 
-  // For now, return the original image but log the issue
-  // TODO: Implement basic canvas-based background removal
-  if (file && typeof file.arrayBuffer === "function") {
-    const ab = await file.arrayBuffer();
-    const buffer = Buffer.from(ab);
-    const base64Data = buffer.toString("base64");
-    const mimeType = file.type || "image/png";
-    console.log(
-      "Fallback: Returning original image as background removal failed"
-    );
-    return `data:${mimeType};base64,${base64Data}`;
+  const model = "gemini-2.5-flash-image";
+  const prompt =
+    "Enhance the sharpness, clarity, and lighting of this image. Make it look professional and high quality. Return the enhanced image.";
+
+  try {
+    const response = await ai.models.generateContent({
+      model: model,
+      contents: {
+        parts: [
+          {
+            inlineData: {
+              mimeType: "image/jpeg",
+              data: base64Data,
+            },
+          },
+          { text: prompt },
+        ],
+      },
+    });
+
+    const parts = response.candidates?.[0]?.content?.parts;
+    if (parts) {
+      for (const part of parts) {
+        if (part.inlineData && part.inlineData.data) {
+          return `data:image/png;base64,${part.inlineData.data}`;
+        }
+      }
+    }
+
+    throw new Error("No image returned from AI");
+  } catch (error) {
+    console.error("Gemini Enhancement Error:", error);
+    throw error;
   }
-
-  // Fallback for other cases (though unlikely in server context)
-  throw new Error("Unsupported file type for fallback background removal");
 };
-
-export const removeImageBackground = removeBackground;
