@@ -22,7 +22,9 @@ export const urlToBase64 = async (url: string): Promise<string> => {
   });
 };
 
-export const removeBackground = async (imageUrl: string): Promise<string> => {
+export const removeImageBackground = async (
+  imageUrl: string
+): Promise<string> => {
   const ai = getAiClient();
   const base64Data = await urlToBase64(imageUrl);
 
