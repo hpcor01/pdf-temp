@@ -1,9 +1,9 @@
-import { GoogleGenAI } from "@google/generative-ai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const getAiClient = () => {
   const apiKey = process.env.API_KEY;
   if (!apiKey) throw new Error("API Key not found");
-  return new GoogleGenAI({ apiKey });
+  return new GoogleGenerativeAI({ apiKey });
 };
 
 // Helper to convert blob/url to base64
