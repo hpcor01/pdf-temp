@@ -22,6 +22,18 @@ export const urlToBase64 = async (url: string): Promise<string> => {
   });
 };
 
+// Helper to convert File to data URL
+export const fileToDataUrl = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      resolve(reader.result as string);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+};
+
 export const removeImageBackground = async (
   imageUrl: string
 ): Promise<string> => {

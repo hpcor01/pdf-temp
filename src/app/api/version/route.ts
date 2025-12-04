@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import type { VersionResponse } from "@/types/api-update.d";
 import { removeImageBackground } from "@/services/geminiService";
+import type { VersionResponse } from "@/types/api-update.d";
 
 /**
  * GET /api/version
@@ -42,14 +42,15 @@ export async function POST(req: Request) {
     }
 
     // Chama o Gemini no servidor
-    const result = await removeImageBackground(file);
+    const dataUrl = await fileToDataUrl(file);
+    const result = await removeImageBackground(dataUrl);
 
     // Retorna a imagem já com fundo removido
     return new NextResponse(result, {
       status: 200,
       headers: {
         "Content-Type": "image/png",
-      }
+      },
     });
   } catch (error) {
     console.error("Erro no Gemini:", error);

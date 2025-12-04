@@ -1,40 +1,10 @@
-import { removeBackground as removeBgGemini } from "@/services/geminiService";
+import { removeImageBackground } from "@/services/geminiService";
 import type { ImageItem } from "@/types/kanban";
 
 export async function removeBackground(src: string): Promise<string> {
   try {
-    // Parse data URL
-    if (!src.startsWith("data:")) {
-      console.warn("Invalid data URL, returning original");
-      return src;
-    }
-
-    const parts = src.split(",");
-    if (parts.length !== 2) {
-      console.warn("Invalid data URL format, returning original");
-      return src;
-    }
-    const mimePart = parts[0];
-    const base64Data = parts[1];
-    if (!mimePart || !base64Data) {
-      console.warn("Invalid data URL parts, returning original");
-      return src;
-    }
-    const mimeType = mimePart.split(":")[1]?.split(";")[0];
-    if (!mimeType) {
-      console.warn("Invalid MIME type, returning original");
-      return src;
-    }
-
-    // Create buffer from base64
-    const buffer = Buffer.from(base64Data, "base64");
-
-    // Create File object using Uint8Array for compatibility
-    const uint8Array = new Uint8Array(buffer);
-    const file = new File([uint8Array], "image.png", { type: mimeType });
-
-    // Call Gemini service
-    const result = await removeBgGemini(file);
+    // Call Gemini service directly with the data URL
+    const result = await removeImageBackground(src);
     return result;
   } catch (error) {
     console.error("Error in removeBackground:", error);
