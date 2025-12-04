@@ -3,7 +3,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 const getAiClient = () => {
   const apiKey = process.env.API_KEY;
   if (!apiKey) throw new Error("API Key not found");
-  return new GoogleGenerativeAI({ apiKey });
+  return new GoogleGenerativeAI(apiKey);
 };
 
 // Helper to convert blob/url to base64
@@ -13,9 +13,13 @@ export const urlToBase64 = async (url: string): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onloadend = () => {
-      const base64String = reader.result as string;
-      // Remove data url prefix (e.g., "data:image/jpeg;base64,")
-      resolve(base64String.split(",")[1]);
+      if (typeof reader.result === "string") {
+        const base64String = reader.result;
+        // Remove data url prefix (e.g., "data:image/jpeg;base64,")
+        resolve(base64String.split(",")[1]);
+      } else {
+        reject(new Error("Failed to read file as data URL"));
+      }
     };
     reader.onerror = reject;
     reader.readAsDataURL(blob);
@@ -40,29 +44,24 @@ export const removeImageBackground = async (
   const ai = getAiClient();
   const base64Data = await urlToBase64(imageUrl);
 
-  const model = "gemini-2.0-flash-image";
+  const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
   const prompt =
     "Remove the background from this image. Return ONLY the object with a white or transparent background. Keep the main subject intact.";
 
   try {
-    const response = await ai.models.generateContent({
-      model: model,
-      contents: {
-        parts: [
-          {
-            inlineData: {
-              mimeType: "image/png",
-              data: base64Data,
-            },
-          },
-          { text: prompt },
-        ],
+    const response = await model.generateContent([
+      {
+        inlineData: {
+          mimeType: "image/png",
+          data: base64Data,
+        },
       },
-    });
+      prompt,
+    ]);
 
     // We expect the model to return an image in the response
     // Iterate through parts to find the image
-    const parts = response.candidates?.[0]?.content?.parts;
+    const parts = response.response.candidates?.[0]?.content?.parts;
     if (parts) {
       for (const part of parts) {
         if (part.inlineData && part.inlineData.data) {
@@ -82,27 +81,22 @@ export const enhanceImage = async (imageUrl: string): Promise<string> => {
   const ai = getAiClient();
   const base64Data = await urlToBase64(imageUrl);
 
-  const model = "gemini-2.0-flash-image";
+  const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
   const prompt =
     "Enhance the sharpness, clarity, and lighting of this image. Make it look professional and high quality. Return the enhanced image.";
 
   try {
-    const response = await ai.models.generateContent({
-      model: model,
-      contents: {
-        parts: [
-          {
-            inlineData: {
-              mimeType: "image/jpeg",
-              data: base64Data,
-            },
-          },
-          { text: prompt },
-        ],
+    const response = await model.generateContent([
+      {
+        inlineData: {
+          mimeType: "image/jpeg",
+          data: base64Data,
+        },
       },
-    });
+      prompt,
+    ]);
 
-    const parts = response.candidates?.[0]?.content?.parts;
+    const parts = response.response.candidates?.[0]?.content?.parts;
     if (parts) {
       for (const part of parts) {
         if (part.inlineData && part.inlineData.data) {

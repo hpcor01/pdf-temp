@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { removeImageBackground } from "@/services/geminiService";
+import { fileToDataUrl, removeImageBackground } from "@/services/geminiService";
 import type { VersionResponse } from "@/types/api-update.d";
 
 /**
