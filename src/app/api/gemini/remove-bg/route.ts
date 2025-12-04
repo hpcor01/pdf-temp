@@ -19,13 +19,13 @@ export async function POST(request: NextRequest) {
       type: file.type,
     });
 
-    const result = await removeBackground(file);
-    console.log("API Route: removeBackground result type:", typeof result);
-    console.log("API Route: removeBackground result length:", result ? result.length : "null");
-    console.log("API Route: removeBackground result starts with:", result ? result.substring(0, 50) : "null");
+    const result = await removeImageBackground(file);
+    console.log("API Route: removeImageBackground result type:", typeof result);
+    console.log("API Route: removeImageBackground result length:", result ? result.length : "null");
+    console.log("API Route: removeImageBackground result starts with:", result ? result.substring(0, 50) : "null");
 
     if (!result) {
-      console.error("API Route: No result from removeBackground");
+      console.error("API Route: No result from removeImageBackground");
       return NextResponse.json({ error: "Failed to process image" }, { status: 500 });
     }
 

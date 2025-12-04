@@ -28,7 +28,7 @@ export const removeImageBackground = async (
   const ai = getAiClient();
   const base64Data = await urlToBase64(imageUrl);
 
-  const model = "gemini-2.5-flash-image";
+  const model = "gemini-2.0-flash-image";
   const prompt =
     "Remove the background from this image. Return ONLY the object with a white or transparent background. Keep the main subject intact.";
 
@@ -70,7 +70,7 @@ export const enhanceImage = async (imageUrl: string): Promise<string> => {
   const ai = getAiClient();
   const base64Data = await urlToBase64(imageUrl);
 
-  const model = "gemini-2.5-flash-image";
+  const model = "gemini-2.0-flash-image";
   const prompt =
     "Enhance the sharpness, clarity, and lighting of this image. Make it look professional and high quality. Return the enhanced image.";
 
